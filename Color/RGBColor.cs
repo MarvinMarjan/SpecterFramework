@@ -3,7 +3,7 @@
 namespace Specter.Color;
 
 
-public struct RGBColor(byte? r = null, byte? g = null, byte? b = null)
+public struct ColorRGB(byte? r = null, byte? g = null, byte? b = null)
 {
 	public byte? r = r;
 	public byte? g = g;

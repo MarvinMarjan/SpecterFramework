@@ -1,4 +1,5 @@
-﻿using Specter.ANSI;
+﻿using System.Reflection.Metadata.Ecma335;
+using Specter.ANSI;
 
 namespace Specter.Color;
 
@@ -14,6 +15,9 @@ public class ColorCodeElement(Color16? code = null) : IANSISequenceElement
 {
 	public Color16? code = code;
 
+
+	public bool IsValid() => code is not null;
+
     public string BuildSequence()
 	{
 		int? intCode = (int?)code;
@@ -28,33 +32,46 @@ public class Color256Element(byte? code = null, ColorLayer layer = ColorLayer.Fo
 	public byte? code = code;
 	public ColorLayer layer = layer;
 
+
+	public bool IsValid() => code is not null;
+
 	public string BuildSequence()
 	{
+		if (code is null)
+			return string.Empty;
+
 		int layerCode = (int)layer;
 
 		return SequenceBuilder.BuildANSIEscapeSequence([
-			layerCode.ToString(), EscapeCodes.Color256TypeCode, code?.ToString()
+			layerCode.ToString(), EscapeCodes.Color256TypeCode, code.ToString()
 		], false);
 	}
 }
 
 
-public class ColorRGBElement(RGBColor color = new(), ColorLayer layer = ColorLayer.Foreground) : IANSISequenceElement
+public class ColorRGBElement(ColorRGB? color = null, ColorLayer layer = ColorLayer.Foreground) : IANSISequenceElement
 {
-	public RGBColor color = color;
+	public ColorRGB? color = color;
 	public ColorLayer layer = layer;
 
 
+	public bool IsValid() => color is not null;
+
 	public string BuildSequence()
 	{
+		if (color is null)
+			return string.Empty;
+
 		int layerCode = (int)layer;
 
-		if (!color.AreAllChannelsNull())
-			color.SetValueToNullChannels(0);
+		var validColor = color ?? new ColorRGB();
+
+		if (!validColor.AreAllChannelsNull())
+			validColor.SetValueToNullChannels(0);
 
 		return SequenceBuilder.BuildANSIEscapeSequence([
 			layerCode.ToString(), EscapeCodes.ColorRGBTypeCode,
-			color.r?.ToString(), color.g?.ToString(), color.b?.ToString()
+			validColor.r?.ToString(), validColor.g?.ToString(), validColor.b?.ToString()
 		], false);
 	}
 }
