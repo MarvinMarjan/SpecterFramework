@@ -1,6 +1,7 @@
 namespace Specter.Color;
 
-public enum ColorCode
+
+public enum Color16
 {
 	FGBlack = 30, BGBlack = 40,
 	FGRed = 31, BGRed = 41,
@@ -26,7 +27,8 @@ public enum ColorCode
 
 public enum ColorMode
 {
-	Bold = 1,
+	Normal,
+	Bold,
 	Dim,
 	Italic,
 	Underline,

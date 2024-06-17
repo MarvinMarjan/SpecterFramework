@@ -2,10 +2,13 @@ using Specter.ANSI;
 
 namespace Specter.Color;
 
+
 public class Painter
 {
-	public static string Paint(string source)
+	public static string Paint(string source, ColorObject? color = null)
 	{
-		return SequenceBuilder.BuildANSIEscapeSequence(new string[] {"1", "90", "255"});
+		color ??= new();
+
+		return color.AsSequence() + source + EscapeCodes.Reset;
 	}
 }
