@@ -32,14 +32,8 @@ public static class SequenceBuilder
 
 		// removes any null or empty value from "codes"
 		var validCodes = (from code in codes where code is not null and not "" select code).ToArray();
-
-		for (int i = 0; i < validCodes.Length; i++)
-		{
-			bool atEnd = i + 1 >= validCodes.Length;
-			string code = validCodes[i];
-
-			builder.Append(code + (!atEnd ? ";" : ""));
-		}
+		
+		builder.Append(string.Join(';', validCodes));
 
 		if (useEscapeCode)
 			builder.Append('m');
