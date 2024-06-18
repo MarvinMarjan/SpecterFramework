@@ -1,5 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using Specter.ANSI;
+﻿using Specter.ANSI;
 
 namespace Specter.Color;
 
@@ -37,7 +36,7 @@ public class Color256Element(byte? code = null, ColorLayer layer = ColorLayer.Fo
 
 	public string BuildSequence()
 	{
-		if (code is null)
+		if (!IsValid())
 			return string.Empty;
 
 		int layerCode = (int)layer;
@@ -59,7 +58,7 @@ public class ColorRGBElement(ColorRGB? color = null, ColorLayer layer = ColorLay
 
 	public string BuildSequence()
 	{
-		if (color is null)
+		if (!IsValid())
 			return string.Empty;
 
 		int layerCode = (int)layer;

@@ -41,8 +41,6 @@ public class ColorObject(IANSISequenceElement? fg, IANSISequenceElement? bg, Col
 	// if "left"'s field is null.
 	public static ColorObject operator+(ColorObject left, ColorObject right)
 	{
-		//bool leftHasForeground = ;
-
 		ColorObject result = new(
 			fg: IANSISequenceElement.IsValid(left.foreground) ? left.foreground : right.foreground,
 			bg: IANSISequenceElement.IsValid(left.background) ? left.background : right.background,

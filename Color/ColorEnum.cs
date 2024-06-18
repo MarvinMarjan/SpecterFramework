@@ -33,7 +33,7 @@ public enum ColorMode
 	Italic,
 	Underline,
 	Blinking,
-	Inverse,
+	Inverse = 7,
 	Hidden,
 	Strike
 }
