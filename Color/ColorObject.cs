@@ -1,4 +1,6 @@
-﻿using Specter.ANSI;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Specter.ANSI;
 
 namespace Specter.Color;
 
@@ -31,6 +33,14 @@ public class ColorObject(IANSISequenceElement? fg, IANSISequenceElement? bg, Col
 	public static ColorObject FromColorMode(ColorMode? mode = null)
 	{
 		return new(null, null, mode);
+	}
+
+
+	public static ColorObject[] ArrayFromColor256Sequence(byte from, byte to)
+	{
+		var numberSequence = Enumerable.Range(from, to - from + 1);
+
+		return (from number in numberSequence select FromColor256((byte)number)).ToArray();
 	}
 
 

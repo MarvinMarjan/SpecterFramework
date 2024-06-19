@@ -55,7 +55,12 @@ public class PatternPainter(ColorPattern? pattern = null) : IPainter
 		{
 			// restart color index when it reaches the colors size
 			if (colorIndex >= colors.Count)
+			{
+				if (validPattern.resetMode == ColorPattern.ResetMode.Revert)
+					colors.Reverse();
+				
 				colorIndex = 0;
+			}
 
 			var color = colors[colorIndex];
 			char ch = source[charIndex];
