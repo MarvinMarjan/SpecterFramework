@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 using Specter.ANSI;
@@ -41,23 +41,39 @@ public class PatternPainter(ColorPattern? pattern = null) : IPainter
 
 	public string Paint(string source)
 	{
-		if (pattern is null || pattern?.length is 0)
+		if (pattern is null)
 			return string.Empty;
 
 		StringBuilder builder = new();
 		ColorPattern validPattern = pattern ?? new();
 
-		List<ColorObject> colors = validPattern.colors;
+		var colors = validPattern.colors;
 
+		uint currentLength = 1;
 
-		for (int charIndex = 0, colorIndex = 0; charIndex < source.Length; charIndex++, colorIndex++)
+		for (int charIndex = 0, colorIndex = 0; charIndex < source.Length; charIndex++)
 		{
-			if (colorIndex == colors.Count)
+			// restart color index when it reaches the colors size
+			if (colorIndex >= colors.Count)
 				colorIndex = 0;
 
-			ColorObject color = colors[colorIndex];
+			var color = colors[colorIndex];
+			char ch = source[charIndex];
 
-			builder.Append(color.AsSequence() + source[charIndex]);
+			if (color.length == 0 || validPattern.ignoreChars.Contains(ch))
+			{
+				builder.Append(ch);
+				continue;
+			}
+
+			// appends the painted character
+			builder.Append(color.obj.AsSequence() + ch);
+
+			if (currentLength++ < color.length)
+				continue;
+
+			currentLength = 1;
+			colorIndex++;
 		}
 
 		builder.Append(EscapeCodes.Reset);
