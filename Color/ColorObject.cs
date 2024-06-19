@@ -34,12 +34,19 @@ public class ColorObject(IANSISequenceElement? fg, IANSISequenceElement? bg, Col
 	}
 
 
-	
+	// use ColorValue fields if a Color16 object is required
+
+    public static implicit operator ColorObject(byte fg) => FromColor256(fg);
+    public static implicit operator ColorObject(ColorRGB fg) => FromColorRGB(fg);
+    public static implicit operator ColorObject(ColorMode mode) => FromColorMode(mode);
 
 
-	// creates a new ColorObject where a field of it has the value of "right"
-	// if "left"'s field is null.
-	public static ColorObject operator+(ColorObject left, ColorObject right)
+
+
+
+    // creates a new ColorObject where a field of it has the value of "right"
+    // if "left"'s field is null.
+    public static ColorObject operator+(ColorObject left, ColorObject right)
 	{
 		ColorObject result = new(
 			fg: IANSISequenceElement.IsValid(left.foreground) ? left.foreground : right.foreground,
