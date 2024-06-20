@@ -1,5 +1,6 @@
 ﻿using Specter.ANSI;
 
+
 namespace Specter.Color;
 
 

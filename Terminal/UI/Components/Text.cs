@@ -1,5 +1,5 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
+
 using Specter.ANSI;
 
 

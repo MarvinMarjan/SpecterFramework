@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+
 using Specter.Color;
+
 
 namespace Specter.Terminal.UI.Components;
 

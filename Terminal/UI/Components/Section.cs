@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.Text;
+﻿using System.Text;
+
 using Specter.ANSI;
-using Specter.Color;
 
 
 namespace Specter.Terminal.UI.Components;

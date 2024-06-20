@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace Specter.Color;
+﻿namespace Specter.Color;
 
 
 public static class ColorValue

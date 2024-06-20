@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Specter.Color;
+﻿namespace Specter.Color;
 
 
 public struct ColorRGB(byte? r = null, byte? g = null, byte? b = null)
