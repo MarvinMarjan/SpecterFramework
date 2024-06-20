@@ -7,8 +7,7 @@ namespace Specter.Color;
 
 public class ColorObject(IANSISequenceElement? fg, IANSISequenceElement? bg, ColorMode? mode)
 {
-	// TODO: this is referencing, not instancing.
-	public static ColorObject Default { get; } = new ColorObject(null, null, null);
+	public static ColorObject Default { get => new(null, null, null); }
 
 	public IANSISequenceElement? foreground = fg;
 	public IANSISequenceElement? background = bg;
