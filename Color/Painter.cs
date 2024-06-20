@@ -48,7 +48,6 @@ public class PatternPainter(ColorPattern? pattern = null) : IPainter
 		ColorPattern validPattern = pattern ?? new();
 
 		var colors = validPattern.colors;
-
 		uint currentLength = 1;
 
 		for (int charIndex = 0, colorIndex = 0; charIndex < source.Length; charIndex++)

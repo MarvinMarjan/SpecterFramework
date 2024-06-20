@@ -29,7 +29,7 @@ public static class SequenceBuilder
 		StringBuilder builder = new();
 
 		if (useEscapeCode)
-			builder.Append(EscapeCodes.Esc + "[");
+			builder.Append(EscapeCodes.DefaultEscapeCode + "[");
 
 		// removes any null or empty value from "codes"
 		var validCodes = (from code in codes where code is not null and not "" select code).ToArray();
