@@ -1,4 +1,7 @@
-﻿using Specter.ANSI;
+﻿using System;
+
+using Specter.ANSI;
+using Specter.OS;
 
 
 namespace Specter.Terminal;
@@ -41,4 +44,14 @@ public static class ControlCodes
 	public static string EraseEntireScreen() => $"{EscapeCodes.EscapeCodeWithController}J";
 	public static string EraseLine(LineErasingMode mode = LineErasingMode.Full)
 		=> $"{EscapeCodes.EscapeCodeWithController}{(int)mode}K";
+}
+
+
+public class Terminal
+{
+	public static void SetEchoEnabled(bool enabled) =>
+		Command.Run($"stty {(enabled ? "" : "-")}echo");
+
+	public static void SetCursorVisible(bool visible) =>
+		Console.CursorVisible = visible;
 }
