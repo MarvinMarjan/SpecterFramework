@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 
 using Specter.Terminal.UI.Components;
@@ -13,6 +14,8 @@ public class App
 	public SectionComponent RootComponent { get; set; } = new(null);
 	public uint MillisecondsDelay = 100;
 
+	public Encoding AppEncoding = new UTF8Encoding();
+
 
 	public App()
 	{
@@ -21,6 +24,8 @@ public class App
 
 		Terminal.SetEchoEnabled(false);
 		Terminal.SetCursorVisible(false);
+		
+		Terminal.SetOutputEncoding(AppEncoding);
 
 		// on CTRL+C pressed
 		Console.CancelKeyPress += delegate { OnExit(); };

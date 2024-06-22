@@ -1,33 +1,50 @@
-﻿using Specter.Color;
+﻿using System.Text;
+
+using Specter.Color;
 
 namespace Specter.Terminal.UI;
 
 
-public struct Border
+public class Border
 {
-	public static Border Default { get => new('|', '-', '+'); }
+	public static Border DefaultASCII { get => new('|', '-', '+'); }
+	public static Border DefaultUTF8 { get => new('│', '─', ' ')
+	{
+		TopLeft = '╭',
+		TopRight = '╮',
+		BottomLeft = '╰',
+		BottomRight = '╯'
+	}; }
 
-	public ColorObject color;
+	public static Border Default { get => Terminal.GetOutputEncoding() switch
+	{
+		ASCIIEncoding => DefaultASCII,
+        UTF8Encoding => DefaultUTF8,
+		_ => DefaultASCII
+	}; }
 
-	public char top;
-	public char bottom;
-	public char left;
-	public char right;
+
+	public ColorObject Color { get; set; }
+
+	public char Top { get; set; }
+	public char Bottom { get; set; }
+	public char Left { get; set; }
+	public char Right { get; set; }
 
 
-	public char topLeft;
-	public char topRight;
-	public char bottomLeft;
-	public char bottomRight;
+	public char TopLeft { get; set; }
+	public char TopRight { get; set; }
+	public char BottomLeft { get; set; }
+	public char BottomRight { get; set; }
 
 
 	public Border(char vertical, char horizontal, char corner, ColorObject? color = null)
 	{
-		this.color = color ?? ColorObject.Default;
+		Color = color ?? ColorObject.Default;
 
-		left = right = vertical;
-		top = bottom = horizontal;
-		topLeft = topRight = bottomLeft = bottomRight = corner;
+		Left = Right = vertical;
+		Top = Bottom = horizontal;
+		TopLeft = TopRight = BottomLeft = BottomRight = corner;
 	}
 
 
@@ -35,33 +52,33 @@ public struct Border
 		=> (edges & (int)edge) == (int)edge;
 
 
-	public readonly char GetBorderCharFromEdgeFlags(int edges)
+	public char GetBorderCharFromEdgeFlags(int edges)
 	{
 		if (HasEdge(edges, Bounds.Edge.TopLeft))
-			return topLeft;
+			return TopLeft;
 
 		if (HasEdge(edges, Bounds.Edge.TopRight))
-			return topRight;
+			return TopRight;
 
 		if (HasEdge(edges, Bounds.Edge.BottomLeft))
-			return bottomLeft;
+			return BottomLeft;
 
 		if (HasEdge(edges, Bounds.Edge.BottomRight))
-			return bottomRight;
+			return BottomRight;
 
 
 
 		if (HasEdge(edges, Bounds.Edge.Top))
-			return top;
+			return Top;
 
 		if (HasEdge(edges, Bounds.Edge.Left))
-			return left;
+			return Left;
 
 		if (HasEdge(edges, Bounds.Edge.Bottom))
-			return bottom;
+			return Bottom;
 
 		if (HasEdge(edges, Bounds.Edge.Right))
-			return right;
+			return Right;
 		
 		return '\0';
 	}

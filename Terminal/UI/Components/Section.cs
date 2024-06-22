@@ -7,16 +7,29 @@ using Specter.Color;
 namespace Specter.Terminal.UI.Components;
 
 
-public class SectionComponent(Component? parent, Point? position = null, Size? size = null)
-	: Component(parent, position)
+public class SectionComponent : Component
 {
 
-	public Size Size { get; set; } = size ?? Size.None;
+	public Size Size { get; set; }
 	public Bounds Bounds { get => Bounds.FromRectangle(Position, Size); }
-	public Border Border { get; set; } = Border.Default;
-	public bool DrawBorder { get; set; } = true;
+	public Border Border { get; set; }
+	public bool DrawBorder { get; set; }
 	
-	public char BackgroundFill { get; set; } = ' ';
+	public char BackgroundFill { get; set; }
+
+
+	public SectionComponent(Component? parent, Point? position = null, Size? size = null)
+		: base(parent, position)
+	{
+		Size = size ?? Size.None;
+
+		Border = Border.Default;
+		Border.Color = Color;
+
+		DrawBorder = true;
+
+		BackgroundFill = ' ';
+	}
 
 
 	protected void DrawAt(ref StringBuilder builder, uint row, uint col)
@@ -24,7 +37,7 @@ public class SectionComponent(Component? parent, Point? position = null, Size? s
 		// draws the border
 		if (DrawBorder && Bounds.IsAtBorder(new Point(row, col) + Position, out int edges))
 		{
-			ColorPainter painter = new(Border.color) { SequenceFinisher = Color.AsSequence() };
+			ColorPainter painter = new(Border.Color) { SequenceFinisher = Color.AsSequence() };
 
 			builder.Append(painter.Paint(new(Border.GetBorderCharFromEdgeFlags(edges), 1)));
 			return;

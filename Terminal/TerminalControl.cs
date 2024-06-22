@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 using Specter.ANSI;
 using Specter.OS;
@@ -52,6 +53,11 @@ public class Terminal
 	public static void SetEchoEnabled(bool enabled) =>
 		Command.Run($"stty {(enabled ? "" : "-")}echo");
 
-	public static void SetCursorVisible(bool visible) =>
-		Console.CursorVisible = visible;
+	public static void SetCursorVisible(bool visible) => Console.CursorVisible = visible;
+	
+	public static void SetOutputEncoding(Encoding encoding) => Console.OutputEncoding = encoding;
+	public static void SetInputEncoding(Encoding encoding) => Console.InputEncoding = encoding;
+
+	public static Encoding GetOutputEncoding() => Console.OutputEncoding;
+	public static Encoding GetInputEncoding() => Console.InputEncoding;
 }

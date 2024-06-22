@@ -10,16 +10,21 @@ namespace Specter.Terminal.UI.Components;
 // Base class of all UI components
 public abstract class Component
 {
-	public Component? Parent { get; set; }
+    //private ColorObject _color = ColorObject.Default;
+
+
+
+    public Component? Parent { get; set; }
 	public List<Component> Childs { get; set; } = [];
 
 	public Point Position { get; set; }
 	public Point RelativePosition { get => Parent is not null ? Parent.RelativePosition + Position : Position; }
 
-	public ColorObject Color { get; set; } = ColorObject.Default;
+    public ColorObject Color { get; set; } = ColorObject.Default;
 
 
-	public Component(Component? parent, Point? position = null)
+
+    public Component(Component? parent, Point? position = null)
 	{
 		Parent = parent;
 		Position = position ?? Point.None;
@@ -34,6 +39,7 @@ public abstract class Component
 	}
 
 	
+
 	public virtual string Draw()
 	{
 		StringBuilder builder = new();
@@ -43,6 +49,7 @@ public abstract class Component
 
 		return builder.ToString();
 	}
+
 
 	public virtual void Update()
 	{
