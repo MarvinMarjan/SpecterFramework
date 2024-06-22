@@ -7,39 +7,40 @@ using Specter.ANSI;
 namespace Specter.Color;
 
 
-public interface IPainter
+public abstract class Painter
 {
-	public string Paint(string source);
+	public string SequenceFinisher { get; set; } = EscapeCodes.Reset;
 
-	public static string Paint(string source, IPainter painter) => painter.Paint(source);
+	public abstract string Paint(string source);
 
 
+	public static string Paint(string source, Painter painter) => painter.Paint(source);
 	public static string Paint(string source, ColorObject color) => Paint(source, new ColorPainter(color));
 	public static string Paint(string source, ColorPattern pattern) => Paint(source, new PatternPainter(pattern));
 }
 
 
-public class ColorPainter(ColorObject? color = null) : IPainter
+public class ColorPainter(ColorObject? color = null) : Painter
 {
 	public ColorObject? color = color;
 
 
-	public string Paint(string source)
+	public override string Paint(string source)
 	{
 		if (color is null)
 			return string.Empty;
 
-		return color.AsSequence() + source + EscapeCodes.Reset;
+		return color.AsSequence() + source + SequenceFinisher;
 	}
 }
 
 
-public class PatternPainter(ColorPattern? pattern = null) : IPainter
+public class PatternPainter(ColorPattern? pattern = null) : Painter
 {
 	public ColorPattern? pattern = pattern;
 
 
-	public string Paint(string source)
+	public override string Paint(string source)
 	{
 		if (pattern is null)
 			return string.Empty;
@@ -80,7 +81,7 @@ public class PatternPainter(ColorPattern? pattern = null) : IPainter
 			colorIndex++;
 		}
 
-		builder.Append(EscapeCodes.Reset);
+		builder.Append(SequenceFinisher);
 
 		return builder.ToString();
 	}
