@@ -6,12 +6,12 @@ namespace Specter.String;
 
 public static class StringColoringExtension
 {
-	public static string Paint(this string str, IPainter painter)
-		=> IPainter.Paint(str, painter);
+	public static string Paint(this string str, Painter painter)
+		=> Painter.Paint(str, painter);
 
 	
-	public static string Paint(this string str, ColorObject color) => IPainter.Paint(str, color);
-	public static string Paint(this string str, ColorPattern pattern) => IPainter.Paint(str, pattern);
+	public static string Paint(this string str, ColorObject color) => Painter.Paint(str, color);
+	public static string Paint(this string str, ColorPattern pattern) => Painter.Paint(str, pattern);
 
 
 	public static string FGRed(this string str) => str.Paint(ColorValue.FGRed);

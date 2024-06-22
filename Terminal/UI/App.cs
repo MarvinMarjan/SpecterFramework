@@ -17,7 +17,8 @@ public class App
 	public App()
 	{
 		RootComponent.Size = new((uint)Console.LargestWindowWidth, (uint)Console.LargestWindowHeight);
-	
+		RootComponent.DrawBorder = false;
+
 		Terminal.SetEchoEnabled(false);
 		Terminal.SetCursorVisible(false);
 
@@ -28,7 +29,7 @@ public class App
 
 	private static void OnExit()
 	{
-		Console.Write(ControlCodes.EraseEntireScreen());
+		Console.Write(ControlCodes.CursorToHome(), ControlCodes.EraseScreen());
 		Terminal.SetEchoEnabled(true);
 		Terminal.SetCursorVisible(true);
 	}
