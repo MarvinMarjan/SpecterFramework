@@ -8,7 +8,7 @@ namespace Specter.Color;
 
 public class ColorObject(IANSISequenceElement? fg, IANSISequenceElement? bg, ColorMode? mode)
 {
-	public static ColorObject Default { get => new(null, null, null); }
+	public static ColorObject None { get => new(null, null, null); }
 
 	public IANSISequenceElement? foreground = fg;
 	public IANSISequenceElement? background = bg;

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 
 using Specter.ANSI;
 
@@ -6,19 +7,25 @@ using Specter.ANSI;
 namespace Specter.Terminal.UI.Components;
 
 
-public class TextComponent(Component? parent, Point? position = null, string? text = null)
-	: Component(parent, position)
+public class TextComponent : Component
 {
-	public string Text { get; set; } = text ?? string.Empty;
+    public InheritableComponentProperty<string> Text { get; set; }
 
 
+    public TextComponent(Component? parent, Point? position = null, string? text = null) : base(parent, position)
+    {
+        Text = text ?? string.Empty;
 
-	public override string Draw()
+		Properties.AddRange([ Text ]);
+    }
+
+
+    public override string Draw()
 	{
 		StringBuilder builder = new();
 
 		builder.Append(ControlCodes.CursorTo(RelativePosition.row, RelativePosition.col));
-		builder.Append(Color.AsSequence());
+		builder.Append(Color.Value.AsSequence());
 
 		builder.Append(Text);
 

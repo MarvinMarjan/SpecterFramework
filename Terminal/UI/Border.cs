@@ -1,30 +1,43 @@
 ﻿using System.Text;
 
-using Specter.Color;
 
-namespace Specter.Terminal.UI;
+namespace Specter.Terminal.UI.Components;
 
 
-public class Border
+public struct BorderCharacters
 {
-	public static Border DefaultASCII { get => new('|', '-', '+'); }
-	public static Border DefaultUTF8 { get => new('│', '─', ' ')
+	public static BorderCharacters UTF8Default
 	{
-		TopLeft = '╭',
-		TopRight = '╮',
-		BottomLeft = '╰',
-		BottomRight = '╯'
-	}; }
+		get
+		{
+			BorderCharacters chars = new();
+			chars.SetBorderCharacters(new UTF8Encoding());
 
-	public static Border Default { get => Terminal.GetOutputEncoding() switch
+			return chars;
+		}
+	}
+
+	public static BorderCharacters ASCIIDefault
 	{
-		ASCIIEncoding => DefaultASCII,
-        UTF8Encoding => DefaultUTF8,
-		_ => DefaultASCII
-	}; }
+		get
+		{
+			BorderCharacters chars = new();
+			chars.SetBorderCharacters(new ASCIIEncoding());
 
+			return chars;
+		}
+	}
 
-	public ColorObject Color { get; set; }
+	public static BorderCharacters Default
+	{
+		get => Terminal.GetOutputEncoding() switch
+		{
+			UTF8Encoding => UTF8Default,
+			ASCIIEncoding => ASCIIDefault,
+			_ => ASCIIDefault
+		};
+	}
+
 
 	public char Top { get; set; }
 	public char Bottom { get; set; }
@@ -38,46 +51,64 @@ public class Border
 	public char BottomRight { get; set; }
 
 
-	public Border(char vertical, char horizontal, char corner, ColorObject? color = null)
+	public void SetBorderCharacters(char vertical, char horizontal, char corner)
 	{
-		Color = color ?? ColorObject.Default;
-
 		Left = Right = vertical;
 		Top = Bottom = horizontal;
 		TopLeft = TopRight = BottomLeft = BottomRight = corner;
 	}
 
 
-	public static bool HasEdge(int edges, Bounds.Edge edge)
-		=> (edges & (int)edge) == (int)edge;
-
-
-	public char GetBorderCharFromEdgeFlags(int edges)
+	public void SetBorderCharacters(Encoding encoding)
 	{
-		if (HasEdge(edges, Bounds.Edge.TopLeft))
+		switch (encoding)
+		{
+			case ASCIIEncoding:
+				SetBorderCharacters('|', '-', '+');
+				break;
+
+			case UnicodeEncoding:
+			case UTF8Encoding:
+				SetBorderCharacters('│', '─', ' ');
+				TopLeft = '╭';
+				TopRight = '╮';
+				BottomLeft = '╰';
+				BottomRight = '╯';
+				break;
+
+			default:
+				SetBorderCharacters(new ASCIIEncoding());
+				break;
+		}
+	}
+
+
+	public readonly char GetBorderCharFromEdgeFlags(int edges)
+	{
+		if (Bounds.HasEdgeInEdges(edges, Bounds.Edge.TopLeft))
 			return TopLeft;
 
-		if (HasEdge(edges, Bounds.Edge.TopRight))
+		if (Bounds.HasEdgeInEdges(edges, Bounds.Edge.TopRight))
 			return TopRight;
 
-		if (HasEdge(edges, Bounds.Edge.BottomLeft))
+		if (Bounds.HasEdgeInEdges(edges, Bounds.Edge.BottomLeft))
 			return BottomLeft;
 
-		if (HasEdge(edges, Bounds.Edge.BottomRight))
+		if (Bounds.HasEdgeInEdges(edges, Bounds.Edge.BottomRight))
 			return BottomRight;
 
 
 
-		if (HasEdge(edges, Bounds.Edge.Top))
+		if (Bounds.HasEdgeInEdges(edges, Bounds.Edge.Top))
 			return Top;
 
-		if (HasEdge(edges, Bounds.Edge.Left))
+		if (Bounds.HasEdgeInEdges(edges, Bounds.Edge.Left))
 			return Left;
 
-		if (HasEdge(edges, Bounds.Edge.Bottom))
+		if (Bounds.HasEdgeInEdges(edges, Bounds.Edge.Bottom))
 			return Bottom;
 
-		if (HasEdge(edges, Bounds.Edge.Right))
+		if (Bounds.HasEdgeInEdges(edges, Bounds.Edge.Right))
 			return Right;
 		
 		return '\0';

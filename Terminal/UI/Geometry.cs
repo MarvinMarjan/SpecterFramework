@@ -74,6 +74,10 @@ public struct Bounds(uint top, uint left, uint bottom, uint right)
 		=> new(position.row, position.col, position.row + size.height - 1, position.col + size.width - 1);
 
 
+	public static bool HasEdgeInEdges(int edges, Edge edge)
+		=> (edges & (int)edge) == (int)edge;
+
+
     public readonly bool IsAtBorder(Point point)
         => (point.row == top || point.row == bottom) && point.col >= left && point.col <= right ||
 			(point.col == left || point.col == right) && point.row >= top && point.row <= bottom;

@@ -11,7 +11,7 @@ namespace Specter.Terminal.UI;
 public class App
 {
 	// The base Component of an UI App
-	public SectionComponent RootComponent { get; set; } = new(null);
+	public SectionComponent RootComponent { get; set; }
 	public uint MillisecondsDelay = 100;
 
 	public Encoding AppEncoding = new UTF8Encoding();
@@ -19,8 +19,11 @@ public class App
 
 	public App()
 	{
-		RootComponent.Size = new((uint)Console.LargestWindowWidth, (uint)Console.LargestWindowHeight);
-		RootComponent.DrawBorder = false;
+		RootComponent = new(null);
+
+		RootComponent.PropertiesCanBeInherited(false);
+		RootComponent.Size.Value = new Size((uint)Console.LargestWindowWidth, (uint)Console.LargestWindowHeight);
+		RootComponent.DrawBorder.Value = false;
 
 		Terminal.SetEchoEnabled(false);
 		Terminal.SetCursorVisible(false);

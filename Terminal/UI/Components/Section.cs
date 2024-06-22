@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 
 using Specter.ANSI;
 using Specter.Color;
@@ -9,37 +12,56 @@ namespace Specter.Terminal.UI.Components;
 
 public class SectionComponent : Component
 {
+	// Properties
 
-	public Size Size { get; set; }
 	public Bounds Bounds { get => Bounds.FromRectangle(Position, Size); }
-	public Border Border { get; set; }
-	public bool DrawBorder { get; set; }
+
+
+	// Component properties
+
+	public ComponentProperty<Size> Size { get; }
 	
-	public char BackgroundFill { get; set; }
+	public InheritableComponentProperty<char> BackgroundFill { get; }
+	public InheritableComponentProperty<BorderCharacters> BorderCharacters { get; }
+	public InheritableComponentProperty<ColorObject> BorderColor { get; }
+	public InheritableComponentProperty<bool> DrawBorder { get; }
 
 
 	public SectionComponent(Component? parent, Point? position = null, Size? size = null)
 		: base(parent, position)
 	{
-		Size = size ?? Size.None;
+		Size = size ?? UI.Size.None;
 
-		Border = Border.Default;
-		Border.Color = Color;
 
-		DrawBorder = true;
+		BorderCharacters = new(
+			Components.BorderCharacters.Default, Parent?.As<SectionComponent>()?.BorderCharacters
+		);
 
-		BackgroundFill = ' ';
+		BorderColor = new(
+			ColorValue.Reset, Parent?.As<SectionComponent>()?.BorderColor
+		);
+
+		DrawBorder = new(
+			true, Parent?.As<SectionComponent>()?.DrawBorder
+		);
+
+		BackgroundFill = new(
+			' ', Parent?.As<SectionComponent>()?.BackgroundFill
+		);
+
+
+		Properties.AddRange([ Size, BorderCharacters, BorderColor, DrawBorder, BackgroundFill ]);
 	}
 
 
-	protected void DrawAt(ref StringBuilder builder, uint row, uint col)
+    protected void DrawAt(ref StringBuilder builder, uint row, uint col)
 	{
 		// draws the border
 		if (DrawBorder && Bounds.IsAtBorder(new Point(row, col) + Position, out int edges))
 		{
-			ColorPainter painter = new(Border.Color) { SequenceFinisher = Color.AsSequence() };
+			ColorPainter painter = new(BorderColor) { SequenceFinisher = Color.Value.AsSequence() };
 
-			builder.Append(painter.Paint(new(Border.GetBorderCharFromEdgeFlags(edges), 1)));
+			builder.Append(painter.Paint(new(BorderCharacters.Value.GetBorderCharFromEdgeFlags(edges), 1)));
 			return;
 		}
 
@@ -53,11 +75,11 @@ public class SectionComponent : Component
 		StringBuilder builder = new();
 
 		builder.Append(ControlCodes.CursorTo(RelativePosition.row, RelativePosition.col));
-		builder.Append(Color.AsSequence());
+		builder.Append(Color.Value.AsSequence());
 
-		for (int i = 0; i < Size.height; i++)
+		for (int i = 0; i < Size.Value.height; i++)
 		{
-			for (int o = 0; o < Size.width; o++)
+			for (int o = 0; o < Size.Value.width; o++)
 				DrawAt(ref builder, (uint)i, (uint)o);
 
 			builder.Append(ControlCodes.CursorDown(1) + ControlCodes.CursorToColumn(RelativePosition.col));
