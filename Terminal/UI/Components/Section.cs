@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
+﻿using System.Text;
 
 using Specter.ANSI;
 using Specter.Color;
@@ -27,26 +24,37 @@ public class SectionComponent : Component
 	public InheritableComponentProperty<bool> DrawBorder { get; }
 
 
-	public SectionComponent(Component? parent, Point? position = null, Size? size = null)
-		: base(parent, position)
+	public SectionComponent(
+		Component? parent,
+		Point? position = null,
+		Size? size = null,
+	
+		ColorObject? color = null,
+
+		BorderCharacters? borderCharacters = null,
+		ColorObject? borderColor = null,
+		bool drawBorder = true,
+		char backgroundFill = ' '
+	
+	) : base(parent, position, color)
 	{
 		Size = size ?? UI.Size.None;
 
 
 		BorderCharacters = new(
-			Components.BorderCharacters.Default, Parent?.As<SectionComponent>()?.BorderCharacters
+			borderCharacters ?? UI.BorderCharacters.Default, Parent?.As<SectionComponent>()?.BorderCharacters
 		);
 
 		BorderColor = new(
-			ColorValue.Reset, Parent?.As<SectionComponent>()?.BorderColor
+			borderColor ?? Color ?? ColorValue.Reset, Parent?.As<SectionComponent>()?.BorderColor
 		);
 
 		DrawBorder = new(
-			true, Parent?.As<SectionComponent>()?.DrawBorder
+			drawBorder, Parent?.As<SectionComponent>()?.DrawBorder
 		);
 
 		BackgroundFill = new(
-			' ', Parent?.As<SectionComponent>()?.BackgroundFill
+			backgroundFill, Parent?.As<SectionComponent>()?.BackgroundFill
 		);
 
 
@@ -54,7 +62,7 @@ public class SectionComponent : Component
 	}
 
 
-    protected void DrawAt(ref StringBuilder builder, uint row, uint col)
+	protected void DrawAt(ref StringBuilder builder, uint row, uint col)
 	{
 		// draws the border
 		if (DrawBorder && Bounds.IsAtBorder(new Point(row, col) + Position, out int edges))

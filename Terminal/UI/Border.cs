@@ -1,7 +1,7 @@
 ﻿using System.Text;
 
 
-namespace Specter.Terminal.UI.Components;
+namespace Specter.Terminal.UI;
 
 
 public struct BorderCharacters

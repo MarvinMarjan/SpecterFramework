@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 using Specter.ANSI;
+using Specter.Color;
 
 
 namespace Specter.Terminal.UI.Components;
@@ -12,9 +12,15 @@ public class TextComponent : Component
     public InheritableComponentProperty<string> Text { get; set; }
 
 
-    public TextComponent(Component? parent, Point? position = null, string? text = null) : base(parent, position)
+    public TextComponent(
+		Component? parent,
+		Point? position = null,
+		string text = "",
+		ColorObject? color = null
+
+	) : base(parent, position, color)
     {
-        Text = text ?? string.Empty;
+        Text = text;
 
 		Properties.AddRange([ Text ]);
     }

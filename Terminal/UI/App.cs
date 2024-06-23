@@ -10,6 +10,8 @@ namespace Specter.Terminal.UI;
 
 public class App
 {
+	public bool Exit { get; set; }
+
 	// The base Component of an UI App
 	public SectionComponent RootComponent { get; set; }
 	public uint MillisecondsDelay = 100;
@@ -19,9 +21,11 @@ public class App
 
 	public App()
 	{
+		Exit = false;
+
 		RootComponent = new(null);
 
-		RootComponent.PropertiesCanBeInherited(false);
+		RootComponent.SetPropertiesCanBeInherited(false);
 		RootComponent.Size.Value = new Size((uint)Console.LargestWindowWidth, (uint)Console.LargestWindowHeight);
 		RootComponent.DrawBorder.Value = false;
 
@@ -44,6 +48,13 @@ public class App
 
 
 	public void Run()
+	{
+		while (!Exit)
+			RunFrame();
+	}
+
+
+	private void RunFrame()
 	{
 		// erase all terminal text
 		Console.Write(ControlCodes.CursorToHome());

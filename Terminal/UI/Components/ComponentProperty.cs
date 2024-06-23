@@ -42,16 +42,27 @@ public class ComponentProperty<T>
 
 public interface IInheritable : IUpdateable
 {
+	public IInheritable? Parent { get; set; }
+
 	public bool Inherit { get; set; }
 	public bool ConstantValueUpdate { get; set; }
 	public bool CanBeInherited { get; set; }
+
+
+	public void InheritValue();
 }
 
 
 // ComponentProperty that can inherit values from its parent
 public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritable
 {
-    public InheritableComponentProperty<T>? ParentProperty { get; set; }
+    public IInheritable? Parent { get; set; }
+
+	public InheritableComponentProperty<T>? ParentAsProperty
+	{
+		get => Parent as InheritableComponentProperty<T>;
+	}
+
 
 	public bool Inherit { get; set; }
 	public bool CanBeInherited { get; set; }
@@ -62,38 +73,39 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 		T value, InheritableComponentProperty<T>? parent = null, bool inherit = true, bool canBeInherited = true
 	) : base(value)
 	{
-		ParentProperty = parent;
+		Parent = parent;
 		Inherit = inherit;
 		CanBeInherited = canBeInherited;
 		ConstantValueUpdate = true;
 
-		if (ParentProperty is null)
+		if (ParentAsProperty is null)
 			return;
 
 		if (CanInherit())
-			Value = ParentProperty.Value;
+			Value = ParentAsProperty.Value;
 			
-		ParentProperty.PropertyValueChanged += OnParentPropertyValueChange;
+		ParentAsProperty.PropertyValueChanged += OnParentPropertyValueChange;
 	}
 
 
-	public bool CanInherit() => Inherit && ParentProperty is not null && ParentProperty.CanBeInherited;
+	public bool CanInherit() => Inherit && ParentAsProperty is not null && ParentAsProperty.CanBeInherited;
+
+	public void InheritValue()
+		=> Value = ParentAsProperty is not null ? ParentAsProperty.Value : Value;
+
+	public void InheritValueIfPossible()
+	{
+		if (CanInherit())
+			InheritValue();
+	}
 
 
 	public static implicit operator T(InheritableComponentProperty<T> property) => property.Value;
 	public static implicit operator InheritableComponentProperty<T>(T value) => new(value);
 
 
-	public virtual void OnParentPropertyValueChange(T newValue)
-	{
-		if (CanInherit())
-			Value = newValue;
-	}
+    public virtual void OnParentPropertyValueChange(T newValue) => InheritValueIfPossible();
 
 
-	public virtual void Update()
-	{
-		if (ParentProperty is not null && CanInherit() && ConstantValueUpdate)
-			Value = ParentProperty.Value;
-	}
+    public virtual void Update() => InheritValueIfPossible();
 }
