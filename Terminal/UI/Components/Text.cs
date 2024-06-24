@@ -7,7 +7,7 @@ using Specter.Color;
 namespace Specter.Terminal.UI.Components;
 
 
-public class TextComponent : Component
+public class TextComponent : Component, IChildLess
 {
     public InheritableComponentProperty<string> Text { get; set; }
 

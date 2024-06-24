@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -19,9 +20,14 @@ public interface IDrawable
 }
 
 
+public interface IChildLess {}
+
+
+
 // Base class of all UI components
-public abstract class Component : IUpdateable, IDrawable
+public abstract partial class Component : IUpdateable, IDrawable
 {
+
 	// Properties
 
 	public Component? Parent { get; set; }
@@ -41,9 +47,6 @@ public abstract class Component : IUpdateable, IDrawable
 
 
 
-	// TODO: add an interface that blocks a Component from having childs (Components can't set it as their parent).
-	// i.e.: public class TextComponent : Component, IChildLess
-
 	public Component(
 
 		Component? parent,
@@ -51,13 +54,15 @@ public abstract class Component : IUpdateable, IDrawable
 		Size?  size     = null,
 
 		Alignment? alignment = null,
-
+		
 		ColorObject? color = null,
 
 		bool inheritProperties = true
 	)
 	{
-		Parent     = parent;
+		Parent = parent;
+		ChildLessParentCheck();
+
 		Childs     = [];
 		Properties = [];
 
@@ -80,6 +85,14 @@ public abstract class Component : IUpdateable, IDrawable
 		// add this component as child of parent
 		if (!Parent.Childs.Contains(this))
 			Parent.Childs.Add(this);
+	}
+
+
+
+	public void ChildLessParentCheck()
+	{
+		if (Parent is IChildLess)
+			throw new Exception("Can't have a 'IChildLess' as parent.");
 	}
 
 
