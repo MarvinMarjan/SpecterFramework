@@ -13,17 +13,26 @@ public class TextComponent : Component
 
 
     public TextComponent(
+
 		Component? parent,
 		Point? position = null,
-		string text = "",
-		ColorObject? color = null
 
-	) : base(parent, position, color)
+		Alignment? alignment = null,
+		
+		ColorObject? color = null,
+
+		string text = ""
+
+
+	) : base(parent, position, null, alignment, color) // * size is set in Update()
     {
         Text = text;
 
 		Properties.AddRange([ Text ]);
     }
+
+
+	protected Size SizeFromText() => new((uint)Text.Value.Length, 1);
 
 
     public override string Draw()
@@ -37,6 +46,16 @@ public class TextComponent : Component
 
 		builder.Append(EscapeCodes.Reset);
 
+
+		builder.Append(base.Draw());
+
 		return builder.ToString();
 	}
+
+    public override void Update()
+    {
+		Size.Value = SizeFromText();
+
+        base.Update();
+    }
 }

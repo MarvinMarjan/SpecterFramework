@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading;
 
+using Specter.Color;
 using Specter.Terminal.UI.Components;
 
 
@@ -19,6 +20,8 @@ public class App
 	public Encoding AppEncoding = new UTF8Encoding();
 
 
+	// TODO: create separated class for RootComponent
+
 	public App()
 	{
 		Exit = false;
@@ -28,6 +31,7 @@ public class App
 		RootComponent.SetPropertiesCanBeInherited(false);
 		RootComponent.Size.Value = new Size((uint)Console.LargestWindowWidth, (uint)Console.LargestWindowHeight);
 		RootComponent.DrawBorder.Value = false;
+		RootComponent.Color.Value = ColorObject.FromColor256(bg: 0);
 
 		Terminal.SetEchoEnabled(false);
 		Terminal.SetCursorVisible(false);

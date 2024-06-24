@@ -16,8 +16,6 @@ public class SectionComponent : Component
 
 	// Component properties
 
-	public ComponentProperty<Size> Size { get; }
-	
 	public InheritableComponentProperty<char> BackgroundFill { get; }
 	public InheritableComponentProperty<BorderCharacters> BorderCharacters { get; }
 	public InheritableComponentProperty<ColorObject> BorderColor { get; }
@@ -25,22 +23,23 @@ public class SectionComponent : Component
 
 
 	public SectionComponent(
+		
 		Component? parent,
 		Point? position = null,
-		Size? size = null,
+		Size?  size     = null,
+
+		Alignment? alignment = null,
 	
 		ColorObject? color = null,
 
 		BorderCharacters? borderCharacters = null,
-		ColorObject? borderColor = null,
-		bool drawBorder = true,
-		char backgroundFill = ' '
+		ColorObject?      borderColor      = null,
+		bool              drawBorder       = true,
+		char              backgroundFill   = ' '
+
 	
-	) : base(parent, position, color)
+	) : base(parent, position, size, alignment, color)
 	{
-		Size = size ?? UI.Size.None;
-
-
 		BorderCharacters = new(
 			borderCharacters ?? UI.BorderCharacters.Default, Parent?.As<SectionComponent>()?.BorderCharacters
 		);
@@ -58,7 +57,7 @@ public class SectionComponent : Component
 		);
 
 
-		Properties.AddRange([ Size, BorderCharacters, BorderColor, DrawBorder, BackgroundFill ]);
+		Properties.AddRange([ BorderCharacters, BorderColor, DrawBorder, BackgroundFill ]);
 	}
 
 
@@ -94,6 +93,7 @@ public class SectionComponent : Component
 		}
 
 		builder.Append(EscapeCodes.Reset);
+
 
 		// draw childs
 		builder.Append(base.Draw());

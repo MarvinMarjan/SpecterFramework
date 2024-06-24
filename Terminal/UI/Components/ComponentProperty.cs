@@ -6,6 +6,11 @@ public class ComponentProperty<T>
 {
     private T _value;
 
+	// TODO: Add default values.
+	// That way, if a property is constructed with a initial value, but defined as inherit, the initial value
+	// is not lost, allowing it to be used in future
+
+
     public T Value
 	{
 		get => _value;

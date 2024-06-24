@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Text;
-using Microsoft.VisualBasic;
+
 using Specter.Color;
 
 
@@ -31,17 +30,31 @@ public abstract class Component : IUpdateable, IDrawable
 
 	public Point RelativePosition { get => Parent is not null ? Parent.RelativePosition + Position : Position; }
 	
+	public Rect Rect { get => new(Position, Size); }
+	
 
 	// Component properties
 	public ComponentProperty<Point> Position { get; }
+	public ComponentProperty<Size> Size { get; }
+	public InheritableComponentProperty<Alignment> Alignment { get; }
 	public InheritableComponentProperty<ColorObject> Color { get; }
 
 
 
+	// TODO: add an interface that blocks a Component from having childs (Components can't set it as their parent).
+	// i.e.: public class TextComponent : Component, IChildLess
+
 	public Component(
+
 		Component? parent,
 		Point? position = null,
+		Size?  size     = null,
+
+		Alignment? alignment = null,
+
 		ColorObject? color = null
+
+		// TODO: add a parameter that defines if the Component should inherit its parent properties
 	)
 	{
 		Parent     = parent;
@@ -49,10 +62,15 @@ public abstract class Component : IUpdateable, IDrawable
 		Properties = [];
 
 		Position = position ?? Point.None;
+		Size = size ?? UI.Size.None;
+
+		Alignment = new(
+			alignment ?? UI.Alignment.None, Parent?.Alignment, false // * temporary. remove later
+		);
 
 		Color = new(color ?? ColorValue.Reset, Parent?.Color);
 
-		Properties.AddRange([ Position, Color ]);
+		Properties.AddRange([ Position, Size, Color ]);
 
 		if (Parent is null)
 			return;
@@ -61,6 +79,7 @@ public abstract class Component : IUpdateable, IDrawable
 		if (!Parent.Childs.Contains(this))
 			Parent.Childs.Add(this);
 	}
+
 
 
 	// Casts this component to another one
@@ -105,6 +124,8 @@ public abstract class Component : IUpdateable, IDrawable
 	{
 		foreach (IUpdateable? property in PropertiesAs<IUpdateable>())
 			property?.Update();
+
+		Position.Value = Alignment.Value.CalculatePosition(this);
 		
 		foreach (Component child in Childs)
 			child.Update();

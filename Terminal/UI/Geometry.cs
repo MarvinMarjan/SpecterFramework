@@ -4,7 +4,7 @@ namespace Specter.Terminal.UI;
 
 public struct Point(uint row, uint col)
 {
-	public static Point None { get => new (1, 1); }
+	public static Point None { get => new (0, 0); }
 
 	public uint row = row;
 	public uint col = col;
@@ -43,6 +43,13 @@ public struct Size(uint width, uint height)
 
 	public static Size operator/(Size left, Size right)
 		=> new(left.width / right.width, left.height / right.height);
+}
+
+
+public struct Rect(Point position, Size size)
+{
+	public Point position = position;
+	public Size size = size;
 }
 
 

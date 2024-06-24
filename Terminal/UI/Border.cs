@@ -39,6 +39,7 @@ public struct BorderCharacters
 	}
 
 
+
 	public char Top { get; set; }
 	public char Bottom { get; set; }
 	public char Left { get; set; }
