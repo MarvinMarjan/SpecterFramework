@@ -6,30 +6,51 @@ namespace Specter.ANSI;
 
 
 
-// Interface for representing a ANSI sequence element.
-// At the sequence "\x1b[0;31;45m", the numbers "0", "31" and "45" are
-// elements.
+/// <summary>
+/// Interface for representing a ANSI sequence element.
+/// At the sequence "\x1b[0;31;45m", the numbers "0", "31" and "45" are
+/// elements.
+/// </summary>
 public interface IANSISequenceElement
 {
-	// Checks whether a sequence element is valid or not.
+	/// <summary>
+	/// Checks whether a sequence element is valid or not.
+	/// </summary>
+	/// <param name="element"> The element to check. </param>
+	/// <returns> True if it's valid, false otherwise. </returns>
 	public static bool IsValid(IANSISequenceElement? element)
 		=> element is not null && element.IsValid();
 
 
-	// Checks whether the current object has a valid sequence or not.
+	/// <summary>
+	/// Checks whether the current object is valid or not.
+	/// </summary>
+	/// <returns> True if it's valid, false otherwise </returns>
 	public bool IsValid();
 
+
+	/// <summary>
+	/// Builds the sequence as a string.
+	/// </summary>
+	/// <returns> A string containing the sequence. </returns>
 	public string BuildSequence();
 }
 
 
 public static class SequenceBuilder
 {
-	// Builds an ANSI sequence based on the codes in "codes".
-	// i.e: the input ["1", "34", "102"] generates "\x1b[1;34;102m"
+	
+	/// <summary>
+	/// Builds an ANSI sequence based on codes of an array.
+	/// i.e: the input ["1", "34", "102"] generates "\x1b[1;34;102m"
+	/// </summary>
+	/// <param name="codes"> The array containing the codes. </param>
+	/// <param name="useEscapeCode"> Should use escape codes in the string? </param>
+	/// <returns></returns>
 	public static string BuildANSIEscapeSequence(string?[] codes, bool useEscapeCode = true)
 	{
 		StringBuilder builder = new();
+
 
 		if (useEscapeCode)
 			builder.Append(EscapeCodes.DefaultEscapeCode + "[");
@@ -41,6 +62,7 @@ public static class SequenceBuilder
 
 		if (useEscapeCode)
 			builder.Append('m');
+		
 		
 		return builder.ToString();
 	}

@@ -1,6 +1,7 @@
 namespace Specter.ANSI;
 
 
+// Some useful ANSI escape codes definition
 public static class EscapeCodes
 {
 	public const string Octal = "\033";

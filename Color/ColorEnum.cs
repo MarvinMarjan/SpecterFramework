@@ -1,6 +1,9 @@
 namespace Specter.Color;
 
 
+/// <summary>
+/// All the 16 (+16 with the background versions) color codes.
+/// </summary>
 public enum Color16
 {
 	FGBlack = 30, BGBlack = 40,
@@ -25,6 +28,9 @@ public enum Color16
 	Reset = 0
 }
 
+/// <summary>
+/// The text rendering mode.
+/// </summary>
 public enum ColorMode
 {
 	Normal,

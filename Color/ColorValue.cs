@@ -1,6 +1,9 @@
 ﻿namespace Specter.Color;
 
 
+/// <summary>
+/// Pre-defined ColorObjects for all Color16 codes.
+/// </summary>
 public static class ColorValue
 {
 	public static ColorObject Reset { get => ColorObject.FromColor16(fg: Color16.Reset); }

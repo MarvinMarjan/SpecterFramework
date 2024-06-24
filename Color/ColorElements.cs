@@ -4,6 +4,10 @@
 namespace Specter.Color;
 
 
+/// <summary>
+/// The layer of a color. Color elements like Color256 or ColorRGB
+/// should use this enum to define which layer they represents.
+/// </summary>
 public enum ColorLayer
 {
 	Foreground = 38,
@@ -11,6 +15,10 @@ public enum ColorLayer
 }
 
 
+/// <summary>
+/// A color element for Color16.
+/// </summary>
+/// <param name="code"> The color code. </param>
 public class ColorCodeElement(Color16? code = null) : IANSISequenceElement
 {
 	public Color16? code = code;
@@ -27,6 +35,13 @@ public class ColorCodeElement(Color16? code = null) : IANSISequenceElement
 }
 
 
+/// <summary>
+/// A color element for 8-bit (0-255) coloring.
+/// 
+/// Take a look at https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797#colors--graphics-mode
+/// </summary>
+/// <param name="code"> The 8-bit color code. </param>
+/// <param name="layer"> The layer of the element. </param>
 public class Color256Element(byte? code = null, ColorLayer layer = ColorLayer.Foreground) : IANSISequenceElement
 {
 	public byte? code = code;
@@ -49,6 +64,11 @@ public class Color256Element(byte? code = null, ColorLayer layer = ColorLayer.Fo
 }
 
 
+/// <summary>
+/// A color element for RGB based coloring.
+/// </summary>
+/// <param name="color"> The RGB color. </param>
+/// <param name="layer"> The layer of the element. </param>
 public class ColorRGBElement(ColorRGB? color = null, ColorLayer layer = ColorLayer.Foreground) : IANSISequenceElement
 {
 	public ColorRGB? color = color;
