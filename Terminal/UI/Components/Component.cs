@@ -46,7 +46,6 @@ public abstract partial class Component : IUpdateable, IDrawable
 	public InheritableComponentProperty<ColorObject> Color { get; }
 
 
-
 	public Component(
 
 		Component? parent,

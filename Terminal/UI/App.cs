@@ -2,7 +2,6 @@
 using System.Text;
 using System.Threading;
 
-using Specter.Color;
 using Specter.Terminal.UI.Components;
 
 
@@ -16,13 +15,11 @@ public class App
 	public bool Exit { get; set; }
 
 	// The base Component of an UI App
-	public SectionComponent RootComponent { get; set; }
+	public RootComponent Root { get; set; }
 	public uint MillisecondsDelay = 100;
 
 	public Encoding AppEncoding = new UTF8Encoding();
 
-
-	// TODO: create separated class for RootComponent
 
 	public App()
 	{
@@ -37,11 +34,7 @@ public class App
 
 		Exit = false;
 
-		RootComponent = new(null);
-
-		RootComponent.SetPropertiesCanBeInherited(false);
-		RootComponent.Size.Value = new Size((uint)Console.LargestWindowWidth, (uint)Console.LargestWindowHeight);
-		RootComponent.DrawBorder.DefaultValue = false;
+		Root = new();
 	}
 
 
@@ -66,8 +59,8 @@ public class App
 		Console.Write(ControlCodes.CursorToHome());
 		Console.Write(ControlCodes.EraseScreen(ControlCodes.ScreenErasingMode.CursorUntilEnd));
 
-		RootComponent.Update();
-		Console.Write(RootComponent.Draw());
+		Root.Update();
+		Console.Write(Root.Draw());
 
 		Thread.Sleep((int)MillisecondsDelay);
 	}
