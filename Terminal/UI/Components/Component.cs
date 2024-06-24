@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using Microsoft.VisualBasic;
@@ -43,13 +44,13 @@ public abstract class Component : IUpdateable, IDrawable
 		ColorObject? color = null
 	)
 	{
-		Parent = parent;
-		Childs = [];
+		Parent     = parent;
+		Childs     = [];
 		Properties = [];
 
 		Position = position ?? Point.None;
 
-		Color = new (color ?? ColorValue.Reset, Parent?.Color);
+		Color = new(color ?? ColorValue.Reset, Parent?.Color);
 
 		Properties.AddRange([ Position, Color ]);
 
@@ -65,13 +66,13 @@ public abstract class Component : IUpdateable, IDrawable
 	// Casts this component to another one
 	public T? As<T>() where T : Component => this as T;
 
-
+	
 	// Casts all component properties to another type, if possible
 	protected List<T?> PropertiesAs<T>() where T : class
 		=> (from property in Properties select property as T).ToList();
-	
+		
 
-	// Defines whether all component properties can inherit from its parents or not
+	// Defines whether all component properties can inherit from its parents or not>
 	public void SetAllPropertiesInherit(bool inherit)
 	{
 		foreach (var property in PropertiesAs<IInheritable>())
@@ -80,7 +81,7 @@ public abstract class Component : IUpdateable, IDrawable
 	}
 
 
-	// Defines whether all component properties can be inherited by its childs or not
+	// Defines whether all component properties can be inherited by its child or not
 	public void SetPropertiesCanBeInherited(bool can)
 	{
 		foreach (IInheritable? property in PropertiesAs<IInheritable>())

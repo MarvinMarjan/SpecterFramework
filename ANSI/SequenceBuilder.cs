@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Text;
 
+
 namespace Specter.ANSI;
 
 
@@ -11,11 +12,13 @@ namespace Specter.ANSI;
 public interface IANSISequenceElement
 {
 	// Checks whether a sequence element is valid or not.
-	public static bool IsValid(IANSISequenceElement? element) => element is not null && element.IsValid();
+	public static bool IsValid(IANSISequenceElement? element)
+		=> element is not null && element.IsValid();
 
 
 	// Checks whether the current object has a valid sequence or not.
 	public bool IsValid();
+
 	public string BuildSequence();
 }
 
