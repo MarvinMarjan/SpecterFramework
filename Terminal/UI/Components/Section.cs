@@ -32,13 +32,15 @@ public class SectionComponent : Component
 	
 		ColorObject? color = null,
 
+		bool inheritProperties = true,
+
 		BorderCharacters? borderCharacters = null,
 		ColorObject?      borderColor      = null,
 		bool              drawBorder       = true,
 		char              backgroundFill   = ' '
 
 	
-	) : base(parent, position, size, alignment, color)
+	) : base(parent, position, size, alignment, color, inheritProperties)
 	{
 		BorderCharacters = new(
 			borderCharacters ?? UI.BorderCharacters.Default, Parent?.As<SectionComponent>()?.BorderCharacters
@@ -58,6 +60,8 @@ public class SectionComponent : Component
 
 
 		Properties.AddRange([ BorderCharacters, BorderColor, DrawBorder, BackgroundFill ]);
+
+		SetAllPropertiesInherit(inheritProperties);
 	}
 
 

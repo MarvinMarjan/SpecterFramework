@@ -6,11 +6,6 @@ public class ComponentProperty<T>
 {
     private T _value;
 
-	// TODO: Add default values.
-	// That way, if a property is constructed with a initial value, but defined as inherit, the initial value
-	// is not lost, allowing it to be used in future
-
-
     public T Value
 	{
 		get => _value;
@@ -69,16 +64,34 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 	}
 
 
+    new public T Value
+	{
+		get => base.Value;
+		private set => base.Value = value;
+	}
+
+    public T DefaultValue { get; set; }
+
+
 	public bool Inherit { get; set; }
 	public bool CanBeInherited { get; set; }
 	public bool ConstantValueUpdate { get; set; }
 
 
 	public InheritableComponentProperty(
-		T value, InheritableComponentProperty<T>? parent = null, bool inherit = true, bool canBeInherited = true
-	) : base(value)
+
+		T defaultValue,
+		InheritableComponentProperty<T>? parent = null,
+		bool inherit = true,
+		bool canBeInherited = true
+
+		
+	) : base(defaultValue)
 	{
 		Parent = parent;
+	
+		DefaultValue = defaultValue;
+
 		Inherit = inherit;
 		CanBeInherited = canBeInherited;
 		ConstantValueUpdate = true;
@@ -98,19 +111,29 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 	public void InheritValue()
 		=> Value = ParentAsProperty is not null ? ParentAsProperty.Value : Value;
 
-	public void InheritValueIfPossible()
+	protected bool InheritValueIfPossible()
 	{
 		if (CanInherit())
+		{
 			InheritValue();
+			return true;
+		}
+
+		return false;
 	}
 
 
-	public static implicit operator T(InheritableComponentProperty<T> property) => property.Value;
+	public static implicit operator T(InheritableComponentProperty<T> property) => property.DefaultValue;
 	public static implicit operator InheritableComponentProperty<T>(T value) => new(value);
 
 
     public virtual void OnParentPropertyValueChange(T newValue) => InheritValueIfPossible();
 
 
-    public virtual void Update() => InheritValueIfPossible();
+    public virtual void Update()
+	{
+		// use DefaultValue if inheritance is not possible
+		if (!InheritValueIfPossible())
+			Value = DefaultValue;
+	}
 }

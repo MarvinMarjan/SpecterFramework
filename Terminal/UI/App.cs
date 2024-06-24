@@ -9,6 +9,8 @@ using Specter.Terminal.UI.Components;
 namespace Specter.Terminal.UI;
 
 
+// TODO: document (add comments) everything.
+
 public class App
 {
 	public bool Exit { get; set; }
@@ -24,15 +26,6 @@ public class App
 
 	public App()
 	{
-		Exit = false;
-
-		RootComponent = new(null);
-
-		RootComponent.SetPropertiesCanBeInherited(false);
-		RootComponent.Size.Value = new Size((uint)Console.LargestWindowWidth, (uint)Console.LargestWindowHeight);
-		RootComponent.DrawBorder.Value = false;
-		RootComponent.Color.Value = ColorObject.FromColor256(bg: 0);
-
 		Terminal.SetEchoEnabled(false);
 		Terminal.SetCursorVisible(false);
 		
@@ -40,6 +33,15 @@ public class App
 
 		// on CTRL+C pressed
 		Console.CancelKeyPress += delegate { OnExit(); };
+
+
+		Exit = false;
+
+		RootComponent = new(null);
+
+		RootComponent.SetPropertiesCanBeInherited(false);
+		RootComponent.Size.Value = new Size((uint)Console.LargestWindowWidth, (uint)Console.LargestWindowHeight);
+		RootComponent.DrawBorder.DefaultValue = false;
 	}
 
 

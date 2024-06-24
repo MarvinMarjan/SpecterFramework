@@ -52,9 +52,9 @@ public abstract class Component : IUpdateable, IDrawable
 
 		Alignment? alignment = null,
 
-		ColorObject? color = null
+		ColorObject? color = null,
 
-		// TODO: add a parameter that defines if the Component should inherit its parent properties
+		bool inheritProperties = true
 	)
 	{
 		Parent     = parent;
@@ -71,6 +71,8 @@ public abstract class Component : IUpdateable, IDrawable
 		Color = new(color ?? ColorValue.Reset, Parent?.Color);
 
 		Properties.AddRange([ Position, Size, Color ]);
+
+		SetAllPropertiesInherit(inheritProperties);
 
 		if (Parent is null)
 			return;

@@ -21,14 +21,19 @@ public class TextComponent : Component
 		
 		ColorObject? color = null,
 
+		bool inheritProperties = false,
+
 		string text = ""
 
 
-	) : base(parent, position, null, alignment, color) // * size is set in Update()
+		// * size is set in Update()
+	) : base(parent, position, null, alignment, color, inheritProperties)
     {
         Text = text;
 
 		Properties.AddRange([ Text ]);
+
+		SetAllPropertiesInherit(inheritProperties);
     }
 
 
