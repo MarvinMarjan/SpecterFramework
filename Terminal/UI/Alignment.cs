@@ -6,6 +6,10 @@ using Specter.Terminal.UI.Components;
 namespace Specter.Terminal.UI;
 
 
+
+/// <summary>
+/// All types of alignment.
+/// </summary>
 [Flags]
 public enum Alignment
 {
@@ -41,19 +45,28 @@ public static class AlignmentExtensions
 	}
 
 
-	public static Point CalculatePosition(this Alignment alignment, Rect parent, Rect rect)
+	/// <summary>
+	/// Calculates the alignment.
+	/// 
+	/// * Note: Alignment may not be precisely, since terminal drawing units are rows and columns.
+	/// </summary>
+	/// <param name="alignment"> The alignments to use. </param>
+	/// <param name="parent"> The parent Rect. </param>
+	/// <param name="child"> The child Rect. </param>
+	/// <returns> The aligned position. </returns>
+	public static Point CalculatePosition(this Alignment alignment, Rect parent, Rect child)
 	{
-		Point finalPosition = rect.position;
-		Size finalSize = rect.size;
+		Point finalPosition = child.position;
+		Size finalSize = child.size;
 
 		bool hasCenterH = alignment.HasFlag(Alignment.CenterHorizontal);
 		bool hasCenterV = alignment.HasFlag(Alignment.CenterVertical);
 
 		if (hasCenterH)
-			finalPosition.col = CalculateCentralizedValue(parent.size.width, rect.size.width);
+			finalPosition.col = CalculateCentralizedValue(parent.size.width, child.size.width);
 
 		if (hasCenterV)
-			finalPosition.row = CalculateCentralizedValue(parent.size.height, rect.size.height);
+			finalPosition.row = CalculateCentralizedValue(parent.size.height, child.size.height);
 
 
 		if (!hasCenterV)

@@ -10,24 +10,32 @@ namespace Specter.Terminal.UI;
 
 // TODO: document (add comments) everything.
 
+/// <summary>
+/// Initializes a terminal UI app.
+/// </summary>
 public class App
 {
 	public bool Exit { get; set; }
 
-	// The base Component of an UI App
+	/// <summary>
+	/// The base Component of an UI App
+	/// </summary>
 	public RootComponent Root { get; set; }
+
+	/// <summary>
+	/// The delay between each update and draw.
+	/// </summary>
 	public uint MillisecondsDelay = 100;
 
 	public Encoding AppEncoding = new UTF8Encoding();
 
+	// TODO: change ^ to properties. { get => Console.OutputEncoding; set => Console.InputEncoding = value; }
 
 	public App()
 	{
 		Terminal.SetEchoEnabled(false);
 		Terminal.SetCursorVisible(false);
 		
-		Terminal.SetOutputEncoding(AppEncoding);
-
 		// on CTRL+C pressed
 		Console.CancelKeyPress += delegate { OnExit(); };
 
@@ -38,12 +46,16 @@ public class App
 	}
 
 
+	/// <summary>
+	/// On exiting stuff.
+	/// </summary>
 	private static void OnExit()
 	{
 		Console.Write(ControlCodes.CursorToHome(), ControlCodes.EraseScreen());
 		Terminal.SetEchoEnabled(true);
 		Terminal.SetCursorVisible(true);
 	}
+
 
 
 	public void Run()

@@ -4,6 +4,9 @@
 namespace Specter.String;
 
 
+/// <summary>
+/// Defines painting extension methods for the String object.
+/// </summary>
 public static class StringColoringExtension
 {
 	public static string Paint(this string str, Painter painter)

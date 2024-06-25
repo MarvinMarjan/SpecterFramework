@@ -1,7 +1,10 @@
 namespace Specter.Terminal.UI.Components;
 
 
-// Represents properties of UI components
+/// <summary>
+/// Represents properties of UI components, but with extended behavior.
+/// </summary>
+/// <typeparam name="T"> The property value type. </typeparam>
 public class ComponentProperty<T>
 {
     private T _value;
@@ -40,6 +43,9 @@ public class ComponentProperty<T>
 
 
 
+/// <summary>
+/// Provides some basic inheritance behavior.
+/// </summary>
 public interface IInheritable : IUpdateable
 {
 	public IInheritable? Parent { get; set; }
@@ -53,23 +59,35 @@ public interface IInheritable : IUpdateable
 }
 
 
-// ComponentProperty that can inherit values from its parent
+/// <summary>
+/// ComponentProperty that can inherit values from its parent.
+/// </summary>
+/// <typeparam name="T"> The property value type. </typeparam>
 public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritable
 {
     public IInheritable? Parent { get; set; }
 
+	/// <summary>
+	/// Tries to convert Parent to a component property.
+	/// </summary>
 	public InheritableComponentProperty<T>? ParentAsProperty
 	{
 		get => Parent as InheritableComponentProperty<T>;
 	}
 
 
+	// * Value should not be modified by this object.
+	// * Use 'DefaultValue' instead.
     new public T Value
 	{
 		get => base.Value;
 		private set => base.Value = value;
 	}
 
+	/// <summary>
+	/// Default value to be set to 'Value'.
+	/// Ignored if inheriting value from 'Parent'.
+	/// </summary>
     public T DefaultValue { get; set; }
 
 

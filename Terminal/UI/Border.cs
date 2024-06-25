@@ -4,6 +4,9 @@
 namespace Specter.Terminal.UI;
 
 
+/// <summary>
+/// Represents each character of a border.
+/// </summary>
 public struct BorderCharacters
 {
 	public static BorderCharacters UTF8Default
@@ -60,6 +63,10 @@ public struct BorderCharacters
 	}
 
 
+	/// <summary>
+	/// Initialization based on the encoding.
+	/// </summary>
+	/// <param name="encoding"> The encoding. </param>
 	public void SetBorderCharacters(Encoding encoding)
 	{
 		switch (encoding)
@@ -84,7 +91,7 @@ public struct BorderCharacters
 	}
 
 
-	public readonly char GetBorderCharFromEdgeFlags(int edges)
+	public readonly char GetBorderCharFromEdgeFlags(Bounds.Edge edges)
 	{
 		if (Bounds.HasEdgeInEdges(edges, Bounds.Edge.TopLeft))
 			return TopLeft;

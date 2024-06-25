@@ -1,8 +1,9 @@
-﻿using System.Net;
-
-namespace Specter.Color;
+﻿namespace Specter.Color;
 
 
+/// <summary>
+/// Create extension methods for the String object.
+/// </summary>
 public static class PaintExtensions
 {
 	public static string Paint(this ColorObject color, string source)

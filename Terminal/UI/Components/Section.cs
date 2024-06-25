@@ -7,10 +7,14 @@ using Specter.Color;
 namespace Specter.Terminal.UI.Components;
 
 
+/// <summary>
+/// Component that represents a section.
+/// </summary>
 public class SectionComponent : Component
 {
 	// Properties
 
+	// TODO: move this to Component.
 	public Bounds Bounds { get => Bounds.FromRectangle(Position, Size); }
 
 
@@ -68,7 +72,7 @@ public class SectionComponent : Component
 	protected void DrawAt(ref StringBuilder builder, uint row, uint col)
 	{
 		// draws the border
-		if (DrawBorder && Bounds.IsAtBorder(new Point(row, col) + Position, out int edges))
+		if (DrawBorder && Bounds.IsAtBorder(new Point(row, col) + Position, out Bounds.Edge edges))
 		{
 			ColorPainter painter = new(BorderColor) { SequenceFinisher = Color.Value.AsSequence() };
 

@@ -7,6 +7,10 @@ using Specter.Color;
 namespace Specter.Terminal.UI.Components;
 
 
+/// <summary>
+/// Represents a text component.
+/// * Note: Can't be defined as parent of another Component.
+/// </summary>
 public class TextComponent : Component, IChildLess
 {
     public InheritableComponentProperty<string> Text { get; set; }
@@ -37,6 +41,7 @@ public class TextComponent : Component, IChildLess
     }
 
 
+	/// <returns> A Size object based on Text. </returns>
 	protected Size SizeFromText() => new((uint)Text.Value.Length, 1);
 
 

@@ -1,7 +1,13 @@
+using System;
+
 namespace Specter.Terminal.UI;
 
 
-
+/// <summary>
+/// Represents a point in the terminal.
+/// </summary>
+/// <param name="row"> The row position. </param>
+/// <param name="col"> The column position. </param>
 public struct Point(uint row, uint col)
 {
 	public static Point None { get => new (0, 0); }
@@ -24,6 +30,11 @@ public struct Point(uint row, uint col)
 }
 
 
+/// <summary>
+/// Represents a size in the terminal.
+/// </summary>
+/// <param name="width"> The width. </param>
+/// <param name="height"> The height. </param>
 public struct Size(uint width, uint height)
 {
 	public static Size None { get => new(0, 0); }
@@ -46,6 +57,11 @@ public struct Size(uint width, uint height)
 }
 
 
+/// <summary>
+/// Encapsulates both position and size in a single object.
+/// </summary>
+/// <param name="position"> The position. </param>
+/// <param name="size"> The size. </param>
 public struct Rect(Point position, Size size)
 {
 	public Point position = position;
@@ -53,6 +69,13 @@ public struct Rect(Point position, Size size)
 }
 
 
+/// <summary>
+/// Represents the bounds of a rectangle in the terminal.
+/// </summary>
+/// <param name="top"> The top. </param>
+/// <param name="left"> The left. </param>
+/// <param name="bottom"> The bottom. </param>
+/// <param name="right"> The right. </param>
 public struct Bounds(uint top, uint left, uint bottom, uint right)
 {
     public uint top = top;
@@ -61,6 +84,7 @@ public struct Bounds(uint top, uint left, uint bottom, uint right)
     public uint right = right;
 
 
+	[Flags]
 	public enum Edge
 	{
 		None = 0b0000,
@@ -81,8 +105,8 @@ public struct Bounds(uint top, uint left, uint bottom, uint right)
 		=> new(position.row, position.col, position.row + size.height - 1, position.col + size.width - 1);
 
 
-	public static bool HasEdgeInEdges(int edges, Edge edge)
-		=> (edges & (int)edge) == (int)edge;
+	public static bool HasEdgeInEdges(Edge edges, Edge edge)
+		=> (edges & edge) == edge;
 
 
     public readonly bool IsAtBorder(Point point)
@@ -90,7 +114,7 @@ public struct Bounds(uint top, uint left, uint bottom, uint right)
 			(point.col == left || point.col == right) && point.row >= top && point.row <= bottom;
 
 
-	public readonly bool IsAtBorder(Point point, out int edges)
+	public readonly bool IsAtBorder(Point point, out Edge edges)
 	{
 		edges = 0;
 
@@ -100,10 +124,10 @@ public struct Bounds(uint top, uint left, uint bottom, uint right)
 			return false;
 		}
 
-		edges |= point.row == top ? (int)Edge.Top : 0;
-		edges |= point.row == bottom ? (int)Edge.Bottom : 0;
-		edges |= point.col == left ? (int)Edge.Left : 0;
-		edges |= point.col == right ? (int)Edge.Right : 0;
+		edges |= point.row == top ? Edge.Top : 0;
+		edges |= point.row == bottom ? Edge.Bottom : 0;
+		edges |= point.col == left ? Edge.Left : 0;
+		edges |= point.col == right ? Edge.Right : 0;
 
 		return true;
 	}

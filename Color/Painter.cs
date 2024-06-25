@@ -7,12 +7,23 @@ using Specter.ANSI;
 namespace Specter.Color;
 
 
+/// <summary>
+/// Provides a method to paint a string.
+/// </summary>
 public abstract class Painter
 {
+	/// <summary>
+	/// The string placed at the end of a sequence.
+	/// </summary>
 	public string SequenceFinisher { get; set; } = EscapeCodes.Reset;
 
+
+	/// <param name="source"> The string to be painted. </param>
+	/// <returns> A painted string. </returns>
 	public abstract string Paint(string source);
 
+
+	// some pre-defined painting methods
 
 	public static string Paint(string source, Painter painter) => painter.Paint(source);
 	public static string Paint(string source, ColorObject color) => Paint(source, new ColorPainter(color));
@@ -20,6 +31,10 @@ public abstract class Painter
 }
 
 
+/// <summary>
+/// A Painter for ColorObjects.
+/// </summary>
+/// <param name="color"> The ColorObject to use. </param>
 public class ColorPainter(ColorObject? color = null) : Painter
 {
 	public ColorObject? color = color;
@@ -35,6 +50,10 @@ public class ColorPainter(ColorObject? color = null) : Painter
 }
 
 
+/// <summary>
+/// A Painter for ColorPatterns.
+/// </summary>
+/// <param name="pattern"> The pattern to be used. </param>
 public class PatternPainter(ColorPattern? pattern = null) : Painter
 {
 	public ColorPattern? pattern = pattern;
@@ -53,6 +72,8 @@ public class PatternPainter(ColorPattern? pattern = null) : Painter
 
 		for (int charIndex = 0, colorIndex = 0; charIndex < source.Length; charIndex++)
 		{
+			// TODO: split these into separated methods
+
 			// restart color index when it reaches the colors size
 			if (colorIndex >= colors.Count)
 			{

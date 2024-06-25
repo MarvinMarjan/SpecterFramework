@@ -8,6 +8,9 @@ using Specter.OS;
 namespace Specter.Terminal;
 
 
+/// <summary>
+/// Defines methods that use ANSI control codes for controlling the terminal behavior.
+/// </summary>
 public static class ControlCodes
 {
 	public enum ScreenErasingMode
