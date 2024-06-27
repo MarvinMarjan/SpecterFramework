@@ -105,9 +105,7 @@ public class ColorObject(IANSISequenceElement? fg, IANSISequenceElement? bg, Col
 
 	/// <returns> This ColorObject converted into an ANSI sequence. </returns>
 	public string AsSequence()
-	{
-		return SequenceBuilder.BuildANSIEscapeSequence([ 
+		=> SequenceBuilder.BuildANSIEscapeSequence([ 
 			((int?)Mode)?.ToString(), Foreground?.BuildSequence(), Background?.BuildSequence(),
 		]);
-	}
 }

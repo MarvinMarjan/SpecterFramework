@@ -47,6 +47,14 @@ public static class SequenceBuilder
 		return source;
 	}
 
+	public static void AddEscapeCode(ref StringBuilder source)
+	{
+		source.Insert(0, EscapeCodes.EscapeCodeWithController);
+		source.Append('m');
+	}
+
+	// TODO: maybe use a constant to represent 'm'
+
 	
 	/// <summary>
 	/// Builds an ANSI sequence based on codes of an array.
@@ -65,7 +73,7 @@ public static class SequenceBuilder
 		builder.Append(string.Join(';', validCodes));
 
 		if (useEscapeCode)
-			builder = new(AddEscapeCode(builder.ToString()));
+			AddEscapeCode(ref builder);
 		
 		return builder.ToString();
 	}
