@@ -35,6 +35,8 @@ public abstract partial class Component : IUpdateable, IDrawable
 	public Component? Parent { get; set; }
 	public List<Component> Childs { get; set; }
 	
+	public Bounds Bounds { get => Bounds.FromRectangle(Position, Size); }
+	
 
 	/// <summary>
 	/// List of all component properties

@@ -21,14 +21,14 @@ public enum ColorLayer
 /// <param name="code"> The color code. </param>
 public class ColorCodeElement(Color16? code = null) : IANSISequenceElement
 {
-	public Color16? code = code;
+	public Color16? Code { get; set; } = code;
 
 
-	public bool IsValid() => code is not null;
+	public bool IsValid() => Code is not null;
 
     public string BuildSequence()
 	{
-		int? intCode = (int?)code;
+		int? intCode = (int?)Code;
 
 		return intCode?.ToString() ?? string.Empty;
 	}
@@ -44,21 +44,21 @@ public class ColorCodeElement(Color16? code = null) : IANSISequenceElement
 /// <param name="layer"> The layer of the element. </param>
 public class Color256Element(byte? code = null, ColorLayer layer = ColorLayer.Foreground) : IANSISequenceElement
 {
-	public byte? code = code;
-	public ColorLayer layer = layer;
+	public byte? Code { get; set; } = code;
+	public ColorLayer Layer { get; set; } = layer;
 
 
-	public bool IsValid() => code is not null;
+	public bool IsValid() => Code is not null;
 
 	public string BuildSequence()
 	{
 		if (!IsValid())
 			return string.Empty;
 
-		int layerCode = (int)layer;
+		int layerCode = (int)Layer;
 
 		return SequenceBuilder.BuildANSIEscapeSequence([
-			layerCode.ToString(), EscapeCodes.Color256TypeCode, code.ToString()
+			layerCode.ToString(), EscapeCodes.Color256TypeCode, Code.ToString()
 		], false);
 	}
 }
@@ -71,27 +71,27 @@ public class Color256Element(byte? code = null, ColorLayer layer = ColorLayer.Fo
 /// <param name="layer"> The layer of the element. </param>
 public class ColorRGBElement(ColorRGB? color = null, ColorLayer layer = ColorLayer.Foreground) : IANSISequenceElement
 {
-	public ColorRGB? color = color;
-	public ColorLayer layer = layer;
+	public ColorRGB? Color { get; set; } = color;
+	public ColorLayer Layer { get; set; } = layer;
 
 
-	public bool IsValid() => color is not null;
+	public bool IsValid() => Color is not null;
 
 	public string BuildSequence()
 	{
 		if (!IsValid())
 			return string.Empty;
 
-		int layerCode = (int)layer;
+		int layerCode = (int)Layer;
 
-		var validColor = color ?? new ColorRGB();
+		var validColor = Color ?? new ColorRGB();
 
 		if (!validColor.AreAllChannelsNull())
 			validColor.SetValueToNullChannels(0);
 
 		return SequenceBuilder.BuildANSIEscapeSequence([
 			layerCode.ToString(), EscapeCodes.ColorRGBTypeCode,
-			validColor.r?.ToString(), validColor.g?.ToString(), validColor.b?.ToString()
+			validColor.Red?.ToString(), validColor.Green?.ToString(), validColor.Blue?.ToString()
 		], false);
 	}
 }

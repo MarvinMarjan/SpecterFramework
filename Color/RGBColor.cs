@@ -9,26 +9,29 @@
 /// <param name="b"> The blue channel. </param>
 public struct ColorRGB(byte? r = null, byte? g = null, byte? b = null)
 {
-	public byte? r = r;
-	public byte? g = g;
-	public byte? b = b;
+	public byte? Red { get; set; } = r;
+	public byte? Green { get; set; } = g;
+	public byte? Blue { get; set; } = b;
 
-	// TODO: create a constructor that sets a single value to all channels. (SetAll wrapper)
+	
+	public ColorRGB(byte? all) : this(all, all, all)
+	{}
+
 
 	public readonly bool AreAllChannelsNull()
 	{
-		return r is null && g is null && b is null;
+		return Red is null && Green is null && Blue is null;
 	}
 
 	public void SetValueToNullChannels(byte value)
 	{
-		r ??= value;
-		g ??= value;
-		b ??= value;
+		Red ??= value;
+		Green ??= value;
+		Blue ??= value;
 	}
 
 	public void SetAll(byte? value)
 	{
-		r = g = b = value;
+		Red = Green = Blue = value;
 	}
 }

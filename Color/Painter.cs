@@ -37,18 +37,17 @@ public abstract class Painter
 /// <param name="color"> The ColorObject to use. </param>
 public class ColorPainter(ColorObject? color = null) : Painter
 {
-	public ColorObject? color = color;
+	public ColorObject? Color { get; set; } = color;
 
 
 	public override string Paint(string source)
 	{
-		if (color is null)
+		if (Color is null)
 			return string.Empty;
 
-		return color.AsSequence() + source + SequenceFinisher;
+		return Color.AsSequence() + source + SequenceFinisher;
 	}
 }
-
 
 /// <summary>
 /// A Painter for ColorPatterns.
@@ -56,18 +55,18 @@ public class ColorPainter(ColorObject? color = null) : Painter
 /// <param name="pattern"> The pattern to be used. </param>
 public class PatternPainter(ColorPattern? pattern = null) : Painter
 {
-	public ColorPattern? pattern = pattern;
+	public ColorPattern? Pattern { get; set; } = pattern;
 
 
 	public override string Paint(string source)
 	{
-		if (pattern is null)
+		if (Pattern is null)
 			return string.Empty;
 
 		StringBuilder builder = new();
-		ColorPattern validPattern = pattern ?? new();
+		ColorPattern validPattern = Pattern ?? new();
 
-		var colors = validPattern.colors;
+		var colors = validPattern.Colors;
 		uint currentLength = 1;
 
 		for (int charIndex = 0, colorIndex = 0; charIndex < source.Length; charIndex++)
@@ -77,7 +76,7 @@ public class PatternPainter(ColorPattern? pattern = null) : Painter
 			// restart color index when it reaches the colors size
 			if (colorIndex >= colors.Count)
 			{
-				if (validPattern.resetMode == ColorPattern.ResetMode.Revert)
+				if (validPattern.ResetMode == ResetMode.Revert)
 					colors.Reverse();
 				
 				colorIndex = 0;
@@ -86,7 +85,7 @@ public class PatternPainter(ColorPattern? pattern = null) : Painter
 			var color = colors[colorIndex];
 			char ch = source[charIndex];
 
-			if (color.length == 0 || validPattern.ignoreChars.Contains(ch))
+			if (color.length == 0 || validPattern.IgnoreChars.Contains(ch))
 			{
 				builder.Append(ch);
 				continue;

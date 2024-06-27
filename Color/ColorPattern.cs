@@ -6,6 +6,25 @@ namespace Specter.Color;
 
 
 /// <summary>
+/// Specifies how the pattern should behave when the ColorObject list reaches
+/// at its end.
+/// </summary>
+public enum ResetMode
+{
+	/// <summary>
+	/// Returns to the begin of the list.
+	/// </summary>
+	FromBeginning,
+	
+	/// <summary>
+	/// Reverts the list indexing direction. If it's going from left-to-right, then
+	/// the direction is changed to right-to-left.
+	/// </summary>
+	Revert
+}
+
+
+/// <summary>
 /// A pattern of ColorObjects. A PatternPainter uses this object to perform painting.
 /// </summary>
 /// <param name="colors"> The ColorObjects as a List of ColorPattern.Color. </param>
@@ -24,38 +43,19 @@ public struct ColorPattern(List<ColorPattern.Color> colors)
 
 
 	/// <summary>
-	/// Specifies how the pattern should behave when the ColorObject list reaches
-	/// at its end.
-	/// </summary>
-	public enum ResetMode
-	{
-		/// <summary>
-		/// Returns to the begin of the list.
-		/// </summary>
-		FromBeginning,
-		
-		/// <summary>
-		/// Reverts the list indexing direction. If it's going from left-to-right, then
-		/// the direction is changed to right-to-left.
-		/// </summary>
-		Revert
-	}
-
-
-	/// <summary>
 	/// The ColorPattern.Color list.
 	/// </summary>
-	public List<Color> colors = colors;
+	public List<Color> Colors { get; set; } = colors;
 	
 	/// <summary>
 	/// Array of characters to be ignored by the pattern.
 	/// </summary>
-	public char[] ignoreChars = [];
+	public char[] IgnoreChars { get; set; } = [];
 
 	/// <summary>
 	/// The reset mode.
 	/// </summary>
-	public ResetMode resetMode = ResetMode.FromBeginning;
+	public ResetMode ResetMode { get; set; } = ResetMode.FromBeginning;
 
 
 	/// <param name="colors"> The ColorPattern.Color list. </param>
@@ -63,6 +63,6 @@ public struct ColorPattern(List<ColorPattern.Color> colors)
 	public ColorPattern(List<ColorObject> colors, uint colorLength = 1)
 		: this([])
 	{
-		this.colors = (from color in colors select new Color(color, colorLength)).ToList();
+		Colors = (from color in colors select new Color(color, colorLength)).ToList();
 	}
 }

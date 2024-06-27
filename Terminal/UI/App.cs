@@ -25,23 +25,26 @@ public class App
 	/// <summary>
 	/// The delay between each update and draw.
 	/// </summary>
-	public uint MillisecondsDelay = 100;
+	public uint MillisecondsDelay { get; set; } = 100;
 
-	public Encoding AppEncoding = new UTF8Encoding();
+	public static Encoding AppEncoding
+	{
+		get => Console.OutputEncoding;
+		set => Console.InputEncoding = value;
+	}
 
-	// TODO: change ^ to properties. { get => Console.OutputEncoding; set => Console.InputEncoding = value; }
 
 	public App()
 	{
 		Terminal.SetEchoEnabled(false);
 		Terminal.SetCursorVisible(false);
-		
+
+		AppEncoding = new UTF8Encoding();
+
 		// on CTRL+C pressed
 		Console.CancelKeyPress += delegate { OnExit(); };
 
-
 		Exit = false;
-
 		Root = new();
 	}
 

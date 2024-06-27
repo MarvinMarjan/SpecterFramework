@@ -9,27 +9,8 @@ namespace Specter.Terminal.UI;
 /// </summary>
 public struct BorderCharacters
 {
-	public static BorderCharacters UTF8Default
-	{
-		get
-		{
-			BorderCharacters chars = new();
-			chars.SetBorderCharacters(new UTF8Encoding());
-
-			return chars;
-		}
-	}
-
-	public static BorderCharacters ASCIIDefault
-	{
-		get
-		{
-			BorderCharacters chars = new();
-			chars.SetBorderCharacters(new ASCIIEncoding());
-
-			return chars;
-		}
-	}
+	public static BorderCharacters UTF8Default => new(new UTF8Encoding());
+	public static BorderCharacters ASCIIDefault => new(new ASCIIEncoding());
 
 	public static BorderCharacters Default
 	{
@@ -53,6 +34,9 @@ public struct BorderCharacters
 	public char TopRight { get; set; }
 	public char BottomLeft { get; set; }
 	public char BottomRight { get; set; }
+
+
+	public BorderCharacters(Encoding encoding) => SetBorderCharacters(encoding);
 
 
 	public void SetBorderCharacters(char vertical, char horizontal, char corner)

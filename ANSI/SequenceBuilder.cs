@@ -39,6 +39,14 @@ public interface IANSISequenceElement
 
 public static class SequenceBuilder
 {
+	public static string AddEscapeCode(string source)
+	{
+		source = source.Insert(0, EscapeCodes.EscapeCodeWithController);
+		source += 'm';
+
+		return source;
+	}
+
 	
 	/// <summary>
 	/// Builds an ANSI sequence based on codes of an array.
@@ -51,18 +59,13 @@ public static class SequenceBuilder
 	{
 		StringBuilder builder = new();
 
-
-		if (useEscapeCode)
-			builder.Append(EscapeCodes.DefaultEscapeCode + "[");
-
 		// removes any null or empty value from "codes"
 		var validCodes = (from code in codes where code is not null and not "" select code).ToArray();
 		
 		builder.Append(string.Join(';', validCodes));
 
 		if (useEscapeCode)
-			builder.Append('m');
-		
+			builder = new(AddEscapeCode(builder.ToString()));
 		
 		return builder.ToString();
 	}

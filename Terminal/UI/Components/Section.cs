@@ -12,12 +12,6 @@ namespace Specter.Terminal.UI.Components;
 /// </summary>
 public class SectionComponent : Component
 {
-	// Properties
-
-	// TODO: move this to Component.
-	public Bounds Bounds { get => Bounds.FromRectangle(Position, Size); }
-
-
 	// Component properties
 
 	public InheritableComponentProperty<char> BackgroundFill { get; }

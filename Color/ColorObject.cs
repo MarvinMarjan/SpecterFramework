@@ -17,11 +17,10 @@ public class ColorObject(IANSISequenceElement? fg, IANSISequenceElement? bg, Col
 	public static ColorObject None { get => new(null, null, null); }
 
 
-	// TODO: Convert all fields to properties.
 
-	public IANSISequenceElement? foreground = fg;
-	public IANSISequenceElement? background = bg;
-	public ColorMode? mode = mode;
+	public IANSISequenceElement? Foreground { get; set; } = fg;
+	public IANSISequenceElement? Background { get; set; } = bg;
+	public ColorMode? Mode { get; set; } = mode;
 
 
 
@@ -94,9 +93,9 @@ public class ColorObject(IANSISequenceElement? fg, IANSISequenceElement? bg, Col
     public static ColorObject operator+(ColorObject left, ColorObject right)
 	{
 		ColorObject result = new(
-			fg: IANSISequenceElement.IsValid(left.foreground) ? left.foreground : right.foreground,
-			bg: IANSISequenceElement.IsValid(left.background) ? left.background : right.background,
-			mode: left.mode ?? right.mode
+			fg: IANSISequenceElement.IsValid(left.Foreground) ? left.Foreground : right.Foreground,
+			bg: IANSISequenceElement.IsValid(left.Background) ? left.Background : right.Background,
+			mode: left.Mode ?? right.Mode
 		);
 
 		return result;
@@ -108,7 +107,7 @@ public class ColorObject(IANSISequenceElement? fg, IANSISequenceElement? bg, Col
 	public string AsSequence()
 	{
 		return SequenceBuilder.BuildANSIEscapeSequence([ 
-			((int?)mode)?.ToString(), foreground?.BuildSequence(), background?.BuildSequence(),
+			((int?)Mode)?.ToString(), Foreground?.BuildSequence(), Background?.BuildSequence(),
 		]);
 	}
 }
