@@ -50,7 +50,7 @@ public struct ColorPattern(List<ColorPattern.Color> colors)
 	/// <summary>
 	/// Array of characters to be ignored by the pattern.
 	/// </summary>
-	public char[] IgnoreChars { get; set; } = [];
+	public char[] IgnoreChars { get; set; } = [ ' ' ];
 
 	/// <summary>
 	/// The reset mode.

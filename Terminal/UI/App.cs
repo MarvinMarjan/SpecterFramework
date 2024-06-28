@@ -8,8 +8,6 @@ using Specter.Terminal.UI.Components;
 namespace Specter.Terminal.UI;
 
 
-// TODO: document (add comments) everything.
-
 /// <summary>
 /// Initializes a terminal UI app.
 /// </summary>
@@ -27,10 +25,17 @@ public class App
 	/// </summary>
 	public uint MillisecondsDelay { get; set; } = 100;
 
-	public static Encoding AppEncoding
+
+	public static Encoding OutputEncoding
 	{
-		get => Console.OutputEncoding;
-		set => Console.InputEncoding = value;
+		get => Terminal.GetOutputEncoding();
+		set => Terminal.SetOutputEncoding(value);
+	}
+
+	public static Encoding InputEncoding
+	{
+		get => Terminal.GetInputEncoding();
+		set => Terminal.SetInputEncoding(value);
 	}
 
 
@@ -39,7 +44,7 @@ public class App
 		Terminal.SetEchoEnabled(false);
 		Terminal.SetCursorVisible(false);
 
-		AppEncoding = new UTF8Encoding();
+		OutputEncoding = new UTF8Encoding();
 
 		// on CTRL+C pressed
 		Console.CancelKeyPress += delegate { OnExit(); };
@@ -60,6 +65,7 @@ public class App
 	}
 
 
+	// TODO: only update parts that need to be updated
 
 	public void Run()
 	{

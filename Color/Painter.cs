@@ -60,7 +60,7 @@ public class PatternPainter(ColorPattern? pattern = null) : Painter
 	public ColorPattern? Pattern { get; set; } = pattern;
 	public ColorPattern ValidPattern => Pattern ?? new ColorPattern();
 	public List<ColorPattern.Color> Colors => ValidPattern.Colors;
-	public ColorPattern.Color CurrentColor => Colors[(int)_currentLength];
+	public ColorPattern.Color CurrentColor => Colors[(int)_colorIndex];
 
 
 	private uint _charIndex;

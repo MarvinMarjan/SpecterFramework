@@ -96,6 +96,7 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 	public bool ConstantValueUpdate { get; set; }
 
 
+	// TODO: set inheriting disabled by default
 	public InheritableComponentProperty(
 
 		T defaultValue,

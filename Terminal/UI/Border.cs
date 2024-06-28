@@ -14,7 +14,7 @@ public struct BorderCharacters
 
 	public static BorderCharacters Default
 	{
-		get => Terminal.GetOutputEncoding() switch
+		get => Terminal.GetOutputEncoding() switch 
 		{
 			UTF8Encoding => UTF8Default,
 			ASCIIEncoding => ASCIIDefault,
