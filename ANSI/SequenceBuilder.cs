@@ -53,8 +53,6 @@ public static class SequenceBuilder
 		source.Append(EscapeCodes.EscapeCodeEnd);
 	}
 
-	// TODO: maybe use a constant to represent EscapeCodes.EscapeCodeEnd
-
 	
 	/// <summary>
 	/// Builds an ANSI sequence based on codes of an array.

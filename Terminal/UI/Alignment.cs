@@ -87,7 +87,7 @@ public static class AlignmentExtensions
 				finalPosition.col = 0;
 	
 			else if (alignment.HasFlag(Alignment.Right))
-				finalPosition.col = parent.size.width - finalSize.width + 1;
+				finalPosition.col = parent.size.width - finalSize.width;
 		}
 
 
