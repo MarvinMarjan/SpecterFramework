@@ -25,6 +25,8 @@ public enum Alignment
 
 	Center = CenterHorizontal | CenterVertical,
 
+	// FIXME: (CenterVertical | Right) is passing through parent's limits.
+
 	TopLeft = Top | Left,
 	TopRight = Top | Right,
 	BottomLeft = Bottom | Left,

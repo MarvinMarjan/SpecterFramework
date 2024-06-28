@@ -5,26 +5,44 @@ namespace Specter.Terminal.UI.Components;
 /// Represents properties of UI components, but with extended behavior.
 /// </summary>
 /// <typeparam name="T"> The property value type. </typeparam>
-public class ComponentProperty<T>
+public class ComponentProperty<T> : IUpdateable
 {
     private T _value;
-
     public T Value
 	{
 		get => _value;
-		set
+		protected set
 		{
 			_value = value;
 			RaiseValueChangedEvent(value);
 		}
 	}
 
+	public T DefaultValue { get; set; }
+
+
+	public ComponentProperty<T>? LinkProperty { get; set; }
+	public bool UseLink { get; set; }
+
+
+	public ComponentProperty(ComponentProperty<T> link) : this(link.Value)
+	{
+		LinkProperty = link;
+		UseLink = true;
+	}
 
 	public ComponentProperty(T value)
 	{
-		_value = value;
+		_value = DefaultValue = value;
+		UseLink = false;
+
 		PropertyValueChanged += OnPropertyValueChange;
 	}
+
+
+	public bool CanLink() => UseLink && LinkProperty is not null;
+
+	public void LinkValue() => Value = LinkProperty is not null ? LinkProperty.Value : Value;
 
 
 	public static implicit operator T(ComponentProperty<T> property) => property.Value;
@@ -39,6 +57,15 @@ public class ComponentProperty<T>
 
 
 	public virtual void OnPropertyValueChange(T newValue) {}
+
+
+	public virtual void Update()
+	{
+		if (CanLink())
+			LinkValue();
+		else
+			Value = DefaultValue;
+	}
 }
 
 
@@ -46,12 +73,11 @@ public class ComponentProperty<T>
 /// <summary>
 /// Provides some basic inheritance behavior.
 /// </summary>
-public interface IInheritable : IUpdateable
+public interface IInheritable
 {
 	public IInheritable? Parent { get; set; }
 
 	public bool Inherit { get; set; }
-	public bool ConstantValueUpdate { get; set; }
 	public bool CanBeInherited { get; set; }
 
 
@@ -70,50 +96,27 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 	/// <summary>
 	/// Tries to convert Parent to a component property.
 	/// </summary>
-	public InheritableComponentProperty<T>? ParentAsProperty
-	{
-		get => Parent as InheritableComponentProperty<T>;
-	}
-
-
-	// * Value should not be modified by this object.
-	// * Use 'DefaultValue' instead.
-    new public T Value
-	{
-		get => base.Value;
-		private set => base.Value = value;
-	}
-
-	/// <summary>
-	/// Default value to be set to 'Value'.
-	/// Ignored if inheriting value from 'Parent'.
-	/// </summary>
-    public T DefaultValue { get; set; }
+	public InheritableComponentProperty<T>? ParentAsProperty => Parent as InheritableComponentProperty<T>;
 
 
 	public bool Inherit { get; set; }
 	public bool CanBeInherited { get; set; }
-	public bool ConstantValueUpdate { get; set; }
 
 
-	// TODO: set inheriting disabled by default
 	public InheritableComponentProperty(
 
-		T defaultValue,
+		T value,
 		InheritableComponentProperty<T>? parent = null,
 		bool inherit = true,
 		bool canBeInherited = true
 
 		
-	) : base(defaultValue)
+	) : base(value)
 	{
 		Parent = parent;
-	
-		DefaultValue = defaultValue;
 
 		Inherit = inherit;
 		CanBeInherited = canBeInherited;
-		ConstantValueUpdate = true;
 
 		if (ParentAsProperty is null)
 			return;
@@ -124,35 +127,47 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 		ParentAsProperty.PropertyValueChanged += OnParentPropertyValueChange;
 	}
 
+	public InheritableComponentProperty(
+
+		ComponentProperty<T> link,
+		InheritableComponentProperty<T>? parent = null,
+		bool inherit = true,
+		bool canBeInherited = true
+
+		
+	) : this(link.Value, parent, inherit, canBeInherited)
+	{
+		LinkProperty = link;
+		UseLink = true;
+	}
+
+	// * Inheriting have a higher priority than Linking. If CanLink and CanInherit,
+	// * Inherit will be considered
+
 
 	public bool CanInherit() => Inherit && ParentAsProperty is not null && ParentAsProperty.CanBeInherited;
 
 	public void InheritValue()
 		=> Value = ParentAsProperty is not null ? ParentAsProperty.Value : Value;
 
-	protected bool InheritValueIfPossible()
+	public void InheritValueIfPossible()
 	{
 		if (CanInherit())
-		{
 			InheritValue();
-			return true;
-		}
-
-		return false;
 	}
 
 
-	public static implicit operator T(InheritableComponentProperty<T> property) => property.DefaultValue;
+	public static implicit operator T(InheritableComponentProperty<T> property) => property.Value;
 	public static implicit operator InheritableComponentProperty<T>(T value) => new(value);
 
 
     public virtual void OnParentPropertyValueChange(T newValue) => InheritValueIfPossible();
 
 
-    public virtual void Update()
+    public override void Update()
 	{
-		// use DefaultValue if inheritance is not possible
-		if (!InheritValueIfPossible())
-			Value = DefaultValue;
+		base.Update();
+
+		InheritValueIfPossible();
 	}
 }

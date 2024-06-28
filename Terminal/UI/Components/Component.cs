@@ -87,15 +87,14 @@ public abstract partial class Component : IUpdateable, IDrawable
 		Properties = [];
 
 		Position = position ?? Point.None;
-		Size = size ?? UI.Size.None;
+		Size     = size ?? UI.Size.None;
 
-		Alignment = new(
-			alignment ?? UI.Alignment.None, Parent?.Alignment, false // * temporary. remove later
-		);
+		Alignment = new(alignment ?? UI.Alignment.None, Parent?.Alignment);
 
-		Color = new(color ?? ColorValue.Reset, Parent?.Color);
+		Color = new(color ?? ColorObject.None, Parent?.Color);
 
-		Properties.AddRange([ Position, Size, Color ]);
+		// * keep synchronized
+		Properties.AddRange([ Position, Size, Alignment, Color ]);
 
 		SetAllPropertiesInherit(inheritProperties);
 
@@ -168,7 +167,7 @@ public abstract partial class Component : IUpdateable, IDrawable
 		foreach (IUpdateable? property in PropertiesAs<IUpdateable>())
 			property?.Update();
 
-		Position.Value = Alignment.Value.CalculatePosition(this);
+		Position.DefaultValue = Alignment.Value.CalculatePosition(this);
 		
 		foreach (Component child in Childs)
 			child.Update();

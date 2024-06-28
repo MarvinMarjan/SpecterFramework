@@ -64,7 +64,7 @@ public class TextComponent : Component, IChildLess
 
     public override void Update()
     {
-		Size.Value = SizeFromText();
+		Size.DefaultValue = SizeFromText();
 
         base.Update();
     }

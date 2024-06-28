@@ -67,6 +67,8 @@ public class App
 
 	// TODO: only update parts that need to be updated
 
+	// FIXME: first drawing is weird.
+
 	public void Run()
 	{
 		while (!Exit)

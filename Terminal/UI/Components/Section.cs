@@ -45,8 +45,12 @@ public class SectionComponent : Component
 		);
 
 		BorderColor = new(
-			borderColor ?? Color ?? ColorValue.Reset, Parent?.As<SectionComponent>()?.BorderColor
-		);
+			borderColor ?? Color, Parent?.As<SectionComponent>()?.BorderColor
+		)
+		{
+			LinkProperty = Color,
+			UseLink = true
+		};
 
 		DrawBorder = new(
 			drawBorder, Parent?.As<SectionComponent>()?.DrawBorder

@@ -18,6 +18,6 @@ public class RootComponent : SectionComponent
 	{
 		base.Update();
 
-		Size.Value = new((uint)Console.LargestWindowWidth, (uint)Console.LargestWindowHeight);
+		Size.DefaultValue = new((uint)Console.LargestWindowWidth, (uint)Console.LargestWindowHeight);
 	}
 }
