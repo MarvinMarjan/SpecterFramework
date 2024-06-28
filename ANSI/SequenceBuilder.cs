@@ -42,7 +42,7 @@ public static class SequenceBuilder
 	public static string AddEscapeCode(string source)
 	{
 		source = source.Insert(0, EscapeCodes.EscapeCodeWithController);
-		source += 'm';
+		source += EscapeCodes.EscapeCodeEnd;
 
 		return source;
 	}
@@ -50,10 +50,10 @@ public static class SequenceBuilder
 	public static void AddEscapeCode(ref StringBuilder source)
 	{
 		source.Insert(0, EscapeCodes.EscapeCodeWithController);
-		source.Append('m');
+		source.Append(EscapeCodes.EscapeCodeEnd);
 	}
 
-	// TODO: maybe use a constant to represent 'm'
+	// TODO: maybe use a constant to represent EscapeCodes.EscapeCodeEnd
 
 	
 	/// <summary>

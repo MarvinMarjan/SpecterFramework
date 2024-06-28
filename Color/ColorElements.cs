@@ -58,7 +58,7 @@ public class Color256Element(byte? code = null, ColorLayer layer = ColorLayer.Fo
 		int layerCode = (int)Layer;
 
 		return SequenceBuilder.BuildANSIEscapeSequence([
-			layerCode.ToString(), EscapeCodes.Color256TypeCode, Code.ToString()
+			layerCode.ToString(), EscapeCodes.Color256TypeCode.ToString(), Code.ToString()
 		], false);
 	}
 }
@@ -90,7 +90,7 @@ public class ColorRGBElement(ColorRGB? color = null, ColorLayer layer = ColorLay
 			validColor.SetValueToNullChannels(0);
 
 		return SequenceBuilder.BuildANSIEscapeSequence([
-			layerCode.ToString(), EscapeCodes.ColorRGBTypeCode,
+			layerCode.ToString(), EscapeCodes.ColorRGBTypeCode.ToString(),
 			validColor.Red?.ToString(), validColor.Green?.ToString(), validColor.Blue?.ToString()
 		], false);
 	}

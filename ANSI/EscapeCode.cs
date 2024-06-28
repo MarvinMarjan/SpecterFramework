@@ -11,8 +11,10 @@ public static class EscapeCodes
 	public const string DefaultEscapeCode = Hexadecimal;
 	public const string EscapeCodeWithController = DefaultEscapeCode + "[";
 
+	public const char EscapeCodeEnd = 'm';
+
 	public const string Reset = DefaultEscapeCode + "[" + "0m";
 
-	public const string Color256TypeCode = "5";
-	public const string ColorRGBTypeCode = "2";
+	public const char Color256TypeCode = '5';
+	public const char ColorRGBTypeCode = '2';
 }
