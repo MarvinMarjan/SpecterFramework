@@ -18,22 +18,38 @@ public class ComponentProperty<T> : IUpdateable
 		}
 	}
 
-	public T DefaultValue { get; set; }
+	private T _defaultValue;
+	public T DefaultValue
+	{
+		get => _defaultValue;
+		set
+		{
+			if (UpdateOnChange)
+				Value = value;
+
+			_defaultValue = value;
+		}
+	}
+
+	public bool UpdateOnChange { get; set; }
+
 
 
 	public ComponentProperty<T>? LinkProperty { get; set; }
 	public bool UseLink { get; set; }
 
 
-	public ComponentProperty(ComponentProperty<T> link) : this(link.Value)
+	public ComponentProperty(ComponentProperty<T> link, bool updateOnChange)
+		: this(link.Value, updateOnChange)
 	{
 		LinkProperty = link;
 		UseLink = true;
 	}
 
-	public ComponentProperty(T value)
+	public ComponentProperty(T value, bool updateOnChange = false)
 	{
-		_value = DefaultValue = value;
+		_value = _defaultValue = value;
+		UpdateOnChange = updateOnChange;
 		UseLink = false;
 
 		PropertyValueChanged += OnPropertyValueChange;
@@ -65,6 +81,9 @@ public class ComponentProperty<T> : IUpdateable
 			LinkValue();
 		else
 			Value = DefaultValue;
+			
+		// ! Default values are setted to Value only in updates.
+		// ! If you need to do this immediately, use 'UpdateOnChange = true'.
 	}
 }
 
@@ -108,10 +127,11 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 		T value,
 		InheritableComponentProperty<T>? parent = null,
 		bool inherit = true,
-		bool canBeInherited = true
+		bool canBeInherited = true,
+		bool updateOnChange = false
 
 		
-	) : base(value)
+	) : base(value, updateOnChange)
 	{
 		Parent = parent;
 
@@ -132,10 +152,11 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 		ComponentProperty<T> link,
 		InheritableComponentProperty<T>? parent = null,
 		bool inherit = true,
-		bool canBeInherited = true
+		bool canBeInherited = true,
+		bool updateOnChange = false
 
 		
-	) : this(link.Value, parent, inherit, canBeInherited)
+	) : this(link.Value, parent, inherit, canBeInherited, updateOnChange)
 	{
 		LinkProperty = link;
 		UseLink = true;
@@ -166,8 +187,10 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 
     public override void Update()
 	{
+		// linking of default value
 		base.Update();
 
+		// inheriting
 		InheritValueIfPossible();
 	}
 }

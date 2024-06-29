@@ -77,7 +77,7 @@ public static class AlignmentExtensions
 				finalPosition.row = 0;
 
 			else if (alignment.HasFlag(Alignment.Bottom))
-				finalPosition.row = parent.size.height - finalSize.height + 1;
+				finalPosition.row = parent.size.height - finalSize.height;
 		}
 			
 

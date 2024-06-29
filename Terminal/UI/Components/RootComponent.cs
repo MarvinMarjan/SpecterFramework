@@ -11,13 +11,20 @@ namespace Specter.Terminal.UI.Components;
 /// </summary>
 public class RootComponent : SectionComponent
 {
-    public RootComponent() : base(null, drawBorder: false) => SetPropertiesCanBeInherited(false);
+	public RootComponent() : base(null, drawBorder: false)
+	{
+		SetPropertiesCanBeInherited(false);
+
+		// * need to set this at the constructor because the first drawing
+		// * frame will need it.
+		Size.DefaultValue = Terminal.GetTerminalSize();
+	}
 
 
-    public override void Update()
+	public override void Update()
 	{
 		base.Update();
 
-		Size.DefaultValue = new((uint)Console.LargestWindowWidth, (uint)Console.LargestWindowHeight);
+		Size.DefaultValue = Terminal.GetTerminalSize();
 	}
 }

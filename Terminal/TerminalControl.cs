@@ -3,6 +3,7 @@ using System.Text;
 
 using Specter.ANSI;
 using Specter.OS;
+using Specter.Terminal.UI;
 
 
 namespace Specter.Terminal;
@@ -53,6 +54,9 @@ public static class ControlCodes
 
 public class Terminal
 {
+	private static Size _lastTerminalSize = GetTerminalSize();
+
+
 	public static void SetEchoEnabled(bool enabled) =>
 		Command.Run($"stty {(enabled ? "" : "-")}echo");
 
@@ -63,4 +67,20 @@ public class Terminal
 
 	public static Encoding GetOutputEncoding() => Console.OutputEncoding;
 	public static Encoding GetInputEncoding() => Console.InputEncoding;
+
+
+	public static Size GetTerminalSize()
+		=> new((uint)Console.LargestWindowWidth, (uint)Console.LargestWindowHeight);
+
+	// TODO: try to add events and work with threads
+	public static bool TerminalResized()
+	{
+		Size terminalSize = GetTerminalSize();
+		bool changed = _lastTerminalSize != terminalSize;
+
+		if (changed)
+			_lastTerminalSize = terminalSize;
+
+		return changed;
+	}
 }

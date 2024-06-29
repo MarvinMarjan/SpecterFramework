@@ -86,8 +86,8 @@ public abstract partial class Component : IUpdateable, IDrawable
 		Childs     = [];
 		Properties = [];
 
-		Position = position ?? Point.None;
-		Size     = size ?? UI.Size.None;
+		Position = new(position ?? Point.None, true);
+		Size     = new(size ?? UI.Size.None, true);
 
 		Alignment = new(alignment ?? UI.Alignment.None, Parent?.Alignment);
 
@@ -166,7 +166,7 @@ public abstract partial class Component : IUpdateable, IDrawable
 	{
 		foreach (IUpdateable? property in PropertiesAs<IUpdateable>())
 			property?.Update();
-
+		
 		Position.DefaultValue = Alignment.Value.CalculatePosition(this);
 		
 		foreach (Component child in Childs)
