@@ -38,7 +38,7 @@ public static class AlignmentExtensions
 {
 	private static uint CalculateCentralizedValue(uint parent, uint child)
 	{
-		double diff = parent - child;
+		double diff = Math.Abs((int)parent - (int)child);
 		double position = diff / 2.0;
 		
 		bool hasRemainder = diff % 2 != 0;

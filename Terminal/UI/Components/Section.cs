@@ -12,6 +12,9 @@ namespace Specter.Terminal.UI.Components;
 /// </summary>
 public class SectionComponent : Component
 {
+	new protected object[] Properties => [ BorderCharacters, BorderColor, DrawBorder, BackgroundFill ];
+
+
 	// Component properties
 
 	public InheritableComponentProperty<char> BackgroundFill { get; }
@@ -61,9 +64,10 @@ public class SectionComponent : Component
 		);
 
 
-		Properties.AddRange([ BorderCharacters, BorderColor, DrawBorder, BackgroundFill ]);
+		AllProperties.AddRange(Properties);
 
-		SetAllPropertiesInherit(inheritProperties);
+		Properties.PropertiesAs<IInheritable>().SetInheritablesInherit(inheritProperties);
+		RequestRenderOnPropertiesChange(Properties.PropertiesAs<IComponentPropertyEvents>());
 	}
 
 

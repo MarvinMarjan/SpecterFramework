@@ -13,6 +13,9 @@ namespace Specter.Terminal.UI.Components;
 /// </summary>
 public class TextComponent : Component, IChildLess
 {
+	new protected object[] Properties => [ Text ];
+
+
     public InheritableComponentProperty<string> Text { get; set; }
 
 
@@ -35,9 +38,10 @@ public class TextComponent : Component, IChildLess
     {
         Text = text;
 
-		Properties.AddRange([ Text ]);
+		AllProperties.AddRange(Properties);
 
-		SetAllPropertiesInherit(inheritProperties);
+		Properties.PropertiesAs<IInheritable>().SetInheritablesInherit(inheritProperties);
+		RequestRenderOnPropertiesChange(Properties.PropertiesAs<IComponentPropertyEvents>());
     }
 
 

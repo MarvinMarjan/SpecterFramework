@@ -1,11 +1,28 @@
 namespace Specter.Terminal.UI.Components;
 
 
+public interface IComponentPropertyEvents<T>
+{
+	delegate void ValueChangedEventHandler(T newValue);
+
+	event ValueChangedEventHandler? PropertyValueChanged;
+}
+
+
+public interface IComponentPropertyEvents
+{
+	delegate void ValueChangedEventHandler(object newValue);
+
+	event ValueChangedEventHandler? PropertyValueChanged;
+}
+
+
 /// <summary>
 /// Represents properties of UI components, but with extended behavior.
 /// </summary>
 /// <typeparam name="T"> The property value type. </typeparam>
-public class ComponentProperty<T> : IUpdateable
+public class ComponentProperty<T> : IComponentPropertyEvents<T>, IComponentPropertyEvents, IUpdateable
+	where T : notnull
 {
     private T _value;
     public T Value
@@ -24,7 +41,7 @@ public class ComponentProperty<T> : IUpdateable
 		get => _defaultValue;
 		set
 		{
-			if (UpdateOnChange)
+			if (UpdateOnChange && !value.Equals(Value))
 				Value = value;
 
 			_defaultValue = value;
@@ -53,26 +70,60 @@ public class ComponentProperty<T> : IUpdateable
 		UseLink = false;
 
 		PropertyValueChanged += OnPropertyValueChange;
+		PropertyObjectValueChanged += OnPropertyObjectValueChange;
 	}
 
 
-	public bool CanLink() => UseLink && LinkProperty is not null;
 
-	public void LinkValue() => Value = LinkProperty is not null ? LinkProperty.Value : Value;
+    public bool CanLink() => UseLink && LinkProperty is not null;
+
+	public void LinkValue()
+	{
+		if (LinkProperty is not null && !LinkProperty.Value.Equals(Value))
+			Value = LinkProperty.Value;
+	}
+
+
+	public void SetValueToDefault()
+	{
+		if (!DefaultValue.Equals(Value))
+			Value = DefaultValue;
+	}
 
 
 	public static implicit operator T(ComponentProperty<T> property) => property.Value;
 	public static implicit operator ComponentProperty<T>(T value) => new(value);
 	
 
-	public delegate void ValueChangedEventHandler(T newValue);
+	// Events
 
-	public event ValueChangedEventHandler? PropertyValueChanged;
+	public event IComponentPropertyEvents<T>.ValueChangedEventHandler? PropertyValueChanged;
+	event IComponentPropertyEvents<T>.ValueChangedEventHandler? IComponentPropertyEvents<T>.PropertyValueChanged
+	{
+		add => PropertyValueChanged += value;
+		remove => PropertyValueChanged -= value;
+	}
 
-	public void RaiseValueChangedEvent(T newValue) => PropertyValueChanged?.Invoke(newValue);
+
+	public event IComponentPropertyEvents.ValueChangedEventHandler? PropertyObjectValueChanged;
+	event IComponentPropertyEvents.ValueChangedEventHandler? IComponentPropertyEvents.PropertyValueChanged
+	{
+		add => PropertyObjectValueChanged += value;
+		remove => PropertyObjectValueChanged -= value;
+	}
 
 
-	public virtual void OnPropertyValueChange(T newValue) {}
+	protected void RaiseValueChangedEvent(T newValue)
+	{
+		PropertyValueChanged?.Invoke(newValue);
+		PropertyObjectValueChanged?.Invoke(newValue);
+	}
+
+
+	protected virtual void OnPropertyValueChange(T newValue) {}
+	protected virtual void OnPropertyObjectValueChange(object newValue) {}
+
+
 
 
 	public virtual void Update()
@@ -80,7 +131,7 @@ public class ComponentProperty<T> : IUpdateable
 		if (CanLink())
 			LinkValue();
 		else
-			Value = DefaultValue;
+			SetValueToDefault();
 			
 		// ! Default values are setted to Value only in updates.
 		// ! If you need to do this immediately, use 'UpdateOnChange = true'.
@@ -109,6 +160,7 @@ public interface IInheritable
 /// </summary>
 /// <typeparam name="T"> The property value type. </typeparam>
 public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritable
+	where T : notnull
 {
     public IInheritable? Parent { get; set; }
 
@@ -145,6 +197,7 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 			Value = ParentAsProperty.Value;
 			
 		ParentAsProperty.PropertyValueChanged += OnParentPropertyValueChange;
+		ParentAsProperty.PropertyObjectValueChanged += OnParentPropertyObjectValueChange;
 	}
 
 	public InheritableComponentProperty(
@@ -169,7 +222,10 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 	public bool CanInherit() => Inherit && ParentAsProperty is not null && ParentAsProperty.CanBeInherited;
 
 	public void InheritValue()
-		=> Value = ParentAsProperty is not null ? ParentAsProperty.Value : Value;
+	{
+		if (ParentAsProperty is not null && !ParentAsProperty.Value.Equals(Value))
+			Value = ParentAsProperty.Value;
+	}
 
 	public void InheritValueIfPossible()
 	{
@@ -183,7 +239,7 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 
 
     public virtual void OnParentPropertyValueChange(T newValue) => InheritValueIfPossible();
-
+    public virtual void OnParentPropertyObjectValueChange(object newValue) {}
 
     public override void Update()
 	{

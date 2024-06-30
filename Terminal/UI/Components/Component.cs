@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 using Specter.Color;
@@ -41,7 +40,8 @@ public abstract partial class Component : IUpdateable, IDrawable
 	/// <summary>
 	/// List of all component properties
 	/// </summary>
-	protected List<object> Properties;
+	protected List<object> AllProperties;
+	protected object[] Properties => [ Position, Size, Alignment, Color ];
 
 
 	/// <summary>
@@ -83,8 +83,8 @@ public abstract partial class Component : IUpdateable, IDrawable
 		Parent = parent;
 		ChildLessParentCheck(); // checks if Parent is a IChildLess
 
-		Childs     = [];
-		Properties = [];
+		Childs        = [];
+		AllProperties = [];
 
 		Position = new(position ?? Point.None, true);
 		Size     = new(size ?? UI.Size.None, true);
@@ -93,10 +93,15 @@ public abstract partial class Component : IUpdateable, IDrawable
 
 		Color = new(color ?? ColorObject.None, Parent?.Color);
 
-		// * keep synchronized
-		Properties.AddRange([ Position, Size, Alignment, Color ]);
 
-		SetAllPropertiesInherit(inheritProperties);
+		// * keep synchronized
+		// TODO: check if AllProperties already containts Properties
+		AllProperties.AddRange(Properties);
+
+		// TODO: try to store properties automatically instead of doing it manually.
+
+		Properties.PropertiesAs<IInheritable>().SetInheritablesInherit(inheritProperties);
+		RequestRenderOnPropertiesChange(Properties.PropertiesAs<IComponentPropertyEvents>());
 
 		if (Parent is null)
 			return;
@@ -106,6 +111,21 @@ public abstract partial class Component : IUpdateable, IDrawable
 			Parent.Childs.Add(this);
 	}
 
+
+	public bool IsChildOf(Component component)
+	{
+		if (component.Childs.Count == 0)
+			return false;
+
+		if (component.Childs.Contains(this))
+			return true;
+		
+		foreach (Component child in component.Childs)
+			if (IsChildOf(child))
+				return true;
+
+		return false;
+	}
 
 
 	public void ChildLessParentCheck()
@@ -120,34 +140,45 @@ public abstract partial class Component : IUpdateable, IDrawable
 	/// <returns> This Component converted to the specified Component derived type. </returns>
 	public T? As<T>() where T : Component => this as T;
 
-	
-	/// <typeparam name="T"> The type to convert. </typeparam>
-	/// <returns> All component properties converted to another type, or null, if not possible. </returns>
-	protected List<T?> PropertiesAs<T>() where T : class
-		=> (from property in Properties select property as T).ToList();
-		
 
-	/// <summary>
-	/// Defines whether all component properties can inherit from its parents or not>
-	/// </summary>
-	/// <param name="inherit"> The value. </param>
-	public void SetAllPropertiesInherit(bool inherit)
+
+	protected T[] PropertiesAs<T>() where T : class
+		=> Properties.PropertiesAs<T>();
+
+	protected T[] AllPropertiesAs<T>() where T : class
+		=> AllProperties.ToArray().PropertiesAs<T>();
+
+
+	protected void SetPropertiesInherit(bool inherit)
+		=> PropertiesAs<IInheritable>().SetInheritablesInherit(inherit);
+
+	protected void SetPropertiesCanBeInherited(bool can)
+		=> PropertiesAs<IInheritable>().SetInheritablesCanBeInherited(can);
+
+	protected void SetAllPropertiesCanBeInherited(bool can)
+		=> AllPropertiesAs<IInheritable>().SetInheritablesCanBeInherited(can);
+
+
+
+	protected void RequestRenderOnPropertiesChange(IComponentPropertyEvents[] properties)
 	{
-		foreach (var property in PropertiesAs<IInheritable>())
-			if (property is not null)
-				property.Inherit = inherit;
+		foreach (var property in properties)
+			RequestRenderOnPropertyChange(property);
 	}
 
+	protected void RequestRenderOnPropertyChange(IComponentPropertyEvents property)
+		=> property.PropertyValueChanged += delegate { AddThisToRenderQueue(); };
 
-	/// <summary>
-	/// Defines whether all component properties can be inherited by its child or not
-	/// </summary>
-	/// <param name="can"> The value. </param>
-	public void SetPropertiesCanBeInherited(bool can)
+	protected void AddThisToRenderQueue()
 	{
-		foreach (IInheritable? property in PropertiesAs<IInheritable>())
-			if (property is not null)
-				property.CanBeInherited = can;
+		// * do not add if there is already a parent in the queue, since
+		// * drawing the parent also draws the child.
+
+		foreach (Component component in App.RenderQueue)
+			if (IsChildOf(component))
+				return;
+
+		App.AddComponentToRenderQueue(this);
 	}
 
 
@@ -164,7 +195,7 @@ public abstract partial class Component : IUpdateable, IDrawable
 
 	public virtual void Update()
 	{
-		foreach (IUpdateable? property in PropertiesAs<IUpdateable>())
+		foreach (IUpdateable? property in AllPropertiesAs<IUpdateable>())
 			property?.Update();
 		
 		Position.DefaultValue = Alignment.Value.CalculatePosition(this);

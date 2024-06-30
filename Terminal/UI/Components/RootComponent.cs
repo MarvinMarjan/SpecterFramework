@@ -13,7 +13,7 @@ public class RootComponent : SectionComponent
 {
 	public RootComponent() : base(null, drawBorder: false)
 	{
-		SetPropertiesCanBeInherited(false);
+		SetAllPropertiesCanBeInherited(false);
 
 		// * need to set this at the constructor because the first drawing
 		// * frame will need it.
@@ -25,6 +25,7 @@ public class RootComponent : SectionComponent
 	{
 		base.Update();
 
-		Size.DefaultValue = Terminal.GetTerminalSize();
+		if (Terminal.TerminalResized())
+			Size.DefaultValue = Terminal.GetTerminalSize();
 	}
 }
