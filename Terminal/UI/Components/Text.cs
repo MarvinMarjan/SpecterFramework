@@ -16,7 +16,7 @@ public class TextComponent : Component, IChildLess
 	new protected object[] Properties => [ Text ];
 
 
-    public InheritableComponentProperty<string> Text { get; set; }
+    public ComponentProperty<string> Text { get; }
 
 
     public TextComponent(

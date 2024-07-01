@@ -71,11 +71,12 @@ public class App
 
 		while (!Exit)
 		{
-			// TODO: resizing is drawing components weird
-
-			if (Terminal.TerminalResized())
+			if (Terminal.TerminalResized)
+			{
 				ClearAndDrawAll();
+			}
 
+			Terminal.Update();
 			RunFrame();
 		}
 	}
@@ -90,6 +91,7 @@ public class App
 		else
 			DrawRenderQueue();
 
+		// TODO: remove this feature after solving the bug if not necessary
 		if (s_renderQueueClosedForOneFrame)
 			s_renderQueueClosedForOneFrame = false;
 	}
@@ -132,8 +134,13 @@ public class App
 
 	private static void ClearAllScreen()
 	{
-		Console.Write(ControlCodes.CursorToHome());
-		Console.Write(ControlCodes.EraseScreen(ControlCodes.ScreenErasingMode.CursorUntilEnd));
+		StringBuilder codes = new();
+
+		codes.Append(ControlCodes.CursorToHome());
+		codes.Append(ControlCodes.EraseScreen(ControlCodes.ScreenErasingMode.CursorUntilEnd));
+		codes.Append(ControlCodes.EraseScreen(ControlCodes.ScreenErasingMode.SavedLines));
+
+		Console.WriteLine(codes);
 	}	
 
 

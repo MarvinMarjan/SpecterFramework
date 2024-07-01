@@ -54,7 +54,12 @@ public static class ControlCodes
 
 public class Terminal
 {
-	private static Size _lastTerminalSize = GetTerminalSize();
+	private static Size? s_lastTerminalSize = null;
+	private static Size? s_currentTerminalSize = null;
+
+	private static bool s_terminalResized = false;
+	public static bool TerminalResized => s_terminalResized;
+
 
 
 	public static void SetEchoEnabled(bool enabled) =>
@@ -70,17 +75,22 @@ public class Terminal
 
 
 	public static Size GetTerminalSize()
-		=> new((uint)Console.LargestWindowWidth, (uint)Console.LargestWindowHeight);
+		=> new((uint)Console.WindowWidth, (uint)Console.WindowHeight);
+
 
 	// TODO: try to add events and work with threads
-	public static bool TerminalResized()
+
+
+	public static void Update()
 	{
-		Size terminalSize = GetTerminalSize();
-		bool changed = _lastTerminalSize != terminalSize;
+		s_terminalResized = false;
+		s_lastTerminalSize ??= Size.None;
 
-		if (changed)
-			_lastTerminalSize = terminalSize;
+		s_currentTerminalSize = GetTerminalSize();
+		
+		s_terminalResized = s_lastTerminalSize != s_currentTerminalSize;
 
-		return changed;
+		if (s_terminalResized)
+			s_lastTerminalSize = s_currentTerminalSize;
 	}
 }

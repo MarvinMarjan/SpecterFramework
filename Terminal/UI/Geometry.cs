@@ -47,7 +47,7 @@ public struct Point(uint row, uint col)
 /// </summary>
 /// <param name="width"> The width. </param>
 /// <param name="height"> The height. </param>
-public struct Size(uint width, uint height)
+public struct Size(uint width, uint height) : IEquatable<Size>
 {
 	public static Size None { get => new(0, 0); }
 
@@ -67,16 +67,20 @@ public struct Size(uint width, uint height)
 	public static Size operator/(Size left, Size right)
 		=> new(left.width / right.width, left.height / right.height);
 
-	
-	public static bool operator==(Size left, Size right)
-		=> left.width == right.width && left.height == right.height;
+
+    public static bool operator==(Size left, Size right)
+		=> left.Equals(right);
 
 	public static bool operator!=(Size left, Size right)
-		=> left.width != right.width || left.height != right.height;
+		=> !left.Equals(right);
 
 
-    public override readonly bool Equals(object? obj) => base.Equals(obj);
-    public override readonly int GetHashCode() => base.GetHashCode();
+	public readonly override int GetHashCode() => (width, height).GetHashCode();
+
+    public readonly override bool Equals(object? obj)
+		=> obj is Size size && Equals(size);
+
+    public readonly bool Equals(Size obj) => width == obj.width && height == obj.height;
 }
 
 

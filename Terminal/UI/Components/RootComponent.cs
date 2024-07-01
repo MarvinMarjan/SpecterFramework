@@ -25,7 +25,7 @@ public class RootComponent : SectionComponent
 	{
 		base.Update();
 
-		if (Terminal.TerminalResized())
+		if (Terminal.TerminalResized)
 			Size.DefaultValue = Terminal.GetTerminalSize();
 	}
 }

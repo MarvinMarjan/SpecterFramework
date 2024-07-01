@@ -65,6 +65,14 @@ public abstract partial class Component : IUpdateable, IDrawable
 
 
 
+	public delegate void UpdateEventHandler();
+
+	public event UpdateEventHandler? UpdateEvent;
+
+	protected void RaiseUpdateEvent() => UpdateEvent?.Invoke();
+
+
+
 	public Component(
 
 		Component? parent,
@@ -199,6 +207,8 @@ public abstract partial class Component : IUpdateable, IDrawable
 			property?.Update();
 		
 		Position.DefaultValue = Alignment.Value.CalculatePosition(this);
+
+		RaiseUpdateEvent();
 		
 		foreach (Component child in Childs)
 			child.Update();
