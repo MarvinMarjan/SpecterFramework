@@ -19,6 +19,9 @@ public interface IDrawable
 }
 
 
+/// <summary>
+/// Classes that inherit from this can't be parent of any component.
+/// </summary>
 public interface IChildLess {}
 
 
@@ -32,9 +35,9 @@ public abstract partial class Component : IUpdateable, IDrawable
 	// Properties
 
 	public Component? Parent { get; set; }
-	public List<Component> Childs { get; set; }
+	public List<Component> Childs { get; private set; }
 	
-	public Bounds Bounds { get => Bounds.FromRectangle(Position, Size); }
+	public Bounds Bounds => Bounds.FromRectangle(Position, Size);
 	
 
 	/// <summary>
@@ -47,13 +50,13 @@ public abstract partial class Component : IUpdateable, IDrawable
 	/// <summary>
 	/// The position of this Component relative to its parent, if not null.
 	/// </summary>
-	public Point RelativePosition { get => Parent is not null ? Parent.RelativePosition + Position : Position; }
+	public Point RelativePosition => Parent is not null ? Parent.RelativePosition + Position : Position;
 
 
 	/// <summary>
 	/// The Rect object of this Component.
 	/// </summary>
-	public Rect Rect { get => new(Position, Size); }
+	public Rect Rect => new(Position, Size);
 	
 
 	// Component properties
@@ -79,8 +82,8 @@ public abstract partial class Component : IUpdateable, IDrawable
 		Point? position = null,
 		Size?  size     = null,
 
-		// If alignment != Alignment.None, Position is ignored and Alignment is used to define the
-		// Component position
+		// * If alignment != Alignment.None (and null), Position is ignored and Alignment is used to define the
+		// * Component position
 		Alignment? alignment = null,
 		
 		ColorObject? color = null,

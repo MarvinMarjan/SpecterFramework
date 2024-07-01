@@ -141,7 +141,7 @@ public class ComponentProperty<T> : IComponentPropertyEvents<T>, IComponentPrope
 
 
 /// <summary>
-/// Provides some basic inheritance behavior.
+/// Provides behaviour for inheriting a value from a parent.
 /// </summary>
 public interface IInheritable
 {

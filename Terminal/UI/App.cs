@@ -42,8 +42,6 @@ public class App
 	private static List<Component> s_renderQueue = [];
 	public static Component[] RenderQueue => [.. s_renderQueue];
 
-	private static bool s_renderQueueClosedForOneFrame = false;
-
 
 
 	public App()
@@ -62,7 +60,6 @@ public class App
 
 
 
-
 	public void Run()
 	{
 		// first drawing
@@ -71,39 +68,36 @@ public class App
 
 		while (!Exit)
 		{
-			if (Terminal.TerminalResized)
-			{
-				ClearAndDrawAll();
-			}
-
 			Terminal.Update();
-			RunFrame();
+
+			RunFrame(Terminal.TerminalResized);
 		}
 	}
 
 
-	private void RunFrame(bool drawAll = false)
+	private void RunFrame(bool drawAll = false, bool? clearScreen = null)
 	{
+		clearScreen ??= drawAll;
+
+		if (clearScreen is true)
+			ClearAllScreen();
+
 		Root.Update();
 
 		if (drawAll)
 			DrawAll(true);
 		else
 			DrawRenderQueue();
-
-		// TODO: remove this feature after solving the bug if not necessary
-		if (s_renderQueueClosedForOneFrame)
-			s_renderQueueClosedForOneFrame = false;
 	}
+
 
 
 	public static void AddComponentToRenderQueue(Component component)
 	{
-		if (!s_renderQueue.Contains(component) && !s_renderQueueClosedForOneFrame)
+		if (!s_renderQueue.Contains(component))
 			s_renderQueue.Add(component);
 	}
 
-	private static void CloseRenderQueueForOneFrame() => s_renderQueueClosedForOneFrame = true;
 
 
 	private static void DrawRenderQueue()
@@ -114,22 +108,12 @@ public class App
 		s_renderQueue.Clear();
 	}
 
-	private void ClearAndDrawAll(bool clearRenderQueue = true)
-	{
-		ClearAllScreen();
-		DrawAll(clearRenderQueue);
-	}
-
 	private void DrawAll(bool clearRenderQueue = false)
 	{
 		Console.Write(Root.Draw());
 
 		if (clearRenderQueue)
-		{
 			s_renderQueue.Clear();
-			CloseRenderQueueForOneFrame();
-		}
-
 	}
 
 	private static void ClearAllScreen()
@@ -155,7 +139,4 @@ public class App
 		Terminal.SetEchoEnabled(true);
 		Terminal.SetCursorVisible(true);
 	}
-
-
-	// TODO: only update parts that need to be updated
 }

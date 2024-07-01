@@ -17,15 +17,18 @@ public class RootComponent : SectionComponent
 
 		// * need to set this at the constructor because the first drawing
 		// * frame will need it.
-		Size.DefaultValue = Terminal.GetTerminalSize();
+		//Size.DefaultValue = Terminal.GetTerminalSize();
 	}
 
 
 	public override void Update()
 	{
-		base.Update();
+		// * setting the Size before updating the base (consequently, updating the childs)
+		// * is needed to avoid drawing issues when the terminal gets resized.
 
 		if (Terminal.TerminalResized)
 			Size.DefaultValue = Terminal.GetTerminalSize();
+		
+		base.Update();
 	}
 }

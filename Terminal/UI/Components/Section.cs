@@ -52,7 +52,7 @@ public class SectionComponent : Component
 		)
 		{
 			LinkProperty = Color,
-			UseLink = true
+			UseLink      = true // * if you want to set a different color to border, disable UseLink first.
 		};
 
 		DrawBorder = new(
@@ -77,8 +77,9 @@ public class SectionComponent : Component
 		if (DrawBorder && Bounds.IsAtBorder(new Point(row, col) + Position, out Bounds.Edge edges))
 		{
 			ColorPainter painter = new(BorderColor) { SequenceFinisher = Color.Value.AsSequence() };
+			string characterAsString = new(BorderCharacters.Value.GetBorderCharFromEdgeFlags(edges), 1);
 
-			builder.Append(painter.Paint(new(BorderCharacters.Value.GetBorderCharFromEdgeFlags(edges), 1)));
+			builder.Append(painter.Paint(characterAsString));
 			return;
 		}
 

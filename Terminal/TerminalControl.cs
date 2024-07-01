@@ -81,6 +81,9 @@ public class Terminal
 	// TODO: try to add events and work with threads
 
 
+	/// <summary>
+	/// Updates the static state of Terminal. It's required if you want to use TerminalResized stuff.
+	/// </summary>
 	public static void Update()
 	{
 		s_terminalResized = false;

@@ -31,14 +31,18 @@ public struct Point(uint row, uint col)
 
 	
 	public static bool operator==(Point left, Point right)
-		=> left.row == right.row && left.col == right.col;
+		=> left.Equals(right);
 
 	public static bool operator!=(Point left, Point right)
-		=> left.row != right.row || left.col != right.col;
+		=> !left.Equals(right);
 
 
-	public override readonly bool Equals(object? obj) => base.Equals(obj);
-    public override readonly int GetHashCode() => base.GetHashCode();
+	public readonly override int GetHashCode() => (row, col).GetHashCode();
+
+    public readonly override bool Equals(object? obj)
+		=> obj is Point point && Equals(point);
+
+    public readonly bool Equals(Point obj) => row == obj.row && col == obj.col;
 }
 
 
