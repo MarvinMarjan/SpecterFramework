@@ -61,6 +61,12 @@ public class Terminal
 	public static bool TerminalResized => s_terminalResized;
 
 
+	public delegate void TerminalResizedEventHandler();
+
+	public static event TerminalResizedEventHandler? TerminalResizedEvent;
+
+	private static void RaiseTerminalResizedEvent() => TerminalResizedEvent?.Invoke();
+
 
 	public static void SetEchoEnabled(bool enabled) =>
 		Command.Run($"stty {(enabled ? "" : "-")}echo");
@@ -78,11 +84,11 @@ public class Terminal
 		=> new((uint)Console.WindowWidth, (uint)Console.WindowHeight);
 
 
-	// TODO: try to add events and work with threads
+	
 
 
 	/// <summary>
-	/// Updates the static state of Terminal. It's required if you want to use TerminalResized stuff.
+	/// Updates the static state of the Terminal class. It's required if you want to use TerminalResized stuff.
 	/// </summary>
 	public static void Update()
 	{
@@ -94,6 +100,9 @@ public class Terminal
 		s_terminalResized = s_lastTerminalSize != s_currentTerminalSize;
 
 		if (s_terminalResized)
+		{
 			s_lastTerminalSize = s_currentTerminalSize;
+			RaiseTerminalResizedEvent();
+		}
 	}
 }

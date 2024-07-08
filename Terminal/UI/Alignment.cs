@@ -16,20 +16,23 @@ public enum Alignment
 	None = 0,
 
 	CenterHorizontal = 0b_0000_0001,
-	Top = 0b_0000_0010,
-	Bottom = 0b_0000_0100,
+	Top              = 0b_0000_0010,
+	Bottom           = 0b_0000_0100,
 
 	CenterVertical = 0b_0000_1000,
-	Left = 0b_0001_0000,
-	Right = 0b_0010_0000,
+	Left           = 0b_0001_0000,
+	Right          = 0b_0010_0000,
 
 	Center = CenterHorizontal | CenterVertical,
 
-	// TODO: add other centralized alignments. LeftCenter, TopCenter...
+	TopCenter    = Top | CenterHorizontal,
+	BottomCenter = Bottom | CenterHorizontal,
+	LeftCenter   = Left | CenterVertical,
+	RightCenter  = Right | CenterHorizontal,
 
-	TopLeft = Top | Left,
-	TopRight = Top | Right,
-	BottomLeft = Bottom | Left,
+	TopLeft     = Top | Left,
+	TopRight    = Top | Right,
+	BottomLeft  = Bottom | Left,
 	BottomRight = Bottom | Right
 }
 

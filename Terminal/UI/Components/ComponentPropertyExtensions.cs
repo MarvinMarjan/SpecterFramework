@@ -10,7 +10,7 @@ public static class ComponentPropertyExtensions
 		=> (from property in properties
 				let convertedProperty = property as T
 				where convertedProperty is not null
-				select convertedProperty).ToArray(); // TODO: maybe split this into method in Util
+				select convertedProperty).ToArray();
 }
 
 
