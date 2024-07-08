@@ -39,9 +39,30 @@ public class App
 	}
 
 
-	private static List<Component> s_renderQueue = [];
-	public static Component[] RenderQueue => [.. s_renderQueue];
+	private static object s_renderQueueLocker = new();
 
+	private static List<Component> s_renderQueue = [];
+	public static List<Component> RenderQueue // ! Use the property instead of the field.
+	{
+		get
+		{
+			lock(s_renderQueueLocker)
+			{
+				return s_renderQueue;
+			}
+		}
+
+		private set
+		{
+			lock(s_renderQueueLocker)
+			{
+				s_renderQueue = value;
+			}
+		}
+	}
+
+
+	private static bool s_drawAllRequested = false;
 
 
 	public App()
@@ -84,36 +105,41 @@ public class App
 
 		Root.Update();
 
-		if (drawAll)
+		if (drawAll || s_drawAllRequested)
 			DrawAll(true);
 		else
 			DrawRenderQueue();
+
+		s_drawAllRequested = false;
 	}
 
 
 
 	public static void AddComponentToRenderQueue(Component component)
 	{
-		if (!s_renderQueue.Contains(component))
-			s_renderQueue.Add(component);
+		if (!RenderQueue.Contains(component))
+			RenderQueue.Add(component);
 	}
 
 
 
 	private static void DrawRenderQueue()
 	{
-		foreach (Component component in s_renderQueue)
+		foreach (Component component in RenderQueue)
 			Console.Write(component.Draw());
 
-		s_renderQueue.Clear();
+		RenderQueue.Clear();
 	}
+
+
+	public static void RequestDrawAll() => s_drawAllRequested = true;
 
 	private void DrawAll(bool clearRenderQueue = false)
 	{
 		Console.Write(Root.Draw());
 
 		if (clearRenderQueue)
-			s_renderQueue.Clear();
+			RenderQueue.Clear();
 	}
 
 	private static void ClearAllScreen()

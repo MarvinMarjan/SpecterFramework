@@ -111,8 +111,15 @@ public abstract partial class Component : IUpdateable, IDrawable
 
 		// TODO: try to store properties automatically instead of doing it manually.
 
+
 		Properties.PropertiesAs<IInheritable>().SetInheritablesInherit(inheritProperties);
-		RequestRenderOnPropertiesChange(Properties.PropertiesAs<IComponentPropertyEvents>());
+		
+		RequestRenderOnPropertiesChange(
+			[ Position, Size, Alignment ],
+			true
+		);
+		RequestRenderOnPropertyChange(Color);
+
 
 		if (Parent is null)
 			return;
@@ -171,15 +178,19 @@ public abstract partial class Component : IUpdateable, IDrawable
 
 
 
-	protected void RequestRenderOnPropertiesChange(IComponentPropertyEvents[] properties)
+	protected void RequestRenderOnPropertiesChange(IComponentPropertyEvents[] properties, bool drawAllRequest = false)
 	{
 		foreach (var property in properties)
-			RequestRenderOnPropertyChange(property);
+			RequestRenderOnPropertyChange(property, drawAllRequest);
 	}
 
-	protected void RequestRenderOnPropertyChange(IComponentPropertyEvents property)
-		=> property.PropertyValueChanged += delegate { AddThisToRenderQueue(); };
-
+	protected void RequestRenderOnPropertyChange(IComponentPropertyEvents property, bool drawAllRequest = false)
+	{
+		if (drawAllRequest)
+			property.PropertyValueChanged += delegate { App.RequestDrawAll(); };
+		else
+			property.PropertyValueChanged += delegate { AddThisToRenderQueue(); };
+	}
 	protected void AddThisToRenderQueue()
 	{
 		// * do not add if there is already a parent in the queue, since

@@ -41,7 +41,7 @@ public class TextComponent : Component, IChildLess
 		AllProperties.AddRange(Properties);
 
 		Properties.PropertiesAs<IInheritable>().SetInheritablesInherit(inheritProperties);
-		RequestRenderOnPropertiesChange(Properties.PropertiesAs<IComponentPropertyEvents>());
+		RequestRenderOnPropertyChange(Text, true);
     }
 
 
