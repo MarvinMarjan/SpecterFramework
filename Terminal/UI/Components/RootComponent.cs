@@ -1,7 +1,4 @@
-﻿using System;
-
-
-namespace Specter.Terminal.UI.Components;
+﻿namespace Specter.Terminal.UI.Components;
 
 
 /// <summary>
@@ -13,11 +10,8 @@ public class RootComponent : SectionComponent
 {
 	public RootComponent() : base(null, drawBorder: false)
 	{
-		SetAllPropertiesCanBeInherited(false);
-
-		// * need to set this at the constructor because the first drawing
-		// * frame will need it.
-		//Size.DefaultValue = Terminal.GetTerminalSize();
+		PropertiesManager.Requirement.CanBeInherited = false;
+		PropertiesManager.SetRequirementToAllProperties();
 	}
 
 

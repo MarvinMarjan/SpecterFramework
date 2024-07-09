@@ -1,59 +1,77 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+
+using Specter.Terminal.UI.Exceptions;
 
 
 namespace Specter.Terminal.UI.Components;
 
 
-public class ComponentPropertyNotFoundException(string propertyName)
-	: Exception($"Could not find property \"{propertyName}\".") {}
-
-public class ComponentPropertyWrongTypeException(string propertyName, string typeName)
-	: Exception($"\"{propertyName}\" property is not of type \"{typeName}\"") {}
-
-public class ComponentPropertyAlreadyExistsException(string propertyName)
-	: Exception($"The property \"{propertyName}\" already exists.") {}
-
-
-// TODO: maybe set this as an interface?
-public class ComponentPropertiesManager
+public class ComponentPropertyManagerRequirement(bool inherit, bool canBeInherited)
 {
-	private Dictionary<string, object> _properties;
+	public bool Inherit { get; set; } = inherit;
+	public bool CanBeInherited { get; set; } = canBeInherited;
+}
 
 
-	public ComponentPropertiesManager()
-	{
-		_properties = [];
-	}
-
-
-	public void Add(string propertyName, object value)
-	{
-		try
-		{
-			_properties.Add(propertyName, value);
-		}
-		catch (ArgumentException)
-		{
-			throw new ComponentPropertyAlreadyExistsException(propertyName);
-		}
-	}
-
-	public bool TryAdd(string propertyName, object value)
-		=> _properties.TryAdd(propertyName, value);
+public class ComponentPropertiesManager(Component parent, ComponentPropertyManagerRequirement? requirement = null)
+{
+	public Component Parent { get; set; } = parent;
 	
+	public ComponentPropertyManagerRequirement Requirement { get; set; } = requirement ?? new(true, true);
+
+	private List<ComponentProperty> _properties = [];
 
 
-	public T Get<T>(string propertyName)
+
+	public void Add(ComponentProperty property)
 	{
-		if (!_properties.ContainsKey(propertyName))
-			throw new ComponentPropertyNotFoundException(propertyName);
+		// TODO: check if this works
+		if (_properties.Contains(property))
+			throw new ComponentPropertyAlreadyExists(property.Name);
 
-		object property = _properties[propertyName];
+		_properties.Add(property);
 
-		if (property is T convertedProperty)
-			return convertedProperty;
-	
-		throw new ComponentPropertyWrongTypeException(propertyName, typeof(T).Name);
+		SetRequirementToProperty(property);
 	}
+
+
+
+	public T GetPropertyAs<T>(string propertyName) where T : class
+	{
+		foreach (ComponentProperty property in _properties)
+			if (property.Name == propertyName && property is T convertedProperty)
+				return convertedProperty;
+			
+		throw new ComponentPropertyNotFoundException(propertyName);
+	}
+
+	public ComponentProperty GetProperty(string propertyName)
+		=> GetPropertyAs<ComponentProperty>(propertyName);
+
+
+
+	public T[] GetAllPropertiesAs<T>() where T : class
+		=> _properties.ToArray().PropertiesAs<T>();
+
+	public ComponentProperty[] GetAllProperties()
+		=> GetAllPropertiesAs<ComponentProperty>();
+
+
+	
+	public void SetRequirementToProperty(ComponentProperty property)
+	{
+		if (property is IInheritable inheritable)
+		{
+			inheritable.Inherit = Requirement.Inherit;
+			inheritable.CanBeInherited = Requirement.CanBeInherited;
+		}
+	}
+
+	public void SetRequirementToProperties(ComponentProperty[] properties)
+	{
+		foreach (ComponentProperty property in properties)
+			SetRequirementToProperty(property);
+	}
+
+	public void SetRequirementToAllProperties() => SetRequirementToProperties([.. _properties]);
 }

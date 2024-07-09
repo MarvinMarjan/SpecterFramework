@@ -17,13 +17,51 @@ public interface IComponentPropertyEvents
 }
 
 
+
+public abstract class ComponentProperty
+{
+	public Component Owner { get; set; }
+	public ComponentPropertiesManager Manager => Owner.PropertiesManager;
+	public bool HasManager => Manager is not null;
+
+	public string Name { get; init; }
+
+	public abstract object ValueObject { get; }
+
+	public bool RequestOwnerRenderOnPropertyChange { get; set; }
+	public bool DrawAllRequest { get; set; }
+
+
+	public ComponentProperty(
+	
+		Component owner,
+		string name,
+		bool requestRenderOnChange = false,
+		bool drawAllRequest = false
+	
+	
+	)
+	{
+		Owner = owner;
+		Manager.Add(this);
+
+		Name = name;
+		RequestOwnerRenderOnPropertyChange = requestRenderOnChange;
+		DrawAllRequest = drawAllRequest;
+	}
+}
+
+
 /// <summary>
 /// Represents properties of UI components, but with extended behavior.
 /// </summary>
 /// <typeparam name="T"> The property value type. </typeparam>
-public class ComponentProperty<T> : IComponentPropertyEvents<T>, IComponentPropertyEvents, IUpdateable
+public class ComponentProperty<T> : ComponentProperty, IComponentPropertyEvents<T>, IComponentPropertyEvents, IUpdateable
 	where T : notnull
 {
+    public override object ValueObject => Value;
+
+
     private T _value;
     public T Value
 	{
@@ -56,21 +94,45 @@ public class ComponentProperty<T> : IComponentPropertyEvents<T>, IComponentPrope
 	public bool UseLink { get; set; }
 
 
-	public ComponentProperty(ComponentProperty<T> link, bool updateOnChange)
-		: this(link.Value, updateOnChange)
-	{
-		LinkProperty = link;
-		UseLink = true;
-	}
+	public ComponentProperty(
+	
+		Component owner,
+		string name,
+		T value,
+		bool updateOnChange = false,
+		bool requestRenderOnChange = false,
+		bool drawAllRequest = false
+	
 
-	public ComponentProperty(T value, bool updateOnChange = false)
+	) : base(owner, name, requestRenderOnChange, drawAllRequest)
 	{
 		_value = _defaultValue = value;
+		
 		UpdateOnChange = updateOnChange;
 		UseLink = false;
 
 		PropertyValueChanged += OnPropertyValueChange;
 		PropertyObjectValueChanged += OnPropertyObjectValueChange;
+	}
+
+
+	public ComponentProperty(
+		
+		Component owner,
+		string name,
+		ComponentProperty<T> link,
+		bool updateOnChange = false,
+		bool requestRenderOnChange = false,
+		bool drawAllRequest = false
+	
+
+	) : this(
+		owner, name, link.Value, updateOnChange, requestRenderOnChange,
+		drawAllRequest
+	)
+	{
+		LinkProperty = link;
+		UseLink = true;
 	}
 
 
@@ -92,7 +154,8 @@ public class ComponentProperty<T> : IComponentPropertyEvents<T>, IComponentPrope
 
 
 	public static implicit operator T(ComponentProperty<T> property) => property.Value;
-	public static implicit operator ComponentProperty<T>(T value) => new(value);
+	
+	//public static implicit operator ComponentProperty<T>(T value) => new(value);
 	
 
 	// Events
@@ -120,7 +183,17 @@ public class ComponentProperty<T> : IComponentPropertyEvents<T>, IComponentPrope
 	}
 
 
-	protected virtual void OnPropertyValueChange(T newValue) {}
+	protected virtual void OnPropertyValueChange(T newValue)
+	{
+		if (!RequestOwnerRenderOnPropertyChange)
+			return;
+
+		if (DrawAllRequest)
+			App.RequestDrawAll();
+		else
+			Owner.AddThisToRenderQueue();
+	}
+
 	protected virtual void OnPropertyObjectValueChange(object newValue) {}
 
 
@@ -176,14 +249,21 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 
 	public InheritableComponentProperty(
 
+		Component owner,
+		string name,
 		T value,
 		InheritableComponentProperty<T>? parent = null,
 		bool inherit = true,
 		bool canBeInherited = true,
-		bool updateOnChange = false
+		bool updateOnChange = false,
+		bool requestRenderOnChange = false,
+		bool drawAllRequest = false
 
 		
-	) : base(value, updateOnChange)
+	) : base(
+		owner, name, value, updateOnChange, requestRenderOnChange,
+		drawAllRequest
+	)
 	{
 		Parent = parent;
 
@@ -202,14 +282,21 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 
 	public InheritableComponentProperty(
 
+		Component owner,
+		string name,
 		ComponentProperty<T> link,
 		InheritableComponentProperty<T>? parent = null,
 		bool inherit = true,
 		bool canBeInherited = true,
-		bool updateOnChange = false
+		bool updateOnChange = false,
+		bool requestRenderOnChange = false,
+		bool drawAllRequest = false
 
 		
-	) : this(link.Value, parent, inherit, canBeInherited, updateOnChange)
+	) : this(
+		owner, name, link.Value, parent, inherit,
+		canBeInherited, updateOnChange, requestRenderOnChange, drawAllRequest
+	)
 	{
 		LinkProperty = link;
 		UseLink = true;
@@ -235,7 +322,8 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 
 
 	public static implicit operator T(InheritableComponentProperty<T> property) => property.Value;
-	public static implicit operator InheritableComponentProperty<T>(T value) => new(value);
+	
+	//public static implicit operator InheritableComponentProperty<T>(T value) => new(value);
 
 
     public virtual void OnParentPropertyValueChange(T newValue) => InheritValueIfPossible();

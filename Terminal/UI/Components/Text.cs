@@ -13,9 +13,6 @@ namespace Specter.Terminal.UI.Components;
 /// </summary>
 public class TextComponent : Component, IChildLess
 {
-	new protected object[] Properties => [ Text ];
-
-
     public ComponentProperty<string> Text { get; }
 
 
@@ -36,12 +33,13 @@ public class TextComponent : Component, IChildLess
 		// * size is set in Update()
 	) : base(parent, position, null, alignment, color, inheritProperties)
     {
-        Text = text;
+        Text = new(
+			this, "Text", text,
+			true, true, true
+		);
 
-		AllProperties.AddRange(Properties);
-
-		Properties.PropertiesAs<IInheritable>().SetInheritablesInherit(inheritProperties);
-		RequestRenderOnPropertyChange(Text, true);
+		/* PropertiesManager.GetPropertiesAs<IInheritable>().SetInheritablesInherit(inheritProperties);
+		RequestRenderOnPropertyChange(Text, true); */
     }
 
 

@@ -12,12 +12,10 @@ namespace Specter.Terminal.UI.Components;
 /// </summary>
 public class SectionComponent : Component
 {
-	new protected object[] Properties => [ BorderCharacters, BorderColor, DrawBorder, BackgroundFill ];
 
+    // Component properties
 
-	// Component properties
-
-	public InheritableComponentProperty<char> BackgroundFill { get; }
+    public InheritableComponentProperty<char> BackgroundFill { get; }
 	public InheritableComponentProperty<BorderCharacters> BorderCharacters { get; }
 	public InheritableComponentProperty<ColorObject> BorderColor { get; }
 	public InheritableComponentProperty<bool> DrawBorder { get; }
@@ -44,11 +42,13 @@ public class SectionComponent : Component
 	) : base(parent, position, size, alignment, color, inheritProperties)
 	{
 		BorderCharacters = new(
-			borderCharacters ?? UI.BorderCharacters.Default, Parent?.As<SectionComponent>()?.BorderCharacters
+			this, "BorderCharacters", borderCharacters ?? UI.BorderCharacters.Default,
+			Parent?.As<SectionComponent>()?.BorderCharacters, requestRenderOnChange: true
 		);
 
 		BorderColor = new(
-			borderColor ?? Color, Parent?.As<SectionComponent>()?.BorderColor
+			this, "BorderColor", borderColor ?? Color,
+			Parent?.As<SectionComponent>()?.BorderColor, requestRenderOnChange: true
 		)
 		{
 			LinkProperty = Color,
@@ -56,18 +56,17 @@ public class SectionComponent : Component
 		};
 
 		DrawBorder = new(
-			drawBorder, Parent?.As<SectionComponent>()?.DrawBorder
+			this, "DrawBorder", drawBorder,
+			Parent?.As<SectionComponent>()?.DrawBorder, requestRenderOnChange: true
 		);
 
 		BackgroundFill = new(
-			backgroundFill, Parent?.As<SectionComponent>()?.BackgroundFill
+			this, "BackgroundFill", backgroundFill,
+			Parent?.As<SectionComponent>()?.BackgroundFill, requestRenderOnChange: true
 		);
 
-
-		AllProperties.AddRange(Properties);
-
-		Properties.PropertiesAs<IInheritable>().SetInheritablesInherit(inheritProperties);
-		RequestRenderOnPropertiesChange(Properties.PropertiesAs<IComponentPropertyEvents>());
+		/* PropertiesManager.GetPropertiesAs<IInheritable>().SetInheritablesInherit(inheritProperties);
+		RequestRenderOnPropertiesChange(PropertiesManager.GetPropertiesAs<IComponentPropertyEvents>()); */
 	}
 
 
