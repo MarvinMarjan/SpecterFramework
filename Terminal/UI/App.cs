@@ -11,14 +11,14 @@ namespace Specter.Terminal.UI;
 /// <summary>
 /// Initializes a terminal UI app.
 /// </summary>
-public class App
+public abstract class App
 {
 	public bool Exit { get; set; }
 
 	/// <summary>
 	/// The base Component of an UI App
 	/// </summary>
-	public RootComponent Root { get; set; }
+	public RootComponent Root { get; private set; }
 
 	/// <summary>
 	/// The delay between each update and draw.
@@ -39,30 +39,17 @@ public class App
 	}
 
 
-	private static object s_renderQueueLocker = new();
 
 	private static List<Component> s_renderQueue = [];
-	public static List<Component> RenderQueue // ! Use the property instead of the field.
+	public static List<Component> RenderQueue
 	{
-		get
-		{
-			lock(s_renderQueueLocker)
-			{
-				return s_renderQueue;
-			}
-		}
-
-		private set
-		{
-			lock(s_renderQueueLocker)
-			{
-				s_renderQueue = value;
-			}
-		}
+		get => s_renderQueue;
+		private set => s_renderQueue = value;
 	}
 
 
 	private static bool s_drawAllRequested = false;
+	public static bool DrawAllRequested => s_drawAllRequested;
 
 
 	public App()
@@ -81,29 +68,27 @@ public class App
 
 
 
-	public void Run()
+	protected virtual void Start()
 	{
 		// first drawing
 		ClearAllScreen();
-		RunFrame(true);
-
-		while (!Exit)
-		{
-			Terminal.Update();
-
-			RunFrame(Terminal.TerminalResized);
-		}
+		Update();
+		Draw();
 	}
 
-
-	private void RunFrame(bool drawAll = false, bool? clearScreen = null)
+	protected virtual void Update()
 	{
-		clearScreen ??= drawAll;
+		Terminal.Update();
 
-		if (clearScreen is true)
+		Root?.Update();
+	}
+
+	protected virtual void Draw()
+	{
+		bool drawAll = Terminal.TerminalResized;
+
+		if (drawAll is true)
 			ClearAllScreen();
-
-		Root.Update();
 
 		if (drawAll || s_drawAllRequested)
 			DrawAll(true);
@@ -112,6 +97,25 @@ public class App
 
 		s_drawAllRequested = false;
 	}
+
+	protected virtual void End()
+		=> OnExit();
+	
+
+
+	public void Run()
+	{
+		Start();
+
+		while (!Exit)
+		{
+			Update();
+			Draw();
+		}
+	}
+
+
+	public static implicit operator Component(App app) => app.Root;
 
 
 

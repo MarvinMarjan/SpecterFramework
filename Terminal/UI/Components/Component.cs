@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 
 using Specter.Color;
+using Specter.Terminal.UI.Exceptions;
 
 
 namespace Specter.Terminal.UI.Components;
@@ -70,6 +70,7 @@ public abstract class Component : IUpdateable, IDrawable
 	protected void RaiseUpdateEvent() => UpdateEvent?.Invoke();
 
 
+	// TODO: add names to Components
 
 	public Component(
 
@@ -93,8 +94,6 @@ public abstract class Component : IUpdateable, IDrawable
 
 		Childs        = [];
 		PropertiesManager = new(this, new(inheritProperties, true));
-
-		// FIXME: Create a way to ComponentProperty ignore ComponentPropertyManagerRequirements
 
 		Position = new(
 			this, "Position", position ?? Point.None,
@@ -168,10 +167,8 @@ public abstract class Component : IUpdateable, IDrawable
 
 	public void ChildLessParentCheck()
 	{
-		// TODO: use a custom exception for this
-
 		if (Parent is IChildLess)
-			throw new Exception("Can't have a 'IChildLess' as parent.");
+			throw new ComponentException("Can't have a 'IChildLess' as parent.");
 	}
 
 
