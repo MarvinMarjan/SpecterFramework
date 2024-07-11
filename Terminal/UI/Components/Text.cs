@@ -13,10 +13,10 @@ namespace Specter.Terminal.UI.Components;
 /// </summary>
 public class TextComponent : Component, IChildLess
 {
-    public ComponentProperty<string> Text { get; }
+	public ComponentProperty<string> Text { get; }
 
 
-    public TextComponent(
+	public TextComponent(
 
 		Component? parent,
 		Point? position = null,
@@ -32,22 +32,19 @@ public class TextComponent : Component, IChildLess
 
 		// * size is set in Update()
 	) : base(parent, position, null, alignment, color, inheritProperties)
-    {
-        Text = new(
+	{
+		Text = new(
 			this, "Text", text,
 			true, true, true
 		);
-
-		/* PropertiesManager.GetPropertiesAs<IInheritable>().SetInheritablesInherit(inheritProperties);
-		RequestRenderOnPropertyChange(Text, true); */
-    }
+	}
 
 
 	/// <returns> A Size object based on Text. </returns>
 	protected Size SizeFromText() => new((uint)Text.Value.Length, 1);
 
 
-    public override string Draw()
+	public override string Draw()
 	{
 		StringBuilder builder = new();
 
@@ -64,10 +61,10 @@ public class TextComponent : Component, IChildLess
 		return builder.ToString();
 	}
 
-    public override void Update()
-    {
+	public override void Update()
+	{
 		Size.DefaultValue = SizeFromText();
 
-        base.Update();
-    }
+		base.Update();
+	}
 }

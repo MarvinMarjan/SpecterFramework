@@ -29,7 +29,7 @@ public interface IChildLess {}
 /// <summary>
 /// Base class of all UI components.
 /// </summary>
-public abstract partial class Component : IUpdateable, IDrawable
+public abstract class Component : IUpdateable, IDrawable
 {
 
 	// Properties
@@ -94,6 +94,7 @@ public abstract partial class Component : IUpdateable, IDrawable
 		Childs        = [];
 		PropertiesManager = new(this, new(inheritProperties, true));
 
+		// FIXME: Create a way to ComponentProperty ignore ComponentPropertyManagerRequirements
 
 		Position = new(
 			this, "Position", position ?? Point.None,
@@ -116,9 +117,6 @@ public abstract partial class Component : IUpdateable, IDrawable
 		);
 
 
-		PropertiesManager.GetAllPropertiesAs<IInheritable>().SetInheritablesInherit(inheritProperties);
-
-
 		if (Parent is null)
 			return;
 
@@ -128,6 +126,11 @@ public abstract partial class Component : IUpdateable, IDrawable
 	}
 
 
+	/// <summary>
+	/// Checks recursively if this Component is child of another one.
+	/// </summary>
+	/// <param name="component"> The Component to check. </param>
+	/// <returns> True if this Component is child of the specified one, false otherwise. </returns>
 	public bool IsChildOf(Component component)
 	{
 		if (component.Childs.Count == 0)
@@ -146,6 +149,8 @@ public abstract partial class Component : IUpdateable, IDrawable
 
 	public void ChildLessParentCheck()
 	{
+		// TODO: use a custom exception for this
+
 		if (Parent is IChildLess)
 			throw new Exception("Can't have a 'IChildLess' as parent.");
 	}
@@ -158,6 +163,10 @@ public abstract partial class Component : IUpdateable, IDrawable
 
 
 
+	/// <summary>
+	/// Adds this Component to the App render queue (App.RenderQueue). If one of the parents of this Component
+	/// is in the queue, then this Component is not added, since drawing the parent also draws its childs.
+	/// </summary>
 	public void AddThisToRenderQueue()
 	{
 		// * do not add if there is already a parent in the queue, since
@@ -184,10 +193,11 @@ public abstract partial class Component : IUpdateable, IDrawable
 
 	public virtual void Update()
 	{
-		foreach (IUpdateable? property in PropertiesManager.GetAllPropertiesAs<IUpdateable>())
-			property?.Update();
+		foreach (IUpdateable property in PropertiesManager.GetAllPropertiesAs<IUpdateable>())
+			property.Update();
 		
 		Position.DefaultValue = Alignment.Value.CalculatePosition(this);
+		PropertiesManager.Update();
 
 		RaiseUpdateEvent();
 		

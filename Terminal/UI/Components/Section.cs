@@ -64,9 +64,6 @@ public class SectionComponent : Component
 			this, "BackgroundFill", backgroundFill,
 			Parent?.As<SectionComponent>()?.BackgroundFill, requestRenderOnChange: true
 		);
-
-		/* PropertiesManager.GetPropertiesAs<IInheritable>().SetInheritablesInherit(inheritProperties);
-		RequestRenderOnPropertiesChange(PropertiesManager.GetPropertiesAs<IComponentPropertyEvents>()); */
 	}
 
 

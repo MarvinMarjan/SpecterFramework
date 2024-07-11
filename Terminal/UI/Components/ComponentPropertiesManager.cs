@@ -6,6 +6,10 @@ using Specter.Terminal.UI.Exceptions;
 namespace Specter.Terminal.UI.Components;
 
 
+/// <summary>
+/// Class that is utilized to set requirement values to ComponentProperties
+/// when they are added to a ComponentPropertyManager.
+/// </summary>
 public class ComponentPropertyManagerRequirement(bool inherit, bool canBeInherited)
 {
 	public bool Inherit { get; set; } = inherit;
@@ -13,7 +17,13 @@ public class ComponentPropertyManagerRequirement(bool inherit, bool canBeInherit
 }
 
 
+/// <summary>
+/// Manages component properties.
+/// </summary>
+/// <param name="parent"> The component that the manager will be a child of </param>
+/// <param name="requirement"> The initial requirements. </param>
 public class ComponentPropertiesManager(Component parent, ComponentPropertyManagerRequirement? requirement = null)
+	: IUpdateable
 {
 	public Component Parent { get; set; } = parent;
 	
@@ -74,4 +84,8 @@ public class ComponentPropertiesManager(Component parent, ComponentPropertyManag
 	}
 
 	public void SetRequirementToAllProperties() => SetRequirementToProperties([.. _properties]);
+
+
+
+	public virtual void Update() => SetRequirementToAllProperties();
 }

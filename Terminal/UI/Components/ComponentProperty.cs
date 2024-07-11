@@ -18,14 +18,26 @@ public interface IComponentPropertyEvents
 
 
 
+/// <summary>
+/// The base class of every other ComponentProperty.
+/// </summary>
 public abstract class ComponentProperty
 {
+	/// <summary>
+	/// The Component that owns and manage this property.
+	/// </summary>
 	public Component Owner { get; set; }
 	public ComponentPropertiesManager Manager => Owner.PropertiesManager;
 	public bool HasManager => Manager is not null;
 
+	/// <summary>
+	/// Name of the property.
+	/// </summary>
 	public string Name { get; init; }
 
+	/// <summary>
+	/// The value of the property as raw Object.
+	/// </summary>
 	public abstract object ValueObject { get; }
 
 	public bool RequestOwnerRenderOnPropertyChange { get; set; }
@@ -35,7 +47,9 @@ public abstract class ComponentProperty
 	public ComponentProperty(
 	
 		Component owner,
+
 		string name,
+
 		bool requestRenderOnChange = false,
 		bool drawAllRequest = false
 	
@@ -53,16 +67,21 @@ public abstract class ComponentProperty
 
 
 /// <summary>
-/// Represents properties of UI components, but with extended behavior.
+/// A generic ComponentProperty with extended behaviour. 
 /// </summary>
 /// <typeparam name="T"> The property value type. </typeparam>
-public class ComponentProperty<T> : ComponentProperty, IComponentPropertyEvents<T>, IComponentPropertyEvents, IUpdateable
-	where T : notnull
+public class ComponentProperty<T>
+	: ComponentProperty, IComponentPropertyEvents<T>, IComponentPropertyEvents, IUpdateable
+		where T : notnull
 {
     public override object ValueObject => Value;
 
 
     private T _value;
+
+	/// <summary>
+	/// The typed value of this property.
+	/// </summary>
     public T Value
 	{
 		get => _value;
@@ -74,6 +93,12 @@ public class ComponentProperty<T> : ComponentProperty, IComponentPropertyEvents<
 	}
 
 	private T _defaultValue;
+
+	/// <summary>
+	/// The default value to be set at every update call.
+	/// Between inheriting a value and setting a default value,
+	/// inheriting have a higher priority, so the default value is ignored.
+	/// </summary>
 	public T DefaultValue
 	{
 		get => _defaultValue;
@@ -86,10 +111,18 @@ public class ComponentProperty<T> : ComponentProperty, IComponentPropertyEvents<
 		}
 	}
 
+	/// <summary>
+	/// Should DefaultValue be setted immediately to Value when
+	/// it changes?
+	/// </summary>
 	public bool UpdateOnChange { get; set; }
 
 
 
+	/// <summary>
+	/// Defines another ComponentProperty this property should
+	/// copy the value. Has a simillar behaviour to DefaultValue.
+	/// </summary>
 	public ComponentProperty<T>? LinkProperty { get; set; }
 	public bool UseLink { get; set; }
 
@@ -99,6 +132,7 @@ public class ComponentProperty<T> : ComponentProperty, IComponentPropertyEvents<
 		Component owner,
 		string name,
 		T value,
+
 		bool updateOnChange = false,
 		bool requestRenderOnChange = false,
 		bool drawAllRequest = false
@@ -121,6 +155,7 @@ public class ComponentProperty<T> : ComponentProperty, IComponentPropertyEvents<
 		Component owner,
 		string name,
 		ComponentProperty<T> link,
+
 		bool updateOnChange = false,
 		bool requestRenderOnChange = false,
 		bool drawAllRequest = false
@@ -146,6 +181,9 @@ public class ComponentProperty<T> : ComponentProperty, IComponentPropertyEvents<
 	}
 
 
+	/// <summary>
+	/// Sets the value of DefaultValue to Value.
+	/// </summary>
 	public void SetValueToDefault()
 	{
 		if (!DefaultValue.Equals(Value))
@@ -154,8 +192,6 @@ public class ComponentProperty<T> : ComponentProperty, IComponentPropertyEvents<
 
 
 	public static implicit operator T(ComponentProperty<T> property) => property.Value;
-	
-	//public static implicit operator ComponentProperty<T>(T value) => new(value);
 	
 
 	// Events
@@ -253,6 +289,7 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 		string name,
 		T value,
 		InheritableComponentProperty<T>? parent = null,
+
 		bool inherit = true,
 		bool canBeInherited = true,
 		bool updateOnChange = false,
@@ -286,6 +323,7 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 		string name,
 		ComponentProperty<T> link,
 		InheritableComponentProperty<T>? parent = null,
+
 		bool inherit = true,
 		bool canBeInherited = true,
 		bool updateOnChange = false,
@@ -308,25 +346,33 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 
 	public bool CanInherit() => Inherit && ParentAsProperty is not null && ParentAsProperty.CanBeInherited;
 
+
+	/// <summary>
+	/// Forces the value inheriting
+	/// </summary>
 	public void InheritValue()
 	{
 		if (ParentAsProperty is not null && !ParentAsProperty.Value.Equals(Value))
 			Value = ParentAsProperty.Value;
 	}
 
-	public void InheritValueIfPossible()
+
+	public bool TryInheritValue()
 	{
 		if (CanInherit())
+		{
 			InheritValue();
+			return true;
+		}
+
+		return false;
 	}
 
 
 	public static implicit operator T(InheritableComponentProperty<T> property) => property.Value;
-	
-	//public static implicit operator InheritableComponentProperty<T>(T value) => new(value);
 
 
-    public virtual void OnParentPropertyValueChange(T newValue) => InheritValueIfPossible();
+    public virtual void OnParentPropertyValueChange(T newValue) => TryInheritValue();
     public virtual void OnParentPropertyObjectValueChange(object newValue) {}
 
     public override void Update()
@@ -335,6 +381,6 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 		base.Update();
 
 		// inheriting
-		InheritValueIfPossible();
+		TryInheritValue();
 	}
 }

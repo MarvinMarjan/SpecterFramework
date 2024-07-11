@@ -11,7 +11,6 @@ public class RootComponent : SectionComponent
 	public RootComponent() : base(null, drawBorder: false)
 	{
 		PropertiesManager.Requirement.CanBeInherited = false;
-		PropertiesManager.SetRequirementToAllProperties();
 	}
 
 
