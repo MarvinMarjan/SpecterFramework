@@ -11,23 +11,38 @@ public static class ComponentPropertyExtensions
 				let convertedProperty = property as T
 				where convertedProperty is not null
 				select convertedProperty).ToArray();
-}
 
 
-public static class InheritableExtensions
-{
-	public static void SetInheritablesInherit(this IInheritable[] properties, bool inherit)
+
+	public static InheritableComponentPropertyAttributes? GetPropertyAttributesFromInheritable(IInheritable inheritable)
+	{
+		var castedProperty = inheritable as ComponentProperty;
+		var castedAttributes = castedProperty?.Attributes as InheritableComponentPropertyAttributes;
+
+		return castedAttributes;
+	}
+
+	
+	public static void SetInheritablePropertiesInherit(this IInheritable[] properties, bool inherit)
 	{
 		foreach (var property in properties)
-			if (property is not null)
-				property.Inherit = inherit;
+		{
+			var attributes = GetPropertyAttributesFromInheritable(property);
+
+			if (attributes is not null)
+				attributes.Inherit = inherit;
+		}
 	}
 
 
-	public static void SetInheritablesCanBeInherited(this IInheritable[] properties, bool can)
+	public static void SetInheritablePropertiesCanBeInherited(this IInheritable[] properties, bool canBeInherited)
 	{
 		foreach (IInheritable? property in properties)
-			if (property is not null)
-				property.CanBeInherited = can;
+		{
+			var attributes = GetPropertyAttributesFromInheritable(property);
+
+			if (attributes is not null)
+				attributes.CanBeInherited = canBeInherited;
+		}
 	}
 }

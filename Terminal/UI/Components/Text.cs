@@ -35,7 +35,12 @@ public class TextComponent : Component, IChildLess
 	{
 		Text = new(
 			this, "Text", text,
-			true, true, true
+			
+			new(
+				updateOnChange: true,
+				requestOwnerRenderOnPropertyChange: true,
+				drawAllRequest: true
+			)
 		);
 	}
 

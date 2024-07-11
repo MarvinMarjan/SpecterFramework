@@ -98,22 +98,41 @@ public abstract class Component : IUpdateable, IDrawable
 
 		Position = new(
 			this, "Position", position ?? Point.None,
-			true, true, true
+			
+			new(
+				updateOnChange: true,
+				requestOwnerRenderOnPropertyChange: true,
+				drawAllRequest: true
+			)
 		);
 		
 		Size = new(
 			this, "Size", size ?? UI.Size.None,
-			true, true, true
+			
+			new(
+				updateOnChange: true,
+				requestOwnerRenderOnPropertyChange: true,
+				drawAllRequest: true
+			)
 		);
 
 		Alignment = new(
 			this, "Alignment", alignment ?? UI.Alignment.None,
-			Parent?.Alignment, requestRenderOnChange: true, drawAllRequest: true
+			Parent?.Alignment, 
+			
+			new(
+				requestOwnerRenderOnPropertyChange: true,
+				drawAllRequest: true
+			)
 		);
 
 		Color = new(
 			this, "Color", color ?? ColorObject.None,
-			Parent?.Color, requestRenderOnChange: true
+			Parent?.Color,
+
+			new(
+				requestOwnerRenderOnPropertyChange: true
+			)
 		);
 
 

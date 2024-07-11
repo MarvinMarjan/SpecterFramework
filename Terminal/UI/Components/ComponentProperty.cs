@@ -40,28 +40,24 @@ public abstract class ComponentProperty
 	/// </summary>
 	public abstract object ValueObject { get; }
 
-	public bool RequestOwnerRenderOnPropertyChange { get; set; }
-	public bool DrawAllRequest { get; set; }
+	
+	public ComponentPropertyAttributes Attributes { get; set; }
 
 
 	public ComponentProperty(
-	
+		
 		Component owner,
-
 		string name,
-
-		bool requestRenderOnChange = false,
-		bool drawAllRequest = false
-	
+		ComponentPropertyAttributes attributes
 	
 	)
 	{
+		Attributes = attributes; // * initialize Attributes before 'Manager.Add()'.
+
 		Owner = owner;
 		Manager.Add(this);
 
 		Name = name;
-		RequestOwnerRenderOnPropertyChange = requestRenderOnChange;
-		DrawAllRequest = drawAllRequest;
 	}
 }
 
@@ -104,18 +100,12 @@ public class ComponentProperty<T>
 		get => _defaultValue;
 		set
 		{
-			if (UpdateOnChange && !value.Equals(Value))
+			if (Attributes.UpdateOnChange && !value.Equals(Value))
 				Value = value;
 
 			_defaultValue = value;
 		}
 	}
-
-	/// <summary>
-	/// Should DefaultValue be setted immediately to Value when
-	/// it changes?
-	/// </summary>
-	public bool UpdateOnChange { get; set; }
 
 
 
@@ -132,17 +122,12 @@ public class ComponentProperty<T>
 		Component owner,
 		string name,
 		T value,
+		ComponentPropertyAttributes attributes
 
-		bool updateOnChange = false,
-		bool requestRenderOnChange = false,
-		bool drawAllRequest = false
-	
-
-	) : base(owner, name, requestRenderOnChange, drawAllRequest)
+	) : base(owner, name, attributes)
 	{
 		_value = _defaultValue = value;
-		
-		UpdateOnChange = updateOnChange;
+
 		UseLink = false;
 
 		PropertyValueChanged += OnPropertyValueChange;
@@ -155,16 +140,9 @@ public class ComponentProperty<T>
 		Component owner,
 		string name,
 		ComponentProperty<T> link,
+		ComponentPropertyAttributes attributes
 
-		bool updateOnChange = false,
-		bool requestRenderOnChange = false,
-		bool drawAllRequest = false
-	
-
-	) : this(
-		owner, name, link.Value, updateOnChange, requestRenderOnChange,
-		drawAllRequest
-	)
+	) : this(owner, name, link.Value, attributes	)
 	{
 		LinkProperty = link;
 		UseLink = true;
@@ -221,10 +199,10 @@ public class ComponentProperty<T>
 
 	protected virtual void OnPropertyValueChange(T newValue)
 	{
-		if (!RequestOwnerRenderOnPropertyChange)
+		if (!Attributes.RequestOwnerRenderOnPropertyChange)
 			return;
 
-		if (DrawAllRequest)
+		if (Attributes.DrawAllRequest)
 			App.RequestDrawAll();
 		else
 			Owner.AddThisToRenderQueue();
@@ -256,10 +234,6 @@ public interface IInheritable
 {
 	public IInheritable? Parent { get; set; }
 
-	public bool Inherit { get; set; }
-	public bool CanBeInherited { get; set; }
-
-
 	public void InheritValue();
 }
 
@@ -271,16 +245,32 @@ public interface IInheritable
 public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritable
 	where T : notnull
 {
-    public IInheritable? Parent { get; set; }
+	public IInheritable? Parent { get; set; }
 
-	/// <summary>
-	/// Tries to convert Parent to a component property.
-	/// </summary>
 	public InheritableComponentProperty<T>? ParentAsProperty => Parent as InheritableComponentProperty<T>;
 
 
-	public bool Inherit { get; set; }
-	public bool CanBeInherited { get; set; }
+	new public InheritableComponentPropertyAttributes Attributes
+	{
+		get
+		{
+			// if the base.Attributes runtime type is ComponentPropertyAttributes, then
+			// its values are copied to a default InheritableComponentPropertyAttributes.
+			// So the return is a InheritableComponentPropertyAttributes with base.Attributes
+			// values.
+
+            if (base.Attributes is not InheritableComponentPropertyAttributes inheritableTypeAttributes)
+                return (InheritableComponentPropertyAttributes)base.Attributes;
+
+            return inheritableTypeAttributes;
+		}
+
+		set
+		{
+			if (value is not null)
+				base.Attributes = value;
+		}
+	}
 
 
 	public InheritableComponentProperty(
@@ -288,24 +278,14 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 		Component owner,
 		string name,
 		T value,
-		InheritableComponentProperty<T>? parent = null,
-
-		bool inherit = true,
-		bool canBeInherited = true,
-		bool updateOnChange = false,
-		bool requestRenderOnChange = false,
-		bool drawAllRequest = false
-
+		InheritableComponentProperty<T>? parent,
+		InheritableComponentPropertyAttributes attributes
 		
 	) : base(
-		owner, name, value, updateOnChange, requestRenderOnChange,
-		drawAllRequest
+		owner, name, value, attributes
 	)
 	{
 		Parent = parent;
-
-		Inherit = inherit;
-		CanBeInherited = canBeInherited;
 
 		if (ParentAsProperty is null)
 			return;
@@ -322,19 +302,10 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 		Component owner,
 		string name,
 		ComponentProperty<T> link,
-		InheritableComponentProperty<T>? parent = null,
-
-		bool inherit = true,
-		bool canBeInherited = true,
-		bool updateOnChange = false,
-		bool requestRenderOnChange = false,
-		bool drawAllRequest = false
-
+		InheritableComponentProperty<T>? parent,
+		InheritableComponentPropertyAttributes attributes
 		
-	) : this(
-		owner, name, link.Value, parent, inherit,
-		canBeInherited, updateOnChange, requestRenderOnChange, drawAllRequest
-	)
+	) : this(owner, name, link.Value, parent, attributes)
 	{
 		LinkProperty = link;
 		UseLink = true;
@@ -344,7 +315,8 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 	// * Inherit will be considered
 
 
-	public bool CanInherit() => Inherit && ParentAsProperty is not null && ParentAsProperty.CanBeInherited;
+	public bool CanInherit()
+		=> Attributes.Inherit && ParentAsProperty is not null && ParentAsProperty.Attributes.CanBeInherited;
 
 
 	/// <summary>

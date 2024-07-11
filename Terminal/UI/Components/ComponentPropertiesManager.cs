@@ -67,14 +67,20 @@ public class ComponentPropertiesManager(Component parent, ComponentPropertyManag
 		=> GetAllPropertiesAs<ComponentProperty>();
 
 
-	
+
 	public void SetRequirementToProperty(ComponentProperty property)
 	{
-		if (property is IInheritable inheritable)
+		if (property.Attributes.IgnoreManagerRequirement)
+			return;
+
+		if (property is IInheritable)
 		{
-			inheritable.Inherit = Requirement.Inherit;
-			inheritable.CanBeInherited = Requirement.CanBeInherited;
-		}
+            if (property.Attributes is not InheritableComponentPropertyAttributes attributes)
+                return; // TODO: throw exception
+
+			attributes.Inherit = Requirement.Inherit;
+			attributes.CanBeInherited = Requirement.CanBeInherited;
+        }
 	}
 
 	public void SetRequirementToProperties(ComponentProperty[] properties)

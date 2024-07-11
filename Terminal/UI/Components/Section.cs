@@ -43,12 +43,16 @@ public class SectionComponent : Component
 	{
 		BorderCharacters = new(
 			this, "BorderCharacters", borderCharacters ?? UI.BorderCharacters.Default,
-			Parent?.As<SectionComponent>()?.BorderCharacters, requestRenderOnChange: true
+			Parent?.As<SectionComponent>()?.BorderCharacters,
+
+			new(requestOwnerRenderOnPropertyChange: true)
 		);
 
 		BorderColor = new(
 			this, "BorderColor", borderColor ?? Color,
-			Parent?.As<SectionComponent>()?.BorderColor, requestRenderOnChange: true
+			Parent?.As<SectionComponent>()?.BorderColor,
+
+			new(requestOwnerRenderOnPropertyChange: true)
 		)
 		{
 			LinkProperty = Color,
@@ -57,12 +61,16 @@ public class SectionComponent : Component
 
 		DrawBorder = new(
 			this, "DrawBorder", drawBorder,
-			Parent?.As<SectionComponent>()?.DrawBorder, requestRenderOnChange: true
+			Parent?.As<SectionComponent>()?.DrawBorder,
+
+			new(requestOwnerRenderOnPropertyChange: true)
 		);
 
 		BackgroundFill = new(
 			this, "BackgroundFill", backgroundFill,
-			Parent?.As<SectionComponent>()?.BackgroundFill, requestRenderOnChange: true
+			Parent?.As<SectionComponent>()?.BackgroundFill,
+
+			new(requestOwnerRenderOnPropertyChange: true)
 		);
 	}
 
