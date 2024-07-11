@@ -10,3 +10,5 @@ public class ComponentPropertyException(string propertyName, string? propertyTyp
 	public string PropertyName { get; } = propertyName;
 	public string? PropertyType { get; } = propertyType;
 }
+
+// TODO: add "Component Owner { get; }"

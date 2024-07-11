@@ -8,7 +8,7 @@
 /// </summary>
 public class RootComponent : SectionComponent
 {
-	public RootComponent() : base(null, drawBorder: false)
+	public RootComponent() : base("Root",null, drawBorder: false)
 	{
 		PropertiesManager.Requirement.CanBeInherited = false;
 	}

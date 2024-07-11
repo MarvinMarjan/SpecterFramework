@@ -22,7 +22,8 @@ public class SectionComponent : Component
 
 
 	public SectionComponent(
-		
+		string name,
+
 		Component? parent,
 		Point? position = null,
 		Size?  size     = null,
@@ -39,7 +40,7 @@ public class SectionComponent : Component
 		char              backgroundFill   = ' '
 
 	
-	) : base(parent, position, size, alignment, color, inheritProperties)
+	) : base(name, parent, position, size, alignment, color, inheritProperties)
 	{
 		BorderCharacters = new(
 			this, "BorderCharacters", borderCharacters ?? UI.BorderCharacters.Default,

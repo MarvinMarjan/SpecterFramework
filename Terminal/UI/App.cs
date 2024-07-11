@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using Specter.Terminal.UI.Components;
+using Specter.Terminal.UI.Exceptions;
 
 
 namespace Specter.Terminal.UI;
@@ -20,10 +21,13 @@ public abstract class App
 	/// </summary>
 	public RootComponent Root { get; private set; }
 
-	/// <summary>
-	/// The delay between each update and draw.
-	/// </summary>
-	//public uint MillisecondsDelay { get; set; } = 100;
+
+	private static App? s_current_app;
+	public static App CurrentApp
+	{
+		get => s_current_app ?? throw new AppException("There's no current app.");
+		set => s_current_app = value;
+	}
 
 
 	public static Encoding OutputEncoding
@@ -64,9 +68,13 @@ public abstract class App
 
 		Exit = false;
 		Root = new();
+
+		Load();
 	}
 
 
+
+	protected virtual void Load() {}
 
 	protected virtual void Start()
 	{
@@ -105,6 +113,8 @@ public abstract class App
 
 	public void Run()
 	{
+		SetThisAsCurrentApp();
+
 		Start();
 
 		while (!Exit)
@@ -112,10 +122,35 @@ public abstract class App
 			Update();
 			Draw();
 		}
+
+		End();
 	}
 
 
-	public static implicit operator Component(App app) => app.Root;
+	
+	public void SetThisAsCurrentApp() => CurrentApp = this;
+
+
+
+	public Component? TryGetComponentByName(string name)
+	{
+		Component? component = null;
+
+		Component.ForeachChildIn(Root, child => {
+			if (child.Name == name)
+				component = child;
+		});
+
+		return component;
+	}
+
+	public Component GetComponentByName(string name)
+		=> TryGetComponentByName(name)
+			?? throw new ComponentException(name, "The Component couldn't be found.");
+
+
+
+    public static implicit operator Component(App app) => app.Root;
 
 
 

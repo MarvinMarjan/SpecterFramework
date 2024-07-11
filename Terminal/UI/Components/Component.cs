@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 using Specter.Color;
@@ -33,6 +34,7 @@ public abstract class Component : IUpdateable, IDrawable
 {
 
 	// Properties
+	public string Name { get; set; }
 
 	public Component? Parent { get; set; }
 	public List<Component> Childs { get; private set; }
@@ -73,6 +75,7 @@ public abstract class Component : IUpdateable, IDrawable
 	// TODO: add names to Components
 
 	public Component(
+		string name,
 
 		Component? parent,
 		Point? position = null,
@@ -89,6 +92,8 @@ public abstract class Component : IUpdateable, IDrawable
 
 	)
 	{
+		Name = name;
+
 		Parent = parent;
 		ChildLessParentCheck(); // checks if Parent is a IChildLess
 
@@ -154,21 +159,32 @@ public abstract class Component : IUpdateable, IDrawable
 		if (component.Childs.Count == 0)
 			return false;
 
-		if (component.Childs.Contains(this))
-			return true;
-		
-		foreach (Component child in component.Childs)
-			if (IsChildOf(child))
-				return true;
+		bool isChild = false;
 
-		return false;
+		// TODO: See if this works
+		ForeachChildIn(component, child => {
+			if (child == this)
+				isChild = true;
+		});
+
+		return isChild;
+	}
+
+
+	public static void ForeachChildIn(Component component, Action<Component> action, bool ignoreFirst = true)
+	{
+		if (!ignoreFirst)
+			action(component);
+
+		foreach (Component child in component.Childs)
+			ForeachChildIn(child, action, false);
 	}
 
 
 	public void ChildLessParentCheck()
 	{
 		if (Parent is IChildLess)
-			throw new ComponentException("Can't have a 'IChildLess' as parent.");
+			throw new ComponentException(Name, "Can't have a 'IChildLess' as parent.");
 	}
 
 

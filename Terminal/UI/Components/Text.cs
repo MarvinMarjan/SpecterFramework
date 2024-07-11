@@ -17,6 +17,7 @@ public class TextComponent : Component, IChildLess
 
 
 	public TextComponent(
+		string name,
 
 		Component? parent,
 		Point? position = null,
@@ -31,7 +32,7 @@ public class TextComponent : Component, IChildLess
 
 
 		// * size is set in Update()
-	) : base(parent, position, null, alignment, color, inheritProperties)
+	) : base(name, parent, position, null, alignment, color, inheritProperties)
 	{
 		Text = new(
 			this, "Text", text,
