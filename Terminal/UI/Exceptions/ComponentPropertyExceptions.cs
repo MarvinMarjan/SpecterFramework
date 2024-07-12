@@ -1,5 +1,6 @@
 using System;
-using System.ComponentModel;
+
+using Specter.Terminal.UI.Components;
 
 
 namespace Specter.Terminal.UI.Exceptions;

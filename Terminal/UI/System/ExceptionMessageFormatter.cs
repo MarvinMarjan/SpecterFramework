@@ -1,5 +1,4 @@
 using System;
-using System.Security.Cryptography;
 using System.Text;
 
 using Specter.Color;
@@ -33,6 +32,18 @@ public static class ExceptionMessageFormatter
 
 
 
+	public static string BuildErrorStringStructure(Exception exception, string? details)
+	{
+		StringBuilder builder = new(ErrorSectionFrom(exception));
+
+		builder.Append($" ({details}):");
+		builder.Append($"\n\n  --->> ".FGBRed() + $"{exception.Message}");
+
+		return builder.ToString();
+	}
+
+
+
 	public static string Format<TException>(TException exception)
 		where TException : Exception => exception switch
 	{
@@ -44,51 +55,25 @@ public static class ExceptionMessageFormatter
 
 
 	public static string Format(Exception exception)
-	{
-		StringBuilder builder = new(ErrorSectionFrom(exception));
-
-		builder.Append(" " + exception.Message);
-
-		return builder.ToString();
-	}
+		=> BuildErrorStringStructure(exception, null);
 
 
 	public static string Format(AppException exception)
-	{
-		StringBuilder builder = new(ErrorSectionFrom(exception, true));
-
-		builder.Append(" " + exception.Message);
-
-		return builder.ToString();
-	}
+		=> BuildErrorStringStructure(exception, null);
 
 
 	public static string Format(ComponentException exception)
-	{
-		StringBuilder builder = new(ErrorSectionFrom(exception));
-
-		string componentNameText = $"\"{exception.ComponentName}\"".FGGreen();
-
-		builder.Append($" (Component {componentNameText}): ");
-		builder.Append(exception.Message);
-
-		return builder.ToString();
-	}
+		=> BuildErrorStringStructure(
+			exception,
+			"Component " + exception.ComponentName.Quote()
+		);
 
 
 	public static string Format(ComponentPropertyException exception)
-	{
-		StringBuilder builder = new(ErrorSectionFrom(exception));
-
-		// TODO: use owner too
-
-		string propertyNameText = $"\"{exception.PropertyName}\"".FGGreen();
-		string propertyTypeText = $"\"{exception.PropertyType}\"".FGYellow();
-		string propertyTypeFullText = exception.PropertyType is not null ? $"of type {propertyTypeText}" : "";
-
-		builder.Append($" (Property {propertyNameText}{propertyTypeFullText}): ");
-		builder.Append(exception.Message);
-
-		return builder.ToString();
-	}
+		=> BuildErrorStringStructure(
+			exception,
+			"Property " + exception.PropertyName.Quote()
+				+ (exception.PropertyType is not null ? " of type " + exception.PropertyType.Quote(ColorValue.FGYellow) : "")
+				+ (exception.Owner is not null ? ", owned by Component " + exception.Owner.Name.Quote() : "")
+		);
 }

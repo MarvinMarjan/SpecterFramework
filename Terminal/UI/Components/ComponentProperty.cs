@@ -1,4 +1,5 @@
 using Specter.Terminal.UI.System;
+using Specter.Terminal.UI.Exceptions;
 
 
 namespace Specter.Terminal.UI.Components;
@@ -44,7 +45,27 @@ public abstract class ComponentProperty
 	public abstract object ValueObject { get; }
 
 
-	public ComponentPropertyAttributes Attributes { get; set; }
+	private ComponentPropertyAttributes _attributes;
+	public ComponentPropertyAttributes Attributes
+	{
+		get => _attributes;
+		set
+		{
+			if (this is IInheritable)
+			{
+				if (value is not InheritableComponentPropertyAttributes inheritableAttribute)
+					throw new ComponentPropertyException(
+						Name, GetType().Name, Owner,
+						@"Trying to set an ""InheritableComponentProperty<T>"" attribute to a non ""InheritableComponentPropertyAttribute""."
+					);
+
+				_attributes = inheritableAttribute;
+			}
+
+			else
+				_attributes = value;
+		}
+	}
 
 
 	public ComponentProperty(
@@ -55,7 +76,7 @@ public abstract class ComponentProperty
 	
 	)
 	{
-		Attributes = attributes; // * initialize Attributes before 'Manager.Add()'.
+		_attributes = attributes; // * initialize Attributes before 'Manager.Add()'.
 
 		Owner = owner;
 		Manager.Add(this);

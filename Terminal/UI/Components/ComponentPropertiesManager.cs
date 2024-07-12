@@ -101,16 +101,8 @@ public class ComponentPropertiesManager(Component owner, ComponentPropertyManage
 		if (property.Attributes.IgnoreManagerRequirement)
 			return;
 
-		if (property is IInheritable)
+		if (property is IInheritable && property.Attributes is InheritableComponentPropertyAttributes attributes)
 		{
-			// TODO: throw this exception in ComponentProperty, not here
-
-            if (property.Attributes is not InheritableComponentPropertyAttributes attributes)
-                throw new ComponentPropertyException(
-					property.Name, property.GetType().Name, null,
-					"Property is a InheritableComponentProperty, but its 'Attributes' isn't a InheritableComponentPropertyAttributes."
-				);
-
 			attributes.Inherit = Requirement.Inherit;
 			attributes.CanBeInherited = Requirement.CanBeInherited;
         }
