@@ -12,6 +12,7 @@ namespace Specter.Terminal.UI.Components;
 /// </summary>
 public class ComponentPropertyManagerRequirement(bool inherit, bool canBeInherited)
 {
+	// TODO: maybe use ComponentPropertyAttributes?
 	public bool Inherit { get; set; } = inherit;
 	public bool CanBeInherited { get; set; } = canBeInherited;
 }
@@ -20,12 +21,12 @@ public class ComponentPropertyManagerRequirement(bool inherit, bool canBeInherit
 /// <summary>
 /// Manages component properties.
 /// </summary>
-/// <param name="parent"> The component that the manager will be a child of </param>
+/// <param name="owner"> The component that the manager will be a child of </param>
 /// <param name="requirement"> The initial requirements. </param>
-public class ComponentPropertiesManager(Component parent, ComponentPropertyManagerRequirement? requirement = null)
+public class ComponentPropertiesManager(Component owner, ComponentPropertyManagerRequirement? requirement = null)
 	: IUpdateable
 {
-	public Component Parent { get; set; } = parent;
+	public Component Owner { get; set; } = owner;
 	
 	public ComponentPropertyManagerRequirement Requirement { get; set; } = requirement ?? new(true, true);
 
@@ -33,6 +34,11 @@ public class ComponentPropertiesManager(Component parent, ComponentPropertyManag
 
 
 
+	/// <summary>
+	/// Adds a new ComponentProperty to the manager.
+	/// </summary>
+	/// <param name="property"> The property to be added. </param>
+	/// <exception cref="ComponentPropertyException"> Exception thrown if the property has already been added to the manager. </exception>
 	public void Add(ComponentProperty property)
 	{
 		if (_properties.Contains(property))
@@ -48,6 +54,12 @@ public class ComponentPropertiesManager(Component parent, ComponentPropertyManag
 
 
 
+	/// <summary>
+	/// Gets a ComponentProperty in the manager as a specific type, if it exists.
+	/// </summary>
+	/// <param name="propertyName"> The name of the property. </param>
+	/// <returns> The property converted to the specified type. </returns>
+	/// <exception cref="ComponentPropertyException"> Exception thrown if it couldn't find the property. </exception>
 	public T GetPropertyAs<T>(string propertyName) where T : class
 	{
 		foreach (ComponentProperty property in _properties)
@@ -60,19 +72,30 @@ public class ComponentPropertiesManager(Component parent, ComponentPropertyManag
 		);
 	}
 
+	/// <summary>
+	/// Same as GetPropertyAs<T>, but it doesn't convert the property.
+	/// </summary>
 	public ComponentProperty GetProperty(string propertyName)
 		=> GetPropertyAs<ComponentProperty>(propertyName);
 
 
 
+	/// <returns> An array containing all the properties converted to a specific type. </returns>
 	public T[] GetAllPropertiesAs<T>() where T : class
 		=> _properties.ToArray().PropertiesAs<T>();
 
+	/// <summary>
+	/// Same as GetAllPropertiesAs<T>, but it doesn't convert the properties.
+	/// </summary>
 	public ComponentProperty[] GetAllProperties()
 		=> GetAllPropertiesAs<ComponentProperty>();
 
 
 
+	/// <summary>
+	/// Applies this manager requirements to a specific property.
+	/// </summary>
+	/// <param name="property"> The property to apply the requirements. </param>
 	public void SetRequirementToProperty(ComponentProperty property)
 	{
 		if (property.Attributes.IgnoreManagerRequirement)
@@ -80,10 +103,12 @@ public class ComponentPropertiesManager(Component parent, ComponentPropertyManag
 
 		if (property is IInheritable)
 		{
+			// TODO: throw this exception in ComponentProperty, not here
+
             if (property.Attributes is not InheritableComponentPropertyAttributes attributes)
                 throw new ComponentPropertyException(
 					property.Name, property.GetType().Name, null,
-					"Property is a InheritableComponentProperty, but its 'Attributes' isn't a InheritableComponentPropertyAttributes"
+					"Property is a InheritableComponentProperty, but its 'Attributes' isn't a InheritableComponentPropertyAttributes."
 				);
 
 			attributes.Inherit = Requirement.Inherit;
@@ -91,12 +116,19 @@ public class ComponentPropertiesManager(Component parent, ComponentPropertyManag
         }
 	}
 
+	/// <summary>
+	/// Applies this manager requirements to specific properties.
+	/// </summary>
+	/// <param name="properties"> The array of properties to apply the requirement. </param>
 	public void SetRequirementToProperties(ComponentProperty[] properties)
 	{
 		foreach (ComponentProperty property in properties)
 			SetRequirementToProperty(property);
 	}
 
+	/// <summary>
+	/// Applies the requirements to the properties in this manager.
+	/// </summary>
 	public void SetRequirementToAllProperties() => SetRequirementToProperties([.. _properties]);
 
 

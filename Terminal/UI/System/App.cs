@@ -22,6 +22,9 @@ public abstract class App
 	public RootComponent Root { get; private set; }
 
 
+	/// <summary>
+	/// The current running App instance.
+	/// </summary>
 	private static App? s_current_app;
 	public static App CurrentApp
 	{
@@ -44,16 +47,13 @@ public abstract class App
 
 
 
-	private static List<Component> s_renderQueue = [];
-	public static List<Component> RenderQueue
-	{
-		get => s_renderQueue;
-		private set => s_renderQueue = value;
-	}
+	/// <summary>
+	/// Queue containing the Components that are going to be drawed/rendered.
+	/// </summary>
+	public static List<Component> RenderQueue { get; private set; } = [];
 
 
-	private static bool s_drawAllRequested = false;
-	public static bool DrawAllRequested => s_drawAllRequested;
+	public static bool DrawAllRequested { get; private set; } = false;
 
 
 	public App()
@@ -98,12 +98,12 @@ public abstract class App
 		if (drawAll is true)
 			Terminal.ClearAllScreen();
 
-		if (drawAll || s_drawAllRequested)
+		if (drawAll || DrawAllRequested)
 			DrawAll(true);
 		else
 			DrawRenderQueue();
 
-		s_drawAllRequested = false;
+		DrawAllRequested = false;
 	}
 
 	protected virtual void End()
@@ -185,7 +185,7 @@ public abstract class App
 	}
 
 
-	public static void RequestDrawAll() => s_drawAllRequested = true;
+	public static void RequestDrawAll() => DrawAllRequested = true;
 
 	private void DrawAll(bool clearRenderQueue = false)
 	{

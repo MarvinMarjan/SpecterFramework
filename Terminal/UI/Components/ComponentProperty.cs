@@ -43,7 +43,7 @@ public abstract class ComponentProperty
 	/// </summary>
 	public abstract object ValueObject { get; }
 
-	
+
 	public ComponentPropertyAttributes Attributes { get; set; }
 
 
@@ -73,15 +73,15 @@ public class ComponentProperty<T>
 	: ComponentProperty, IComponentPropertyEvents<T>, IComponentPropertyEvents, IUpdateable
 		where T : notnull
 {
-    public override object ValueObject => Value;
+	public override object ValueObject => Value;
 
 
-    private T _value;
+	private T _value;
 
 	/// <summary>
 	/// The typed value of this property.
 	/// </summary>
-    public T Value
+	public T Value
 	{
 		get => _value;
 		protected set
@@ -153,7 +153,7 @@ public class ComponentProperty<T>
 
 
 
-    public bool CanLink() => UseLink && LinkProperty is not null;
+	public bool CanLink() => UseLink && LinkProperty is not null;
 
 	public void LinkValue()
 	{
@@ -262,10 +262,10 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 			// So the return is a InheritableComponentPropertyAttributes with base.Attributes
 			// values.
 
-            if (base.Attributes is not InheritableComponentPropertyAttributes inheritableTypeAttributes)
-                return (InheritableComponentPropertyAttributes)base.Attributes;
+			if (base.Attributes is not InheritableComponentPropertyAttributes inheritableTypeAttributes)
+				return (InheritableComponentPropertyAttributes)base.Attributes;
 
-            return inheritableTypeAttributes;
+			return inheritableTypeAttributes;
 		}
 
 		set
@@ -347,10 +347,10 @@ public class InheritableComponentProperty<T> : ComponentProperty<T>, IInheritabl
 	public static implicit operator T(InheritableComponentProperty<T> property) => property.Value;
 
 
-    public virtual void OnParentPropertyValueChange(T newValue) => TryInheritValue();
-    public virtual void OnParentPropertyObjectValueChange(object newValue) {}
+	public virtual void OnParentPropertyValueChange(T newValue) => TryInheritValue();
+	public virtual void OnParentPropertyObjectValueChange(object newValue) {}
 
-    public override void Update()
+	public override void Update()
 	{
 		// linking of default value
 		base.Update();

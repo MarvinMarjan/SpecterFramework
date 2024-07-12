@@ -46,7 +46,7 @@ public abstract class Component : IUpdateable, IDrawable
 
 
 	/// <summary>
-	/// The position of this Component relative to its parent, if not null.
+	/// The position of this Component relative to its parent, if it has one.
 	/// </summary>
 	public Point RelativePosition => Parent is not null ? Parent.RelativePosition + Position : Position;
 
@@ -71,6 +71,7 @@ public abstract class Component : IUpdateable, IDrawable
 	public event UpdateEventHandler? UpdateEvent;
 
 	protected void RaiseUpdateEvent() => UpdateEvent?.Invoke();
+
 
 
 	public Component(
@@ -179,10 +180,11 @@ public abstract class Component : IUpdateable, IDrawable
 	}
 
 
-	public void ChildLessParentCheck()
+	
+	private void ChildLessParentCheck()
 	{
 		if (Parent is IChildLess)
-			throw new ComponentException(Name, "Can't have a 'IChildLess' as parent.");
+			throw new ComponentException(Name, @"Can't have a ""IChildLess"" as parent.");
 	}
 
 
@@ -220,6 +222,7 @@ public abstract class Component : IUpdateable, IDrawable
 
 		return builder.ToString();
 	}
+
 
 	public virtual void Update()
 	{

@@ -80,6 +80,8 @@ public static class ExceptionMessageFormatter
 	{
 		StringBuilder builder = new(ErrorSectionFrom(exception));
 
+		// TODO: use owner too
+
 		string propertyNameText = $"\"{exception.PropertyName}\"".FGGreen();
 		string propertyTypeText = $"\"{exception.PropertyType}\"".FGYellow();
 		string propertyTypeFullText = exception.PropertyType is not null ? $"of type {propertyTypeText}" : "";

@@ -30,10 +30,3 @@ public class InheritableComponentPropertyAttributes(
 	public bool Inherit { get; set; } = inherit;
 	public bool CanBeInherited { get; set; } = canBeInherited;
 }
-
-
-
-/* public static class ComponentPropertyAttributesBuilder
-{
-	
-} */
