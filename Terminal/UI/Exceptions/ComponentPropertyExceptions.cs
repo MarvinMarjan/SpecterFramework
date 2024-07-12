@@ -19,5 +19,3 @@ public class ComponentPropertyException(
 
 	public Component? Owner { get; } = owner;
 }
-
-// TODO: add "Component Owner { get; }"

@@ -84,7 +84,16 @@ public class Terminal
 		=> new((uint)Console.WindowWidth, (uint)Console.WindowHeight);
 
 
-	
+	public static void ClearAllScreen()
+	{
+		StringBuilder codes = new();
+
+		codes.Append(ControlCodes.CursorToHome());
+		codes.Append(ControlCodes.EraseScreen(ControlCodes.ScreenErasingMode.CursorUntilEnd));
+		codes.Append(ControlCodes.EraseScreen(ControlCodes.ScreenErasingMode.SavedLines));
+
+		Console.WriteLine(codes);
+	}
 
 
 	/// <summary>

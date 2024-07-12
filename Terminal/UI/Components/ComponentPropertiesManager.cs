@@ -35,7 +35,6 @@ public class ComponentPropertiesManager(Component parent, ComponentPropertyManag
 
 	public void Add(ComponentProperty property)
 	{
-		// TODO: check if this works
 		if (_properties.Contains(property))
 			throw new ComponentPropertyException(
 				property.Name, property.GetType().Name, null,

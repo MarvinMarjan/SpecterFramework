@@ -79,7 +79,7 @@ public abstract class App
 	protected virtual void Start()
 	{
 		// first drawing
-		ClearAllScreen();
+		Terminal.ClearAllScreen();
 		Update();
 		Draw();
 	}
@@ -96,7 +96,7 @@ public abstract class App
 		bool drawAll = Terminal.TerminalResized;
 
 		if (drawAll is true)
-			ClearAllScreen();
+			Terminal.ClearAllScreen();
 
 		if (drawAll || s_drawAllRequested)
 			DrawAll(true);
@@ -128,21 +128,14 @@ public abstract class App
 			End();
 		}
 		
-		catch (AppException e) {
-			Console.WriteLine(ExceptionMessageFormatter.Format(e));
-		}
-		
-		catch (ComponentException e) {
-			Console.WriteLine(ExceptionMessageFormatter.Format(e));
-		}
-
-		catch (ComponentPropertyException e) {
-			Console.WriteLine(ExceptionMessageFormatter.Format(e));
+		catch (Exception e)
+		{
+			Log.Error(e);
 		}
 
 		finally
 		{
-			Console.Read();
+			Console.ReadKey(true);
 			End();
 		}
 	}
@@ -201,17 +194,6 @@ public abstract class App
 		if (clearRenderQueue)
 			RenderQueue.Clear();
 	}
-
-	private static void ClearAllScreen()
-	{
-		StringBuilder codes = new();
-
-		codes.Append(ControlCodes.CursorToHome());
-		codes.Append(ControlCodes.EraseScreen(ControlCodes.ScreenErasingMode.CursorUntilEnd));
-		codes.Append(ControlCodes.EraseScreen(ControlCodes.ScreenErasingMode.SavedLines));
-
-		Console.WriteLine(codes);
-	}	
 
 
 

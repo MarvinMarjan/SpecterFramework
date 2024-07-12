@@ -35,5 +35,22 @@ public static class StringColoringExtension
 	public static string BGWhite(this string str) => str.Paint(ColorValue.BGWhite);
 	public static string BGBlack(this string str) => str.Paint(ColorValue.BGBlack);
 
-	// TODO: add bright versions
+
+	public static string FGBRed(this string str) => str.Paint(ColorValue.FGBRed);
+	public static string FGBGreen(this string str) => str.Paint(ColorValue.FGBGreen);
+	public static string FGBYellow(this string str) => str.Paint(ColorValue.FGBYellow);
+	public static string FGBBlue(this string str) => str.Paint(ColorValue.FGBBlue);
+	public static string FGBMagenta(this string str) => str.Paint(ColorValue.FGBMagenta);
+	public static string FGBCyan(this string str) => str.Paint(ColorValue.FGBCyan);
+	public static string FGBWhite(this string str) => str.Paint(ColorValue.FGBWhite);
+	public static string FGBBlack(this string str) => str.Paint(ColorValue.FGBBlack);
+
+	public static string BGBRed(this string str) => str.Paint(ColorValue.BGBRed);
+	public static string BGBGreen(this string str) => str.Paint(ColorValue.BGBGreen);
+	public static string BGBYellow(this string str) => str.Paint(ColorValue.BGBYellow);
+	public static string BGBBlue(this string str) => str.Paint(ColorValue.BGBBlue);
+	public static string BGBMagenta(this string str) => str.Paint(ColorValue.BGBMagenta);
+	public static string BGBCyan(this string str) => str.Paint(ColorValue.BGBCyan);
+	public static string BGBWhite(this string str) => str.Paint(ColorValue.BGBWhite);
+	public static string BGBBlack(this string str) => str.Paint(ColorValue.BGBBlack);
 }

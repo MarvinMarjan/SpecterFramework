@@ -73,8 +73,6 @@ public abstract class Component : IUpdateable, IDrawable
 	protected void RaiseUpdateEvent() => UpdateEvent?.Invoke();
 
 
-	// TODO: add names to Components
-
 	public Component(
 		string name,
 
@@ -162,7 +160,6 @@ public abstract class Component : IUpdateable, IDrawable
 
 		bool isChild = false;
 
-		// TODO: See if this works
 		ForeachChildIn(component, child => {
 			if (child == this)
 				isChild = true;
