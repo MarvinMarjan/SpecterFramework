@@ -6,6 +6,9 @@ using Specter.ANSI;
 namespace Specter.Color;
 
 
+// TODO: also use operator() to paint
+
+
 /// <summary>
 /// Represents a sequence with both foreground, background and color mode of a text.
 /// </summary>

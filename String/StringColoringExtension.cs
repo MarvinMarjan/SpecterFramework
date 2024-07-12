@@ -34,4 +34,6 @@ public static class StringColoringExtension
 	public static string BGCyan(this string str) => str.Paint(ColorValue.BGCyan);
 	public static string BGWhite(this string str) => str.Paint(ColorValue.BGWhite);
 	public static string BGBlack(this string str) => str.Paint(ColorValue.BGBlack);
+
+	// TODO: add bright versions
 }

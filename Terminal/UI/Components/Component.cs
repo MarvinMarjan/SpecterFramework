@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 
 using Specter.Color;
+using Specter.Terminal.UI.System; 
 using Specter.Terminal.UI.Exceptions;
 
 
-namespace Specter.Terminal.UI.Components;
+namespace Specter.Terminal.UI.Components; 
 
 
 public interface IUpdateable

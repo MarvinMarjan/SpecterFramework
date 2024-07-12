@@ -38,7 +38,7 @@ public class ComponentPropertiesManager(Component parent, ComponentPropertyManag
 		// TODO: check if this works
 		if (_properties.Contains(property))
 			throw new ComponentPropertyException(
-				property.Name, property.GetType().Name,
+				property.Name, property.GetType().Name, null,
 				"Can't add a new property because it has already been added."
 			);
 
@@ -56,7 +56,7 @@ public class ComponentPropertiesManager(Component parent, ComponentPropertyManag
 				return convertedProperty;
 			
 		throw new ComponentPropertyException(
-			propertyName, null,
+			propertyName, null, null,
 			"Property couldn't be found."
 		);
 	}
@@ -83,7 +83,7 @@ public class ComponentPropertiesManager(Component parent, ComponentPropertyManag
 		{
             if (property.Attributes is not InheritableComponentPropertyAttributes attributes)
                 throw new ComponentPropertyException(
-					property.Name, property.GetType().Name,
+					property.Name, property.GetType().Name, null,
 					"Property is a InheritableComponentProperty, but its 'Attributes' isn't a InheritableComponentPropertyAttributes"
 				);
 

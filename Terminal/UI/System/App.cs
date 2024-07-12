@@ -6,7 +6,7 @@ using Specter.Terminal.UI.Components;
 using Specter.Terminal.UI.Exceptions;
 
 
-namespace Specter.Terminal.UI;
+namespace Specter.Terminal.UI.System;
 
 
 /// <summary>
@@ -68,7 +68,7 @@ public abstract class App
 
 		Exit = false;
 		Root = new();
-
+	
 		Load();
 	}
 
@@ -115,15 +115,36 @@ public abstract class App
 	{
 		SetThisAsCurrentApp();
 
-		Start();
-
-		while (!Exit)
+		try
 		{
-			Update();
-			Draw();
+			Start();
+
+			while (!Exit)
+			{
+				Update();
+				Draw();
+			}
+
+			End();
+		}
+		
+		catch (AppException e) {
+			Console.WriteLine(ExceptionMessageFormatter.Format(e));
+		}
+		
+		catch (ComponentException e) {
+			Console.WriteLine(ExceptionMessageFormatter.Format(e));
 		}
 
-		End();
+		catch (ComponentPropertyException e) {
+			Console.WriteLine(ExceptionMessageFormatter.Format(e));
+		}
+
+		finally
+		{
+			Console.Read();
+			End();
+		}
 	}
 
 
