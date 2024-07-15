@@ -1,4 +1,4 @@
-﻿namespace Specter.Color;
+﻿namespace Specter.Color.Paint;
 
 
 /// <summary>

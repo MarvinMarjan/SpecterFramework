@@ -2,6 +2,7 @@ using System;
 using System.Text;
 
 using Specter.Color;
+using Specter.Color.Paint;
 using Specter.String;
 using Specter.Terminal.UI.Exceptions;
 

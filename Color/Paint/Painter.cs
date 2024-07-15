@@ -5,7 +5,7 @@ using System.Text;
 using Specter.ANSI;
 
 
-namespace Specter.Color;
+namespace Specter.Color.Paint;
 
 
 /// <summary>
