@@ -1,5 +1,6 @@
 ﻿using Specter.Color;
 
+
 namespace Specter.String;
 
 

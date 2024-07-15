@@ -12,7 +12,6 @@ namespace Specter.Terminal.UI.Components;
 /// </summary>
 public class ComponentPropertyManagerRequirement(bool inherit, bool canBeInherited)
 {
-	// TODO: maybe use ComponentPropertyAttributes?
 	public bool Inherit { get; set; } = inherit;
 	public bool CanBeInherited { get; set; } = canBeInherited;
 }
@@ -30,7 +29,7 @@ public class ComponentPropertiesManager(Component owner, ComponentPropertyManage
 	
 	public ComponentPropertyManagerRequirement Requirement { get; set; } = requirement ?? new(true, true);
 
-	private List<ComponentProperty> _properties = [];
+	private readonly List<ComponentProperty> _properties = [];
 
 
 

@@ -74,8 +74,14 @@ public abstract class App
 
 
 
+	/// <summary>
+	/// Called after the construction of the class.
+	/// </summary>
 	protected virtual void Load() {}
 
+	/// <summary>
+	/// Called before the App starts the updating cycle.
+	/// </summary>
 	protected virtual void Start()
 	{
 		// first drawing
@@ -84,6 +90,9 @@ public abstract class App
 		Draw();
 	}
 
+	/// <summary>
+	/// Called every frame. Should update all the program.
+	/// </summary>
 	protected virtual void Update()
 	{
 		Terminal.Update();
@@ -91,6 +100,9 @@ public abstract class App
 		Root?.Update();
 	}
 
+	/// <summary>
+	/// Called every frame. Should draw the components that need to be drawn.
+	/// </summary>
 	protected virtual void Draw()
 	{
 		bool drawAll = Terminal.TerminalResized;
@@ -106,11 +118,17 @@ public abstract class App
 		DrawAllRequested = false;
 	}
 
+	/// <summary>
+	/// Called at the end of the program. Should deinitialize stuff and back to normal state.
+	/// </summary>
 	protected virtual void End()
 		=> OnExit();
 	
 
 
+	/// <summary>
+	/// Starts running the App.
+	/// </summary>
 	public void Run()
 	{
 		SetThisAsCurrentApp();
@@ -164,7 +182,7 @@ public abstract class App
 
 
 
-    public static implicit operator Component(App app) => app.Root;
+	public static implicit operator Component(App app) => app.Root;
 
 
 
