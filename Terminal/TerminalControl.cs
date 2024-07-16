@@ -52,6 +52,8 @@ public static class ControlCodes
 }
 
 
+
+
 public class Terminal
 {
 	private static Size? s_lastTerminalSize = null;
@@ -59,6 +61,13 @@ public class Terminal
 
 	private static bool s_terminalResized = false;
 	public static bool TerminalResized => s_terminalResized;
+
+	private static bool s_cursorVisible = true;
+	public static bool CursorVisible
+	{
+		get => s_cursorVisible;
+		set => s_cursorVisible = Console.CursorVisible = value;
+	}
 
 
 	public delegate void TerminalResizedEventHandler();
@@ -70,14 +79,6 @@ public class Terminal
 
 	public static void SetEchoEnabled(bool enabled) =>
 		Command.Run($"stty {(enabled ? "" : "-")}echo");
-
-	public static void SetCursorVisible(bool visible) => Console.CursorVisible = visible;
-	
-	public static void SetOutputEncoding(Encoding encoding) => Console.OutputEncoding = encoding;
-	public static void SetInputEncoding(Encoding encoding) => Console.InputEncoding = encoding;
-
-	public static Encoding GetOutputEncoding() => Console.OutputEncoding;
-	public static Encoding GetInputEncoding() => Console.InputEncoding;
 
 
 	public static Size GetTerminalSize()

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 
 namespace Specter.Terminal.UI;
@@ -14,7 +15,7 @@ public struct BorderCharacters
 
 	public static BorderCharacters Default
 	{
-		get => Terminal.GetOutputEncoding() switch 
+		get => Console.OutputEncoding switch 
 		{
 			UTF8Encoding => UTF8Default,
 			ASCIIEncoding => ASCIIDefault,

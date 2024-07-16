@@ -36,19 +36,6 @@ public abstract class App
 	}
 
 
-	public static Encoding OutputEncoding
-	{
-		get => Terminal.GetOutputEncoding();
-		set => Terminal.SetOutputEncoding(value);
-	}
-
-	public static Encoding InputEncoding
-	{
-		get => Terminal.GetInputEncoding();
-		set => Terminal.SetInputEncoding(value);
-	}
-
-
 
 	/// <summary>
 	/// Queue containing the Components that are going to be drawed/rendered.
@@ -62,9 +49,8 @@ public abstract class App
 	public App()
 	{
 		Terminal.SetEchoEnabled(false);
-		Terminal.SetCursorVisible(false);
-
-		OutputEncoding = new UTF8Encoding();
+		Terminal.CursorVisible = false;
+		Console.OutputEncoding = new UTF8Encoding();
 
 		// on CTRL+C pressed
 		Console.CancelKeyPress += delegate { OnExit(); };
@@ -226,6 +212,6 @@ public abstract class App
 	{
 		Console.Write(ControlCodes.CursorToHome(), ControlCodes.EraseScreen());
 		Terminal.SetEchoEnabled(true);
-		Terminal.SetCursorVisible(true);
+		Terminal.CursorVisible = true;
 	}
 }
