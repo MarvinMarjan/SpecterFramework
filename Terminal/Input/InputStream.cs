@@ -98,13 +98,9 @@ public class DefaultInputStream : InputStream
 
 		while (Reading)
 		{
-			Console.Write(
-				ControlCodes.LoadCursorPos()
-				+ ControlCodes.EraseScreen(ControlCodes.ScreenErasingMode.CursorUntilEnd)
-				+ Format(Data)
-			);
+			WriteFormat(true);
 
-			ConsoleKeyInfo info = Console.ReadKey();
+			ConsoleKeyInfo info = Console.ReadKey(true);
 			bool processed = ProcessChar(info.Key);
 
 			if (!processed)
@@ -117,6 +113,8 @@ public class DefaultInputStream : InputStream
 			else
 				Cursor.IndexLimit = Data.Length;
 		}
+
+		WriteFormat(false);
 
 		return Data;
 	}
@@ -134,4 +132,25 @@ public class DefaultInputStream : InputStream
 
 	protected override string Format(string source)
 		=> Painter.Paint(source);
+
+
+	private void WriteFormat(bool drawCursor = true)
+		=> Console.Write(
+				ControlCodes.LoadCursorPos()
+				+ ControlCodes.EraseScreen(ControlCodes.ScreenErasingMode.CursorUntilEnd)
+				+ (drawCursor ? Format(Data) : FormatWithoutCursor(Data))
+			);
+
+
+	private string FormatWithoutCursor(string source)
+	{
+		Cursor? lastCursor = Painter.Cursor;
+		Painter.Cursor = null;
+
+		string formatted = Format(source);
+
+		Painter.Cursor = lastCursor;
+		return formatted;
+	}
+
 }

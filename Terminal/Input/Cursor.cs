@@ -1,4 +1,5 @@
-﻿using Specter.Color;
+﻿using System.Text;
+using Specter.Color;
 using Specter.Color.Paint;
 using Specter.Terminal.UI;
 
@@ -28,19 +29,32 @@ public class Cursor(ColorObject? color = null)
 	public Point Position { get; set; }
 
 
-	public string DrawTo(string source)
+	public string GetCursorAtEnd() => Color.Paint("_");
+
+	public string DrawTo(string source, int? index = null, ColorObject? endColor = null)
 	{
 		string result = source;
 
-		if (Index >= IndexLimit)
-			result += Color.Paint("_");
+		int finalIndex = index ?? Index;
+		int finalLimit = index is null ? IndexLimit : source.Length;
+
+		ColorObject oldEndColor = EndColor;
+		EndColor = endColor ?? EndColor;
+
+		if (finalIndex >= finalLimit)
+			result += GetCursorAtEnd();
 		
 		else
 		{
-			result = result.Insert(Index + 1, EndColor.AsSequence());
-			result = result.Insert(Index, Color.AsSequence());
+			result = result.Insert(finalIndex + 1, ColorValue.Reset.AsSequence() + EndColor.AsSequence());
+			result = result.Insert(finalIndex, Color.AsSequence());
 		}
+
+		EndColor = oldEndColor;
 
 		return result;
 	}
+
+	public string DrawTo(char ch, ColorObject? endColor = null)
+		=> DrawTo(ch.ToString(), 0, endColor);
 }

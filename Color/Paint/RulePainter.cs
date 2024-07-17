@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using Specter.ANSI;
+using System.Text;
+
 using Specter.Terminal.Input;
 
 
@@ -39,7 +40,7 @@ public partial class RulePainter(List<PaintRule> rules) : Painter
 
 		targets.Reverse();
 
-		return PaintStringUsingTargets(source, targets);
+		return PaintTokensUsingTargets(tokens, targets);
 	}
 
 
@@ -62,24 +63,76 @@ public partial class RulePainter(List<PaintRule> rules) : Painter
 	}
 
 
-	private string PaintStringUsingTargets(string source, List<PaintTarget> targets)
+	private string PaintTokensUsingTargets(List<Token> tokens, List<PaintTarget> targets)
 	{
-		if (Cursor is not null && targets.Count == 0)
-			source = Cursor.DrawTo(source); 
+		StringBuilder builder = new();
+		
+		PaintTarget? targetMatched;
+		bool cursorDrawed = false;
 
-		foreach (PaintTarget target in targets)
+		foreach (Token token in tokens)
 		{
-			// FIXME: not working
-			if (Cursor?.Index >= target.Start && Cursor?.Index <= target.End)
-			{
-				source = Cursor.DrawTo(source);
-				continue;
-			}
+			targetMatched = null;
 
-			source = source.Insert(target.End, EscapeCodes.Reset);
-			source = source.Insert(target.Start, target.Color.AsSequence());
+			foreach (PaintTarget target in targets)
+			{
+				// If the Start and End indexes of the token are the same as the target, paint the token.
+				if (token.Start != target.Start || token.End != target.End)
+					continue;
+
+				targetMatched = target;
+				break;
+			}
+			
+			builder.Append(DrawCursorIfInsideToken(
+				Cursor ?? new(), token, targetMatched?.Color,
+				CursorAtToken(token), out bool drawed
+			));
+
+			if (drawed)
+				cursorDrawed = true;
 		}
 
-		return source;
+		if (Cursor is not null && !cursorDrawed)
+			builder.Append(Cursor.GetCursorAtEnd());
+
+		return builder.ToString();
+	}
+
+
+	private bool CursorAtToken(Token token)
+		=> Cursor?.Index >= token.Start && Cursor?.Index < token.End;
+
+
+	private static string DrawCursorIfInsideToken(Cursor cursor, Token token, ColorObject? tokenColor, bool inside, out bool cursorDrawed)
+	{
+		StringBuilder builder = new();
+
+		if (cursorDrawed = inside)
+			builder.Append(DrawCursorAtToken(cursor, token, tokenColor));
+		else
+			builder.Append(tokenColor?.Paint(token.Lexeme) ?? token.Lexeme);
+
+		return builder.ToString();
+	}
+
+
+	private static string DrawCursorAtToken(Cursor cursor, Token token, ColorObject? tokenColor = null)
+	{
+		StringBuilder builder = new(tokenColor?.AsSequence() ?? "");
+
+		for (int i = 0; i < token.Lexeme.Length; i++)
+		{
+			char ch = token.Lexeme[i];
+
+			if (cursor.Index == i + token.Start)
+				builder.Append(cursor.DrawTo(ch, tokenColor));
+			else
+				builder.Append(ch);
+		}
+
+		builder.Append(ColorValue.Reset.AsSequence());
+
+		return builder.ToString();
 	}
 }

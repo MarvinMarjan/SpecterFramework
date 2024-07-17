@@ -69,6 +69,17 @@ public class Terminal
 		set => s_cursorVisible = Console.CursorVisible = value;
 	}
 
+	private static bool s_echoEnabled = true;
+	public static bool EchoEnabled
+	{
+		get => s_echoEnabled;
+		set
+		{
+			s_echoEnabled = value;
+			SetEchoEnabled(value);
+		}
+	}
+
 
 	public delegate void TerminalResizedEventHandler();
 
@@ -77,7 +88,7 @@ public class Terminal
 	private static void RaiseTerminalResizedEvent() => TerminalResizedEvent?.Invoke();
 
 
-	public static void SetEchoEnabled(bool enabled) =>
+	private static void SetEchoEnabled(bool enabled) =>
 		Command.Run($"stty {(enabled ? "" : "-")}echo");
 
 

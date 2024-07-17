@@ -49,8 +49,8 @@ public partial class RulePainter
 		{
 			char ch = Advance();
 
-			if (ch is ' ' or '\n' or '\t' or '\r')
-				return;		
+			/* if (ch is ' ' or '\n' or '\t' or '\r')
+				return; */
 
 			if (char.IsLetter(ch))
 				Identifier();

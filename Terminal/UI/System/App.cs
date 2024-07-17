@@ -48,7 +48,7 @@ public abstract class App
 
 	public App()
 	{
-		Terminal.SetEchoEnabled(false);
+		Terminal.EchoEnabled = false;
 		Terminal.CursorVisible = false;
 		Console.OutputEncoding = new UTF8Encoding();
 
@@ -211,7 +211,7 @@ public abstract class App
 	private static void OnExit()
 	{
 		Console.Write(ControlCodes.CursorToHome(), ControlCodes.EraseScreen());
-		Terminal.SetEchoEnabled(true);
+		Terminal.EchoEnabled = true;
 		Terminal.CursorVisible = true;
 	}
 }
