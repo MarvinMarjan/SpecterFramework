@@ -23,12 +23,16 @@ public readonly struct PaintTarget(ColorObject color, int start, int end)
 
 
 /// <summary>
-/// Paints using one or more PaintRule.
+/// Paints using one or more paint rules.
 /// </summary>
 /// <param name="rules"> The paint rules to use. </param>
 public partial class RulePainter(List<PaintRule> rules) : Painter
 {
 	public List<PaintRule> Rules { get; set; } = rules;
+
+	/// <summary>
+	/// The optional cursor to draw.
+	/// </summary>
 	public Cursor? Cursor { get; set; } = null;
 
 
@@ -43,7 +47,7 @@ public partial class RulePainter(List<PaintRule> rules) : Painter
 		return PaintTokensUsingTargets(tokens, targets);
 	}
 
-
+	
 	private List<PaintTarget> MatchRules(List<Token> tokens)
 	{
 		List<PaintTarget> targets = [];

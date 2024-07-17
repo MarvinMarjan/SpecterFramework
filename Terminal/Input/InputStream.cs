@@ -6,15 +6,31 @@ using Specter.Color.Paint;
 namespace Specter.Terminal.Input;
 
 
+/// <summary>
+/// Joins input receiving, key processment and visual formatting into a single class.
+/// </summary>
 public abstract class InputStream
 {
 	public delegate void KeyProcessor();
 
+	/// <summary>
+	/// Stores processors linked to their corresponding key.
+	/// </summary>
 	public Dictionary<ConsoleKey, KeyProcessor> KeyProcessors { get; set; }
 
+	/// <summary>
+	/// Receiving input?
+	/// </summary>
 	protected bool Reading { get; set; }
 
+	/// <summary>
+	/// The string data received from stdin.
+	/// </summary>
 	protected string Data { get; set; }
+
+	/// <summary>
+	/// The cursor to be used.
+	/// </summary>
 	public Cursor Cursor { get; set; }
 
 
@@ -26,19 +42,44 @@ public abstract class InputStream
 	}
 
 
+	/// <summary>
+	/// Starts reading from stdin.
+	/// </summary>
+	/// <returns> The inputted data. </returns>
 	public abstract string Read();
 
 
+	/// <summary>
+	/// Reads each character when inputted.
+	/// </summary>
 	protected abstract string ReadData();
-	protected abstract bool ProcessChar(ConsoleKey ch);
+
+	/// <summary>
+	/// Processes the character if there's a processor for it.
+	/// </summary>
+	/// <param name="key"> The ConsoleKey representation of the character. </param>
+	/// <returns> True if it was processed, false otherwise. </returns>
+	protected abstract bool ProcessKey(ConsoleKey key);
+
+	/// <summary>
+	/// Controls how the input data is showed to the terminal.
+	/// </summary>
+	/// <param name="source"> The current full string data. </param>
+	/// <returns> A formatted (or not) string. </returns>
 	protected abstract string Format(string source);
 }
 
 
 
 
+/// <summary>
+/// The default implementation of InputStream.
+/// </summary>
 public class DefaultInputStream : InputStream
 {
+	/// <summary>
+	/// The painter to be used when formatting.
+	/// </summary>
 	public RulePainter Painter { get; set; }
 
 	new public Cursor Cursor
@@ -75,11 +116,13 @@ public class DefaultInputStream : InputStream
 
 	public override string Read()
 	{
+		// disable the default cursor visibility. We are going to use our own customized cursor
 		bool startCursorVisibility = Terminal.CursorVisible;
 		Terminal.CursorVisible = false;
 
 		string data = ReadData();
 
+		// reset the default cursor visibility to the original state.
 		Terminal.CursorVisible = startCursorVisibility;
 
 		Console.Write('\n');
@@ -101,8 +144,9 @@ public class DefaultInputStream : InputStream
 			WriteFormat(true);
 
 			ConsoleKeyInfo info = Console.ReadKey(true);
-			bool processed = ProcessChar(info.Key);
+			bool processed = ProcessKey(info.Key);
 
+			// don't insert keys that have a processor to Data.
 			if (!processed)
 			{
 				Data = Data.Insert(Cursor.Index, info.KeyChar.ToString());
@@ -111,17 +155,20 @@ public class DefaultInputStream : InputStream
 			}
 
 			else
-				Cursor.IndexLimit = Data.Length;
+				Cursor.IndexLimit = Data.Length; // locks the cursor index limit to string data length.
 		}
 
+		// writes the formatted data once again, but without drawing the cursor.
 		WriteFormat(false);
 
 		return Data;
 	}
 
-	protected override bool ProcessChar(ConsoleKey ch)
+
+	protected override bool ProcessKey(ConsoleKey key)
 	{
-		if (KeyProcessors.TryGetValue(ch, out KeyProcessor? processor))
+		// tries to get the corresponding key processor.
+		if (KeyProcessors.TryGetValue(key, out KeyProcessor? processor))
 		{
 			processor();
 			return true;
@@ -129,20 +176,13 @@ public class DefaultInputStream : InputStream
 
 		return false;
 	}
+	
 
 	protected override string Format(string source)
 		=> Painter.Paint(source);
 
 
-	private void WriteFormat(bool drawCursor = true)
-		=> Console.Write(
-				ControlCodes.LoadCursorPos()
-				+ ControlCodes.EraseScreen(ControlCodes.ScreenErasingMode.CursorUntilEnd)
-				+ (drawCursor ? Format(Data) : FormatWithoutCursor(Data))
-			);
-
-
-	private string FormatWithoutCursor(string source)
+	protected string FormatWithoutCursor(string source)
 	{
 		Cursor? lastCursor = Painter.Cursor;
 		Painter.Cursor = null;
@@ -153,4 +193,12 @@ public class DefaultInputStream : InputStream
 		return formatted;
 	}
 
+
+
+	protected void WriteFormat(bool drawCursor = true)
+		=> Console.Write(
+				ControlCodes.LoadCursorPos()
+				+ ControlCodes.EraseScreen(ControlCodes.ScreenErasingMode.CursorUntilEnd)
+				+ (drawCursor ? Format(Data) : FormatWithoutCursor(Data))
+			);
 }
