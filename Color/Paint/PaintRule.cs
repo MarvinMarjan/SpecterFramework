@@ -1,7 +1,4 @@
-﻿using System.Linq;
-
-
-namespace Specter.Color.Paint;
+﻿namespace Specter.Color.Paint;
 
 
 /// <summary>
@@ -13,8 +10,7 @@ public abstract class PaintRule(ColorObject color)
 	public ColorObject Color { get; set; } = color;
 
 
-	public abstract bool Match(Token token);
-	public abstract bool Match(Token token, out PaintTarget target);
+	public abstract bool Match(ref PaintingState state, Token token);
 }
 
 
@@ -42,25 +38,13 @@ public class LogicRule<TRule>(ColorObject color, TRule left, TRule right, LogicR
 	public LogicOperator Operator { get; set; } = @operator;
 
 
-	private PaintTarget _lastTarget;
-
-
-	public override bool Match(Token token) => Operator switch
+	public override bool Match(ref PaintingState state, Token token) => Operator switch
 	{
-		LogicOperator.And => Left.Match(token, out _lastTarget) && Right.Match(token),
-		LogicOperator.Or => Left.Match(token, out _lastTarget) || Right.Match(token),
+		LogicOperator.And => Left.Match(ref state, token) && Right.Match(ref state, token),
+		LogicOperator.Or => Left.Match(ref state, token) || Right.Match(ref state, token),
 
 		_ => false
 	};
-
-	public override bool Match(Token token, out PaintTarget target)
-	{
-		bool result = Match(token);
-		
-		target = _lastTarget with { Color = Color };
-
-		return result;
-	}
 }
 
 
@@ -71,20 +55,61 @@ public class LogicRule<TRule>(ColorObject color, TRule left, TRule right, LogicR
 /// <param name="color"> The color to paint. </param>
 /// <param name="sources"> The sources to check equality. </param>
 /// <param name="equal"> Whether it should equal o not ('==' or '!='). </param>
-public class EqualityRule(ColorObject color, string[] sources, bool equal = true)
+public class EqualityRule(ColorObject color, TokenLexemeSet[] sources, bool equal = true)
 	: PaintRule(color), ILogicRule
 {
 	public bool Equal { get; set; } = equal;
-	public string[] Sources { get; set; } = sources;
+	public TokenLexemeSet[] Sources { get; set; } = sources;
+
+	public int? ExtraPaintLength { get; set; }
 
 
-	public override bool Match(Token token)
-		=> Equal ? Sources.Contains(token.Lexeme) : !Sources.Contains(token.Lexeme);
-
-	public override bool Match(Token token, out PaintTarget target)
+	public override bool Match(ref PaintingState state, Token token)
 	{
-		target = new(Color, token.Start, token.End);
+		bool matched = false;
+		int paintLength = 0;
 
-		return Match(token);
+		foreach (TokenLexemeSet set in Sources)
+		{
+			if (!set.Match(token))
+				continue;
+
+			paintLength = set.Set.Length;
+			matched = true;
+			
+			break;
+		}
+			
+		if (matched)
+		{
+			state.Color = Color;
+			state.PaintLength = paintLength + (ExtraPaintLength ?? 0);
+		}
+		
+		return matched;
+	}
+}
+
+
+
+public class BetweenRule(ColorObject color, TokenLexemeSet left, TokenLexemeSet right)
+	: PaintRule(color)
+{
+	public TokenLexemeSet Left { get; set; } = left;
+	public TokenLexemeSet Right { get; set; } = right;
+
+
+	public override bool Match(ref PaintingState state, Token token)
+	{
+		bool matched = Left.Match(token);
+
+		if (matched)
+		{
+			state.PaintUntilToken = Right;
+			state.Color = Color;
+			state.IgnoreCurrentToken = true;
+		}
+
+		return matched;
 	}
 }

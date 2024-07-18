@@ -1,15 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 
 namespace Specter.Color.Paint;
-
-
-public struct Token(string lexeme, int start, int end)
-{
-	public string Lexeme { get; set; } = lexeme;
-	public int Start { get; set; } = start;
-	public int End { get; set; } = end;
-}
 
 
 public partial class RulePainter
@@ -70,7 +63,17 @@ public partial class RulePainter
 			=> AddToken(_source[_start .. _end]);
 
 		private void AddToken(string lexeme)
-			=> _tokens.Add(new(lexeme, _start, _end));
+		{
+			Token token = new(lexeme, _start, _end);
+			Token? previous = _tokens.Count == 0 ? null : _tokens.Last();
+			
+			token.Previous = previous;
+
+			if (previous is not null)
+				previous.Next = token;
+
+			_tokens.Add(token);
+		}
 
 
 
