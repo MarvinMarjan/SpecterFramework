@@ -11,7 +11,7 @@ namespace Specter.Terminal.Input;
 /// </summary>
 public abstract class InputStream
 {
-	public delegate void KeyProcessor();
+	public delegate void KeyProcessor(ConsoleKeyInfo info);
 
 	/// <summary>
 	/// Stores processors linked to their corresponding key.
@@ -26,7 +26,7 @@ public abstract class InputStream
 	/// <summary>
 	/// The string data received from stdin.
 	/// </summary>
-	protected string Data { get; set; }
+	public string Data { get; set; }
 
 	/// <summary>
 	/// The cursor to be used.
@@ -59,7 +59,7 @@ public abstract class InputStream
 	/// </summary>
 	/// <param name="key"> The ConsoleKey representation of the character. </param>
 	/// <returns> True if it was processed, false otherwise. </returns>
-	protected abstract bool ProcessKey(ConsoleKey key);
+	protected abstract bool ProcessKey(ConsoleKeyInfo info);
 
 	/// <summary>
 	/// Controls how the input data is showed to the terminal.
@@ -98,24 +98,59 @@ public class DefaultInputStream : InputStream
 			Cursor = Cursor
 		};
 
-		KeyProcessors.Add(ConsoleKey.Enter, () => Reading = false);
-		KeyProcessors.Add(ConsoleKey.LeftArrow, () => Cursor.Index--);
-		KeyProcessors.Add(ConsoleKey.RightArrow, () => Cursor.Index++);
-		KeyProcessors.Add(ConsoleKey.Backspace,
-		() => {
-				if (Data.Length == 0 || Cursor.Index - 1 < 0)
-					return;
+		KeyProcessors.Add(ConsoleKey.Enter, _ => Reading = false);
+		KeyProcessors.Add(ConsoleKey.LeftArrow, CursorLeft);
+		KeyProcessors.Add(ConsoleKey.RightArrow, CursorRight);
+		KeyProcessors.Add(ConsoleKey.Backspace, Backspace);
+	}
 
-				Data = Data.Remove(Cursor.Index - 1, 1);
-				Cursor.Index--;
-			}
-		);
+
+
+	protected void CursorLeft(ConsoleKeyInfo info)
+	{
+		if (info.Modifiers.HasFlag(ConsoleModifiers.Control))
+			Cursor.CursorPreviousWord();
+		else
+			Cursor.CursorToLeft();
+	}
+
+	protected void CursorRight(ConsoleKeyInfo info)
+	{
+		if (info.Modifiers.HasFlag(ConsoleModifiers.Control))
+			Cursor.CursorNextWord();
+		else
+			Cursor.CursorToRight();
+	}
+
+
+	protected void Backspace(ConsoleKeyInfo info)
+	{
+		if (Data.Length == 0 || Cursor.AtStart())
+			return;
+
+		bool controlPressed = info.Modifiers.HasFlag(ConsoleModifiers.Control);
+
+		char current;
+
+		do
+		{
+			// store the current character before removing it
+			current = Cursor.PeekCurrent();
+
+			Data = Data.Remove(--Cursor.Index, 1);
+
+			if (!controlPressed)
+				break;
+		}
+		while (!Cursor.AtStart() && char.IsLetterOrDigit(current));
 	}
 
 
 
 	public override string Read()
 	{
+		Cursor.Stream = this;
+
 		// disable the default cursor visibility. We are going to use our own customized cursor
 		bool startCursorVisibility = Terminal.CursorVisible;
 		Terminal.CursorVisible = false;
@@ -144,18 +179,14 @@ public class DefaultInputStream : InputStream
 			WriteFormat(true);
 
 			ConsoleKeyInfo info = Console.ReadKey(true);
-			bool processed = ProcessKey(info.Key);
+			bool processed = ProcessKey(info);
 
 			// don't insert keys that have a processor to Data.
 			if (!processed)
 			{
 				Data = Data.Insert(Cursor.Index, info.KeyChar.ToString());
-				Cursor.IndexLimit = Data.Length;
 				Cursor.Index++;
 			}
-
-			else
-				Cursor.IndexLimit = Data.Length; // locks the cursor index limit to string data length.
 		}
 
 		// writes the formatted data once again, but without drawing the cursor.
@@ -165,12 +196,12 @@ public class DefaultInputStream : InputStream
 	}
 
 
-	protected override bool ProcessKey(ConsoleKey key)
+	protected override bool ProcessKey(ConsoleKeyInfo info)
 	{
 		// tries to get the corresponding key processor.
-		if (KeyProcessors.TryGetValue(key, out KeyProcessor? processor))
+		if (KeyProcessors.TryGetValue(info.Key, out KeyProcessor? processor))
 		{
-			processor();
+			processor(info);
 			return true;
 		}
 

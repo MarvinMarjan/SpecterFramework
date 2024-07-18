@@ -1,8 +1,11 @@
 ﻿using Specter.Color;
 using Specter.Color.Paint;
-using Specter.Terminal.UI;
+
 
 namespace Specter.Terminal.Input;
+
+
+// TODO: maybe create a RangedInt that doesn't overflows its limits
 
 
 /// <summary>
@@ -11,6 +14,8 @@ namespace Specter.Terminal.Input;
 /// <param name="color"> The color of the cursor. </param>
 public class Cursor(ColorObject? color = null)
 {
+	public InputStream? Stream { get; set; } = null;
+	
 	public ColorObject Color { get; set; } = color ?? ColorValue.Inverse;
 	public ColorObject EndColor { get; set; } = ColorValue.Reset;
 	
@@ -26,10 +31,71 @@ public class Cursor(ColorObject? color = null)
 		}
 	}
 	
-	public int ValidIndex => Index >= IndexLimit && Index - 1 >= 0 ? Index - 1 : Index;
+	public int ValidIndex => ForceRange(Index);
 
-	public int IndexLimit { get; set; }
-	public Point Position { get; set; }
+	public int IndexLimit => Stream?.Data.Length ?? 0;
+
+
+
+	public bool AtEnd() => Index >= IndexLimit;
+	public bool AtStart() => Index - 1 < 0;
+
+
+
+	public void CursorToLeft() => Index--;
+	public void CursorToRight() => Index++;
+
+
+
+	public void CursorPreviousWord()
+	{
+		if (Stream is null)
+		{
+			CursorToLeft();
+			return;
+		}
+
+		do
+			CursorToLeft();
+		while(!AtStart() && char.IsLetterOrDigit(PeekCurrent()));
+	}
+
+
+	public void CursorNextWord()
+	{
+		if (Stream is null)
+		{
+			CursorToRight();
+			return;
+		}
+
+		do
+			CursorToRight();
+		while(!AtEnd() && char.IsLetterOrDigit(PeekCurrent()));
+	}
+
+
+	public char PeekCurrent()
+		=> Stream?.Data[ValidIndex] ?? '\0';
+
+	public char PeekLeftChar()
+		=> Stream?.Data[ForceRange(Index - 1)] ?? '\0';
+
+	public char PeekRightChar()
+		=> Stream?.Data[ForceRange(Index + 1)] ?? '\0';
+	
+
+
+	private int ForceRange(int index)
+	{
+		if (index < 0)
+			return 0;
+		
+		else if (index >= IndexLimit)
+			return IndexLimit - 1;
+
+		return index;
+	}
 
 
 	public string GetCursorAtEnd() => Color.Paint("_");
