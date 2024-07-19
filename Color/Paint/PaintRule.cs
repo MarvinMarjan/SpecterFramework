@@ -8,10 +8,12 @@
 public abstract class PaintRule(ColorObject color)
 {
 	public ColorObject Color { get; set; } = color;
+	public bool IgnoreWhiteSpace { get; set; } = true;
 
 
 	public abstract bool Match(ref PaintingState state, Token token);
 }
+
 
 
 /// <summary>
@@ -47,6 +49,45 @@ public class LogicRule<TRule>(ColorObject color, TRule left, TRule right, LogicR
 	};
 }
 
+// TODO: try to improve everything related to RulePainter
+
+
+public interface IRuleCondition
+{
+	public bool IsTrue(Token token);
+	public bool IsFalse(Token token) => !IsTrue(token);
+}
+
+
+public class NextTokenIs(TokenTarget set) : IRuleCondition
+{
+	public TokenTarget Set { get; set; } = set;
+	public bool UseNextNonWhiteSpaceToken { get; set; } = true;
+
+
+	public bool IsTrue(Token token)
+	{
+		Token? next = UseNextNonWhiteSpaceToken ? token.NextNonWhiteSpace : token.Next;
+		
+		return next is not null && Set.Match(next);
+	}
+}
+
+
+public class PreviousTokenIs(TokenTarget set) : IRuleCondition
+{
+	public TokenTarget Set { get; set; } = set;
+	public bool UsePreviousNonWhiteSpaceToken { get; set; } = true;
+
+
+	public bool IsTrue(Token token)
+	{
+		Token? previous = UsePreviousNonWhiteSpaceToken ? token.PreviousNonWhiteSpace : token.Previous;
+		
+		return previous is not null && Set.Match(previous);
+	}
+}
+
 
 
 /// <summary>
@@ -55,11 +96,18 @@ public class LogicRule<TRule>(ColorObject color, TRule left, TRule right, LogicR
 /// <param name="color"> The color to paint. </param>
 /// <param name="sources"> The sources to check equality. </param>
 /// <param name="equal"> Whether it should equal o not ('==' or '!='). </param>
-public class EqualityRule(ColorObject color, TokenLexemeSet[] sources, bool equal = true)
-	: PaintRule(color), ILogicRule
+public class EqualityRule(
+
+	ColorObject color,
+	TokenTarget[] sources,
+	IRuleCondition? condition = null,
+	bool equal = true
+
+) : PaintRule(color), ILogicRule
 {
+	public TokenTarget[] Sources { get; set; } = sources;
+	public IRuleCondition? Condition { get; set; } = condition;
 	public bool Equal { get; set; } = equal;
-	public TokenLexemeSet[] Sources { get; set; } = sources;
 
 	public int? ExtraPaintLength { get; set; }
 
@@ -69,9 +117,11 @@ public class EqualityRule(ColorObject color, TokenLexemeSet[] sources, bool equa
 		bool matched = false;
 		int paintLength = 0;
 
-		foreach (TokenLexemeSet set in Sources)
+		bool ConditionIsTrue = Condition?.IsTrue(token) ?? true;
+
+		foreach (TokenTarget set in Sources)
 		{
-			if (!set.Match(token))
+			if (!set.Match(token) || !ConditionIsTrue)
 				continue;
 
 			paintLength = set.Set.Length;
@@ -92,11 +142,11 @@ public class EqualityRule(ColorObject color, TokenLexemeSet[] sources, bool equa
 
 
 
-public class BetweenRule(ColorObject color, TokenLexemeSet left, TokenLexemeSet right)
+public class BetweenRule(ColorObject color, TokenTarget left, TokenTarget right)
 	: PaintRule(color)
 {
-	public TokenLexemeSet Left { get; set; } = left;
-	public TokenLexemeSet Right { get; set; } = right;
+	public TokenTarget Left { get; set; } = left;
+	public TokenTarget Right { get; set; } = right;
 
 
 	public override bool Match(ref PaintingState state, Token token)

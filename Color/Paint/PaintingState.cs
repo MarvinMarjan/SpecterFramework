@@ -6,7 +6,7 @@ public struct PaintingState(ColorObject color)
 	public ColorObject Color { get; set; } = color;
 	public ColorObject DefaultColor { get; set; } = ColorValue.Reset;
 
-	public TokenLexemeSet? PaintUntilToken { get; set; }
+	public TokenTarget? PaintUntilToken { get; set; }
 	public int PaintLength { get; set; }
 	public int DefaultPaintLength { get; set; } = 1;
 	public int PaintCounter { get; private set; }
@@ -26,11 +26,13 @@ public struct PaintingState(ColorObject color)
 			return;
 		}
 
-		if (PaintUntilToken is TokenLexemeSet validSet && !validSet.Match(currentToken))
-			return;
-
-		if (PaintUntilToken is not null)
-			PaintLength = PaintUntilToken?.Set.Length ?? 1;
+		if (PaintUntilToken is TokenTarget validTokenSet)
+		{
+			if (!validTokenSet.Match(currentToken))
+				return;
+	
+			PaintLength = validTokenSet.Set.Length;
+		}
 
 		PaintUntilToken = null;
 

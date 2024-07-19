@@ -65,12 +65,30 @@ public partial class RulePainter
 		private void AddToken(string lexeme)
 		{
 			Token token = new(lexeme, _start, _end);
-			Token? previous = _tokens.Count == 0 ? null : _tokens.Last();
+
+			bool empty = _tokens.Count == 0;
+
+			Token? previous = empty ? null : _tokens.Last();
+			Token? previousNonWhitespace = empty ? null : _tokens.FindLast(
+				token => !char.IsWhiteSpace(token.Lexeme, 0)
+			);
 			
 			token.Previous = previous;
+			token.PreviousNonWhiteSpace = previousNonWhitespace;
+
+			bool isThisTokenWhiteSpace = char.IsWhiteSpace(token.Lexeme, 0);
 
 			if (previous is not null)
+			{
 				previous.Next = token;
+				previous.NextNonWhiteSpace = !isThisTokenWhiteSpace ? token : null;
+			}
+
+			if (previousNonWhitespace is not null)
+			{
+				previousNonWhitespace.Next = token;
+				previousNonWhitespace.NextNonWhiteSpace = !isThisTokenWhiteSpace ? token : null;
+			}
 
 			_tokens.Add(token);
 		}
