@@ -27,7 +27,7 @@ public partial class RulePainter(List<PaintRule> rules) : Painter
 
 	public override string Paint(string source)
 	{
-		List<Token> tokens = new Scanner().Scan(source);
+		List<Token> tokens = new RulePainterScanner().Scan(source);
 		
 		return PaintTokens(tokens);
 	}
