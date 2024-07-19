@@ -38,6 +38,10 @@ public class LogicCondition(IRuleCondition left, IRuleCondition right, LogicCond
 }
 
 
+/// <summary>
+/// Applies a condition to the next token of a token.
+/// </summary>
+/// <param name="condition"> The condition to satisfy. </param>
 public class NextTokenIs(IRuleCondition condition) : IRuleCondition
 {
 	public IRuleCondition Condition { get; set; } = condition;
@@ -53,6 +57,10 @@ public class NextTokenIs(IRuleCondition condition) : IRuleCondition
 }
 
 
+/// <summary>
+/// Applies a condition to the previous token of a token.
+/// </summary>
+/// <param name="condition"> The condition to satisfy. </param>
 public class PreviousTokenIs(IRuleCondition condition) : IRuleCondition
 {
 	public IRuleCondition Condition { get; set; } = condition;
@@ -68,6 +76,10 @@ public class PreviousTokenIs(IRuleCondition condition) : IRuleCondition
 }
 
 
+/// <summary>
+/// A custom condition.
+/// </summary>
+/// <param name="predicate"> The condition. </param>
 public class TokenIs(Func<Token, bool> predicate) : IRuleCondition
 {
 	public Func<Token, bool> Predicate { get; set; } = predicate;
@@ -78,6 +90,10 @@ public class TokenIs(Func<Token, bool> predicate) : IRuleCondition
 }
 
 
+/// <summary>
+/// The current target must match the current token.
+/// </summary>
+/// <param name="target"> The target to use. </param>
 public class TokenIsTarget(TokenTarget target) : IRuleCondition
 {
 	public TokenTarget Target { get; set; } = target;
@@ -88,9 +104,15 @@ public class TokenIsTarget(TokenTarget target) : IRuleCondition
 }
 
 
+/// <summary>
+/// The current token must be a word (i.e: "myid", "myid123". returns false to "123myid")
+/// </summary>
 public class TokenIsWord()
 	: TokenIs(token => char.IsLetter(token.Lexeme[0]) && token.Lexeme.IsAlphaNumeric());
 
 
+/// <summary>
+/// The current token must be conversible to a double type number.
+/// </summary>
 public class TokenIsNumber()
 	: TokenIs(token => double.TryParse(token.Lexeme, out _));

@@ -17,42 +17,11 @@ public abstract class PaintRule(ColorObject color)
 
 
 /// <summary>
-/// Rules that don't inherit from this aren't able to be used as operands in 
-/// LogicRule.
-/// ! Probably useless. Maybe should be removed.
+/// A rule that matches when its condition is true.
 /// </summary>
-public interface ILogicRule
-{}
-
-public class LogicRule<TRule>(ColorObject color, TRule left, TRule right, LogicRule<TRule>.LogicOperator @operator)
-	: PaintRule(color)
-		where TRule : PaintRule, ILogicRule
-{
-	public enum LogicOperator
-	{
-		And,
-		Or
-	}
-
-
-	public TRule Left { get; set; } = left;
-	public TRule Right { get; set; } = right;
-
-	public LogicOperator Operator { get; set; } = @operator;
-
-
-	public override bool Match(ref PaintingState state, Token token) => Operator switch
-	{
-		LogicOperator.And => Left.Match(ref state, token) && Right.Match(ref state, token),
-		LogicOperator.Or => Left.Match(ref state, token) || Right.Match(ref state, token),
-
-		_ => false
-	};
-}
-
-
-
-public class WildcardRule(ColorObject color, IRuleCondition? condition)
+/// <param name="color"> The color to paint. </param>
+/// <param name="condition"> The condition. </param>
+public class ConditionalRule(ColorObject color, IRuleCondition? condition)
 	: PaintRule(color)
 {
 	public IRuleCondition? Condition { get; set; } = condition;
@@ -92,7 +61,7 @@ public class EqualityRule(
 	IRuleCondition? condition = null,
 	bool equal = true
 
-) : PaintRule(color), ILogicRule
+) : PaintRule(color)
 {
 	public TokenTarget[] Sources { get; set; } = sources;
 	public IRuleCondition? Condition { get; set; } = condition;
@@ -131,6 +100,12 @@ public class EqualityRule(
 
 
 
+/// <summary>
+/// A rule that matches for every target between two other targets.
+/// </summary>
+/// <param name="color"> The color to paint. </param>
+/// <param name="left"> The left sided target. </param>
+/// <param name="right"> The right sided target. </param>
 public class BetweenRule(ColorObject color, TokenTarget left, TokenTarget right)
 	: PaintRule(color)
 {
@@ -144,7 +119,7 @@ public class BetweenRule(ColorObject color, TokenTarget left, TokenTarget right)
 
 		if (matched)
 		{
-			state.PaintUntilToken = Right;
+			state.PaintUntilToken = Right; // paints until the right sided target
 			state.Color = Color;
 			state.IgnoreCurrentToken = true;
 		}
@@ -155,17 +130,22 @@ public class BetweenRule(ColorObject color, TokenTarget left, TokenTarget right)
 
 
 
-public class CustomMatchRule(ColorObject color, CustomMatchRule.RuleFunc func)
+/// <summary>
+/// Uses a custom condition to match.
+/// </summary>
+/// <param name="color"> The color to paint. </param>
+/// <param name="predicate"> The function that checks whether it matches or not. </param>
+public class CustomMatchRule(ColorObject color, CustomMatchRule.RuleFunc predicate)
 	: PaintRule(color)
 {
 	public delegate bool RuleFunc(Token token);
 
-	public RuleFunc Func { get; set; } = func;
+	public RuleFunc Predicate { get; set; } = predicate;
 
 
 	public override bool Match(ref PaintingState state, Token token)
 	{
-		bool matched = Func(token);
+		bool matched = Predicate(token);
 
 		if (matched)
 		{
@@ -179,14 +159,19 @@ public class CustomMatchRule(ColorObject color, CustomMatchRule.RuleFunc func)
 
 
 
-public class CustomRule(ColorObject color, CustomRule.RuleFunc func)
+/// <summary>
+/// Full custom behaviour.
+/// </summary>
+/// <param name="color"> The color to paint. </param>
+/// <param name="matcher"> The matcher function. </param>
+public class CustomRule(ColorObject color, CustomRule.RuleFunc matcher)
 	: PaintRule(color)
 {
 	public delegate bool RuleFunc(ref PaintingState state, Token token);
 
-	public RuleFunc Func { get; set; } = func;
+	public RuleFunc Matcher { get; set; } = matcher;
 
 
 	public override bool Match(ref PaintingState state, Token token)
-		=> Func(ref state, token);
+		=> Matcher(ref state, token);
 }
