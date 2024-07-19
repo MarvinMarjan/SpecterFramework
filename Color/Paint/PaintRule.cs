@@ -52,6 +52,33 @@ public class LogicRule<TRule>(ColorObject color, TRule left, TRule right, LogicR
 
 
 
+public class WildcardRule(ColorObject color, IRuleCondition? condition)
+	: PaintRule(color)
+{
+	public IRuleCondition? Condition { get; set; } = condition;
+
+	public bool ShouldIgnoreWhitespace { get; set; } = true;
+
+
+	public override bool Match(ref PaintingState state, Token token)
+	{
+		if (ShouldIgnoreWhitespace && token.IsWhiteSpace)
+			return false;
+
+		bool matched = Condition?.IsTrue(token) ?? true;
+
+		if (matched)
+		{
+			state.Color = Color;
+			state.PaintLength = 1;
+		}
+
+		return matched;
+	}
+}
+
+
+
 /// <summary>
 /// A PaintRule that matches using equality.
 /// </summary>
@@ -124,4 +151,42 @@ public class BetweenRule(ColorObject color, TokenTarget left, TokenTarget right)
 
 		return matched;
 	}
+}
+
+
+
+public class CustomMatchRule(ColorObject color, CustomMatchRule.RuleFunc func)
+	: PaintRule(color)
+{
+	public delegate bool RuleFunc(Token token);
+
+	public RuleFunc Func { get; set; } = func;
+
+
+	public override bool Match(ref PaintingState state, Token token)
+	{
+		bool matched = Func(token);
+
+		if (matched)
+		{
+			state.Color = Color;
+			state.PaintLength = 1;
+		}
+
+		return matched;
+	}
+}
+
+
+
+public class CustomRule(ColorObject color, CustomRule.RuleFunc func)
+	: PaintRule(color)
+{
+	public delegate bool RuleFunc(ref PaintingState state, Token token);
+
+	public RuleFunc Func { get; set; } = func;
+
+
+	public override bool Match(ref PaintingState state, Token token)
+		=> Func(ref state, token);
 }
