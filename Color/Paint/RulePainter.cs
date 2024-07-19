@@ -49,13 +49,7 @@ public partial class RulePainter(List<PaintRule> rules) : Painter
 					break;
 			}
 
-			builder.Append(DrawCursorIfInsideToken(
-				Cursor ?? new(), token, State.Color,
-				CursorAtToken(token), out bool drawed
-			));
-
-			if (drawed)
-				cursorDrawed = true;
+			builder.Append(DrawToken(token, ref cursorDrawed));
 
 			State.Update(token);
 		}
@@ -63,7 +57,24 @@ public partial class RulePainter(List<PaintRule> rules) : Painter
 		if (!cursorDrawed)
 			builder.Append(Cursor?.GetCursorAtEnd() ?? "");
 
+		State.FullReset();
+
 		return builder.ToString();
+	}
+
+
+	private string DrawToken(Token token, ref bool cursorDrawed)
+	{
+		string drawnToken = DrawCursorIfInsideToken(
+			Cursor ?? new(), token, State.Color,
+			CursorAtToken(token), out bool drawed
+		);
+
+		// once set to true, never turns to false again
+		if (drawed)
+			cursorDrawed = true;
+
+		return drawnToken;
 	}
 
 

@@ -66,31 +66,33 @@ public partial class RulePainter
 		{
 			Token token = new(lexeme, _start, _end);
 
+			SetTokenNeighbors(token);
+
+			_tokens.Add(token);
+		}
+
+
+		private void SetTokenNeighbors(Token token)
+		{
 			bool empty = _tokens.Count == 0;
 
 			Token? previous = empty ? null : _tokens.Last();
-			Token? previousNonWhitespace = empty ? null : _tokens.FindLast(
-				token => !char.IsWhiteSpace(token.Lexeme, 0)
-			);
-			
+			Token? previousNonWhitespace = _tokens.FindLast(token => !token.IsWhiteSpace);
+
 			token.Previous = previous;
 			token.PreviousNonWhiteSpace = previousNonWhitespace;
-
-			bool isThisTokenWhiteSpace = char.IsWhiteSpace(token.Lexeme, 0);
 
 			if (previous is not null)
 			{
 				previous.Next = token;
-				previous.NextNonWhiteSpace = !isThisTokenWhiteSpace ? token : null;
+				previous.NextNonWhiteSpace = !token.IsWhiteSpace ? token : null;
 			}
 
 			if (previousNonWhitespace is not null)
 			{
 				previousNonWhitespace.Next = token;
-				previousNonWhitespace.NextNonWhiteSpace = !isThisTokenWhiteSpace ? token : null;
+				previousNonWhitespace.NextNonWhiteSpace = !token.IsWhiteSpace ? token : null;
 			}
-
-			_tokens.Add(token);
 		}
 
 
