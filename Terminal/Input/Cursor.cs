@@ -5,9 +5,6 @@ using Specter.Color.Paint;
 namespace Specter.Terminal.Input;
 
 
-// TODO: maybe create a RangedInt that doesn't overflows its limits
-
-
 /// <summary>
 /// Wraps some useful cursor data.
 /// </summary>
@@ -20,26 +17,9 @@ public class Cursor(ColorObject? color = null)
 	public ColorObject EndColor { get; set; } = ColorValue.Reset;
 	
 
-	private int _index = 0;
-	public int Index
-	{
-		get => _index;
-		set
-		{
-			if (value <= IndexLimit && value >= 0)
-				_index = value;
-		}
-	}
-	
-	public int ValidIndex => ForceRange(Index);
-
-	public int IndexLimit => Stream?.Data.Length ?? 0;
-
-
-
-	public bool AtEnd() => Index >= IndexLimit;
-	public bool AtStart() => Index - 1 < 0;
-
+	private RangedInt _index;
+	public ref RangedInt Index => ref _index;
+	public int ValidIndex => Index.IsAtEnd() ? Index - 1 : Index;
 
 
 	public void CursorToLeft() => Index--;
@@ -57,7 +37,7 @@ public class Cursor(ColorObject? color = null)
 
 		do
 			CursorToLeft();
-		while(!AtStart() && char.IsLetterOrDigit(PeekCurrent()));
+		while(!Index.IsAtStart() && char.IsLetterOrDigit(PeekCurrent()));
 	}
 
 
@@ -71,7 +51,7 @@ public class Cursor(ColorObject? color = null)
 
 		do
 			CursorToRight();
-		while(!AtEnd() && char.IsLetterOrDigit(PeekCurrent()));
+		while(!Index.IsAtEnd() && char.IsLetterOrDigit(PeekCurrent()));
 	}
 
 
@@ -79,23 +59,10 @@ public class Cursor(ColorObject? color = null)
 		=> Stream?.Data[ValidIndex] ?? '\0';
 
 	public char PeekLeftChar()
-		=> Stream?.Data[ForceRange(Index - 1)] ?? '\0';
+		=> Stream?.Data[Index - 1] ?? '\0';
 
 	public char PeekRightChar()
-		=> Stream?.Data[ForceRange(Index + 1)] ?? '\0';
-	
-
-
-	private int ForceRange(int index)
-	{
-		if (index < 0)
-			return 0;
-		
-		else if (index >= IndexLimit)
-			return IndexLimit - 1;
-
-		return index;
-	}
+		=> Stream?.Data[Index + 1] ?? '\0';
 
 
 	public string GetCursorAtEnd() => Color.Paint("_");
@@ -115,7 +82,7 @@ public class Cursor(ColorObject? color = null)
 		string result = source;
 
 		int finalIndex = index ?? Index;
-		int finalLimit = index is null ? IndexLimit : source.Length;
+		int finalLimit = index is null ? Index.Max : source.Length;
 
 		ColorObject oldEndColor = EndColor;
 		EndColor = endColor ?? EndColor;

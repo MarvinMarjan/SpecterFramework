@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+
 using Specter.Color.Paint;
 
 
@@ -26,7 +27,16 @@ public abstract class InputStream
 	/// <summary>
 	/// The string data received from stdin.
 	/// </summary>
-	public string Data { get; set; }
+	private string _data;
+	public string Data
+	{
+		get => _data;
+		set
+		{
+			_data = value;
+			Cursor.Index.Max = _data.Length;
+		}
+	}
 
 	/// <summary>
 	/// The cursor to be used.
@@ -36,8 +46,8 @@ public abstract class InputStream
 
 	public InputStream()
 	{
-		Data = "";
 		Cursor = new();
+		Data = _data = "";
 		KeyProcessors = [];
 	}
 
@@ -125,24 +135,27 @@ public class DefaultInputStream : InputStream
 
 	protected void Backspace(ConsoleKeyInfo info)
 	{
-		if (Data.Length == 0 || Cursor.AtStart())
+		if (Data.Length == 0 || Cursor.Index.IsAtStart())
 			return;
 
 		bool controlPressed = info.Modifiers.HasFlag(ConsoleModifiers.Control);
 
-		char current;
+		bool startedWithWord = char.IsLetterOrDigit(Cursor.PeekLeftChar());
 
 		do
 		{
-			// store the current character before removing it
-			current = Cursor.PeekCurrent();
+			if (!startedWithWord)
+			{
+				Data = Data.Remove(--Cursor.Index, 1);
+				break;
+			}
 
 			Data = Data.Remove(--Cursor.Index, 1);
 
 			if (!controlPressed)
 				break;
 		}
-		while (!Cursor.AtStart() && char.IsLetterOrDigit(current));
+		while (!Cursor.Index.IsAtStart() && char.IsLetterOrDigit(Cursor.PeekLeftChar()));
 	}
 
 

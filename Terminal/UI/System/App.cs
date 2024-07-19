@@ -9,9 +9,6 @@ using Specter.Terminal.UI.Exceptions;
 namespace Specter.Terminal.UI.System;
 
 
-// TODO: add Input interface
-
-
 /// <summary>
 /// Initializes a terminal UI app.
 /// </summary>

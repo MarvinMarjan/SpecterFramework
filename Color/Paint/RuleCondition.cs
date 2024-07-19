@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 using Specter.Util;
 
@@ -13,8 +14,7 @@ public interface IRuleCondition
 }
 
 
-// TODO: receiving more than two argments ("param" keyword) probably is possible. try it later
-public class LogicCondition(IRuleCondition left, IRuleCondition right, LogicCondition.LogicOperation operation) : IRuleCondition
+public class LogicCondition(LogicCondition.LogicOperation operation, params IRuleCondition[] conditions) : IRuleCondition
 {
 	public enum LogicOperation
 	{
@@ -23,15 +23,14 @@ public class LogicCondition(IRuleCondition left, IRuleCondition right, LogicCond
 	}
 
 
-	public IRuleCondition Left { get; set; } = left;
-	public IRuleCondition Right { get; set; } = right;
+	public IRuleCondition[] Conditions { get; set; } = conditions;
 	public LogicOperation Operation { get; set; } = operation;
 
 
 	public bool IsTrue(Token token) => Operation switch
 	{
-		LogicOperation.And => Left.IsTrue(token) && Right.IsTrue(token),
-		LogicOperation.Or => Left.IsTrue(token) || Right.IsTrue(token),
+		LogicOperation.And => Conditions.All(condition => condition.IsTrue(token)),
+		LogicOperation.Or => Conditions.Any(condition => condition.IsTrue(token)),
 
 		_ => false
 	};
