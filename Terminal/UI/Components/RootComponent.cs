@@ -19,8 +19,8 @@ public class RootComponent : SectionComponent
 		// * setting the Size before updating the base (consequently, updating the childs)
 		// * is needed to avoid drawing issues when the terminal gets resized.
 
-		if (Terminal.TerminalResized)
-			Size.DefaultValue = Terminal.GetTerminalSize();
+		if (TerminalManager.TerminalResized)
+			Size.DefaultValue = TerminalManager.GetTerminalSize();
 		
 		base.Update();
 	}

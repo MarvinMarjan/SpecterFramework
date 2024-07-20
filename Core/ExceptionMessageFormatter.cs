@@ -2,12 +2,13 @@ using System;
 using System.Text;
 
 using Specter.Color;
+using Specter.Color.Chroma;
 using Specter.Color.Paint;
 using Specter.String;
 using Specter.Terminal.UI.Exceptions;
 
 
-namespace Specter.Terminal.UI.System;
+namespace Specter.Core;
 
 
 public static class ExceptionMessageFormatter
@@ -25,20 +26,26 @@ public static class ExceptionMessageFormatter
 
 	public static string GetExceptionTypeAsString(Exception exception) => exception switch 
 	{
+		// TODO: probably can be automatized.
+
 		AppException => "App",
 		ComponentException => "Component",
 		ComponentPropertyException => "ComponentProperty",
-		_ => "App"
+
+		ChromaException => "Chroma",
+
+		_ => "Specter"
 	};
 
 
 
-	public static string BuildErrorStringStructure(Exception exception, string? details)
+	public static string BuildErrorStringStructure(Exception exception, string? details, string? extra = null)
 	{
 		StringBuilder builder = new(ErrorSectionFrom(exception));
 
 		builder.Append($" ({details}):");
 		builder.Append($"\n\n  --->> ".FGBRed() + $"{exception.Message}");
+		builder.Append($"\n\n{extra}");
 
 		return builder.ToString();
 	}
@@ -76,5 +83,12 @@ public static class ExceptionMessageFormatter
 			"Property " + exception.PropertyName.Quote()
 				+ (exception.PropertyType is not null ? " of type " + exception.PropertyType.Quote(ColorValue.FGYellow) : "")
 				+ (exception.Owner is not null ? ", owned by Component " + exception.Owner.Name.Quote() : "")
+		);
+
+
+	public static string Format(ChromaException exception)
+		=> BuildErrorStringStructure(
+			exception,
+			exception.Token is not null ? "Index: " + $"{exception.Token?.Start}:{exception.Token?.End}" : ""
 		);
 }

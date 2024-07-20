@@ -26,12 +26,15 @@ public class ColorCodeElement(Color16? code = null) : IANSISequenceElement
 
 	public bool IsValid() => Code is not null;
 
-    public string BuildSequence()
+	public string BuildSequence()
 	{
 		int? intCode = (int?)Code;
 
 		return intCode?.ToString() ?? string.Empty;
 	}
+
+
+	public static implicit operator ColorCodeElement(Color16 code) => new(code);
 }
 
 
@@ -61,6 +64,9 @@ public class Color256Element(byte? code = null, ColorLayer layer = ColorLayer.Fo
 			layerCode.ToString(), EscapeCodes.Color256TypeCode.ToString(), Code.ToString()
 		], false);
 	}
+
+
+	public static implicit operator Color256Element(byte code) => new(code);
 }
 
 
@@ -94,4 +100,7 @@ public class ColorRGBElement(ColorRGB? color = null, ColorLayer layer = ColorLay
 			validColor.Red?.ToString(), validColor.Green?.ToString(), validColor.Blue?.ToString()
 		], false);
 	}
+
+
+	public static implicit operator ColorRGBElement(ColorRGB color) => new(color);
 }
