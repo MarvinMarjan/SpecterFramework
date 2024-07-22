@@ -1,13 +1,64 @@
+using System;
+
+using Specter.Core;
+using Specter.ANSI;
+
+
 namespace Specter.Color.Chroma;
 
 
-public static class Chroma
+public static class ChromaLang
 {
+	public static string? LastSource { get; set; }
+
+
 	public static string Format(string source)
 	{
-		var tokens = new Scanner().Scan(source);
-		var expressions = new Parser().Parse(tokens);
+		try
+		{
+			LastSource = source;
+	
+			var tokens = new Scanner().Scan(source);
+			var expressions = new Parser().Parse(tokens);
+	
+			return Formatter.Format(expressions);
+		}
+		
+		catch (ChromaException e)
+		{
+			Log.Error(e);
+		}
 
-		return Formatter.Format(expressions);
+		return string.Empty;
+	}
+
+
+	public static bool TryFormat(string source, out string? output)
+	{
+		try
+		{
+			output = Format(source);
+			return true;
+		}
+		catch (Exception)
+		{
+			output = null;
+			return false;
+		}
+	}
+
+
+
+	public static string HighlightTokenFromLastSource(Token token)
+	{
+		if (LastSource is null)
+			return string.Empty;
+
+		string source = LastSource;
+
+		source = source.Insert(token.End, EscapeCodes.Reset);
+		source = source.Insert(token.Start, ColorValue.FGRed.AsSequence());
+
+		return source;
 	}
 }

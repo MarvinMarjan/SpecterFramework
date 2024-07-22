@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 
@@ -6,9 +7,10 @@ namespace Specter.Color.Chroma;
 
 public static class ColorTable
 {
-	private static Dictionary<string, ColorCodeElement> s_colorTable = new([
+	private readonly static Dictionary<string, ColorCodeElement> s_colorTable = new([
 		new("fgblack", Color16.FGBlack),
 		new("fgred", Color16.FGRed),
+		new("fggreen", Color16.FGGreen),
 		new("fgyellow", Color16.FGYellow),
 		new("fgblue", Color16.FGBlue),
 		new("fgmagenta", Color16.FGMagenta),
@@ -18,6 +20,8 @@ public static class ColorTable
 
 		new("fgbblack", Color16.FGBBlack),
 		new("fgbred", Color16.FGBRed),
+		new("fgbgreen", Color16.FGBGreen),
+
 		new("fgbyellow", Color16.FGBYellow),
 		new("fgbblue", Color16.FGBBlue),
 		new("fgbmagenta", Color16.FGBMagenta),
@@ -27,6 +31,7 @@ public static class ColorTable
 
 		new("bgblack", Color16.BGBlack),
 		new("bgred", Color16.BGRed),
+		new("bggreen", Color16.BGGreen),
 		new("bgyellow", Color16.BGYellow),
 		new("bgblue", Color16.BGBlue),
 		new("bgmagenta", Color16.BGMagenta),
@@ -36,6 +41,7 @@ public static class ColorTable
 
 		new("bgbblack", Color16.BGBBlack),
 		new("bgbred", Color16.BGBRed),
+		new("bgbgreen", Color16.BGBGreen),
 		new("bgbyellow", Color16.BGBYellow),
 		new("bgbblue", Color16.BGBBlue),
 		new("bgbmagenta", Color16.BGBMagenta),
@@ -44,7 +50,7 @@ public static class ColorTable
 	]);
 
 
-	private static Dictionary<string, ColorMode> s_colorModeTable = new([
+	private readonly static Dictionary<string, ColorMode> s_colorModeTable = new([
 		new("normal", ColorMode.Normal),
 		new("bold", ColorMode.Bold),
 		new("dim", ColorMode.Dim),
@@ -75,6 +81,21 @@ public static class ColorTable
 		return element ?? Color16.Reset;
 	}
 
+	public static bool TryGetColor(string colorName, ColorLayer layer, out ColorCodeElement? colorCode)
+	{
+		try
+		{
+			colorCode = GetColor(colorName, layer);
+			return true;
+		}
+		catch (Exception)
+		{
+			colorCode = null;
+			return false;
+		}
+	}
+
+
 
 	public static ColorMode GetMode(string colorModeName)
 	{
@@ -83,7 +104,20 @@ public static class ColorTable
 		if (!found)
 			throw new ChromaException($"Invalid color mode name: {colorModeName}");
 
-
 		return mode;
+	}
+
+	public static bool TryGetMode(string colorModeName, out ColorMode? mode)
+	{
+		try
+		{
+			mode = GetMode(colorModeName);
+			return true;
+		}
+		catch (Exception)
+		{
+			mode = null;
+			return false;
+		}
 	}
 }

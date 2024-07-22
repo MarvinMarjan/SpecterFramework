@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Intrinsics.X86;
 
 
 namespace Specter.Color.Chroma;
@@ -56,7 +55,7 @@ public class Parser
 			{
 			case TokenType.TagDelimeterLeft:
 				expressions.Add(new FormatExpression(ParseTag().ToColorObject()));
-				Advance();
+				Advance(); // advance tag delimiter right advance
 				break;
 
 			default:
@@ -72,6 +71,7 @@ public class Parser
 	private FormatTag ParseTag()
 	{
 		List<Token> tokens = [];
+		string[] arguments = ["_", "_", "_"];
 		Token tagStart = Previous();
 
 		while (Current().Type != TokenType.TagDelimeterRight && !IsAtEnd())
@@ -86,14 +86,20 @@ public class Parser
 		if (tokens.Count == 1 && tokens[0].Lexeme == "/")
 			return new(); // reset tag
 
-		if (tokens.Count != 3)
-			throw new ChromaException($"Expected 3 arguments, got {tokens.Count}.", tagStart);
+		if (tokens.Count < 1)
+			throw new ChromaException("Expected at least 1 argument.", tagStart);
 
-		return new(tokens[0].Lexeme, tokens[1].Lexeme, tokens[2].Lexeme);
+		if (tokens.Count > 3)
+			throw new ChromaException($"Expected a max of 3 arguments, got {tokens.Count}", tagStart);
+
+		for (int i = 0; i < tokens.Count; i++)
+			arguments[i] = tokens[i].Lexeme;
+
+		return new(arguments[0], arguments[1], arguments[2]);
 	}
 
 
-	private bool IsAtEnd() => _index + 1 >= _tokens.Count;
+	private bool IsAtEnd() => _index >= _tokens.Count;
 
 	private Token Advance() => _tokens[_index++];
 	private Token Current() => _tokens[_index];

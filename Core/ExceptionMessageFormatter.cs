@@ -7,6 +7,8 @@ using Specter.Color.Paint;
 using Specter.String;
 using Specter.Terminal.UI.Exceptions;
 
+using ChromaToken = Specter.Color.Chroma.Token;
+using RuleToken = Specter.Color.Paint.Token;
 
 namespace Specter.Core;
 
@@ -41,11 +43,11 @@ public static class ExceptionMessageFormatter
 
 	public static string BuildErrorStringStructure(Exception exception, string? details, string? extra = null)
 	{
-		StringBuilder builder = new(ErrorSectionFrom(exception));
+		StringBuilder builder = new(ErrorSectionFrom(exception, details is null));
 
-		builder.Append($" ({details}):");
+		builder.Append(details is not null ? $" ({details}):" : string.Empty);
 		builder.Append($"\n\n  --->> ".FGBRed() + $"{exception.Message}");
-		builder.Append($"\n\n{extra}");
+		builder.Append($"\n\n\n{extra}");
 
 		return builder.ToString();
 	}
@@ -58,6 +60,7 @@ public static class ExceptionMessageFormatter
 		AppException newException => Format(newException),
 		ComponentException newException => Format(newException),
 		ComponentPropertyException newException => Format(newException),
+		ChromaException newException => Format(newException),
 		Exception newException => Format(newException)
 	};
 
@@ -78,17 +81,27 @@ public static class ExceptionMessageFormatter
 
 
 	public static string Format(ComponentPropertyException exception)
-		=> BuildErrorStringStructure(
-			exception,
-			"Property " + exception.PropertyName.Quote()
-				+ (exception.PropertyType is not null ? " of type " + exception.PropertyType.Quote(ColorValue.FGYellow) : "")
-				+ (exception.Owner is not null ? ", owned by Component " + exception.Owner.Name.Quote() : "")
-		);
+	{
+		string typeOfText = exception.PropertyType is not null ? " of type " + exception.PropertyType.Quote(ColorValue.FGYellow) : string.Empty;
+		string ownedByText = exception.Owner is not null ? ", owned by Component " + exception.Owner.Name.Quote() : string.Empty;
+
+		string details = "Property " + exception.PropertyName.Quote() + typeOfText + ownedByText;
+
+		return BuildErrorStringStructure(exception, details);
+	}
 
 
 	public static string Format(ChromaException exception)
-		=> BuildErrorStringStructure(
-			exception,
-			exception.Token is not null ? "Index: " + $"{exception.Token?.Start}:{exception.Token?.End}" : ""
-		);
+	{
+		string? details = null;
+		string? extra = null;
+
+		if (exception.Token is ChromaToken token)
+		{
+			details = "Index: " + $"{exception.Token?.Start};{exception.Token?.End}";
+			extra = ChromaLang.HighlightTokenFromLastSource(token);
+		}
+
+		return BuildErrorStringStructure(exception, details, extra);
+	}
 }
