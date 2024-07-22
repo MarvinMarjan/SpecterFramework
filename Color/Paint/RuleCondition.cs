@@ -1,8 +1,6 @@
 using System;
 using System.Linq;
 
-using Specter.Util;
-
 
 namespace Specter.Color.Paint;
 
@@ -107,7 +105,7 @@ public class TokenIsTarget(TokenTarget target) : IRuleCondition
 /// The current token must be a word (i.e: "myid", "myid123". returns false to "123myid")
 /// </summary>
 public class TokenIsWord()
-	: TokenIs(token => char.IsLetter(token.Lexeme[0]) && token.Lexeme.IsAlphaNumeric());
+	: TokenIs(token => char.IsLetter(token.Lexeme[0]) && token.Lexeme.All(char.IsLetterOrDigit));
 
 
 /// <summary>

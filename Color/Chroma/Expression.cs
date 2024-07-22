@@ -7,6 +7,12 @@ public interface IExpression
 }
 
 
+public interface IExpressionConvertable
+{
+	IExpression ToExpression();
+}
+
+
 
 public class FormatExpression(ColorObject color) : IExpression
 {

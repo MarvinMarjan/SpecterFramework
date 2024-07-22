@@ -43,7 +43,10 @@ public class Scanner
 		{
 			case '<': AddToken(TokenType.TagDelimeterLeft); break;
 			case '>': AddToken(TokenType.TagDelimeterRight); break;
+			case '(': AddToken(TokenType.LeftParen); break;
+			case ')': AddToken(TokenType.RightParen); break;
 			case '/': AddToken(TokenType.Slash); break;
+			case ',': AddToken(TokenType.Comma); break;
 
 			default:
 				if (!char.IsLetterOrDigit(ch))

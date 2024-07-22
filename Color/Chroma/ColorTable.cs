@@ -21,7 +21,6 @@ public static class ColorTable
 		new("fgbblack", Color16.FGBBlack),
 		new("fgbred", Color16.FGBRed),
 		new("fgbgreen", Color16.FGBGreen),
-
 		new("fgbyellow", Color16.FGBYellow),
 		new("fgbblue", Color16.FGBBlue),
 		new("fgbmagenta", Color16.FGBMagenta),

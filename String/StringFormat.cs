@@ -1,4 +1,6 @@
-﻿using Specter.Color;
+﻿using System.Linq;
+using Specter.ANSI;
+using Specter.Color;
 using Specter.Color.Paint;
 
 

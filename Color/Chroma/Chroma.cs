@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 using Specter.Core;
 using Specter.ANSI;
@@ -19,7 +20,8 @@ public static class ChromaLang
 			LastSource = source;
 	
 			var tokens = new Scanner().Scan(source);
-			var expressions = new Parser().Parse(tokens);
+			var structures = new StructureBuilder().BuildExpressionConvertableStructures(tokens);
+			var expressions = ExpressionConverter.Convert(structures);
 	
 			return Formatter.Format(expressions);
 		}

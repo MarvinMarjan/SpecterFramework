@@ -5,8 +5,11 @@ public enum TokenType
 {
 	TagDelimeterLeft,
 	TagDelimeterRight,
+	LeftParen,
+	RightParen,
 	Slash,
-	Identifier,
+	Comma,
+	Identifier
 }
 
 
