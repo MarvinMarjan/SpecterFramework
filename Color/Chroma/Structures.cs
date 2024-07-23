@@ -1,9 +1,15 @@
 namespace Specter.Color.Chroma;
 
 
+/// <summary>
+/// Represent Chroma structures.
+/// </summary>
 public interface IStructure
 {}
 
+/// <summary>
+/// Represents a structure that can be converted to a notation representation.
+/// </summary>
 public interface INotationConvertableStructure : IStructure
 {
 	string ToNotation();
@@ -14,6 +20,9 @@ public interface INotationConvertableStructure : IStructure
 }
 
 
+/// <summary>
+/// Represents identifiers: "red", "78", etc...
+/// </summary>
 public class IdentifierStructure(string source) : INotationConvertableStructure, IExpressionConvertable
 {
 	public string Source { get; set; } = source;
@@ -23,6 +32,9 @@ public class IdentifierStructure(string source) : INotationConvertableStructure,
 }
 
 
+/// <summary>
+/// Represents a RGB color: "(255, 0, 23)"
+/// </summary>
 public class RGBStructure(byte r, byte g, byte b) : INotationConvertableStructure
 {
 	public byte R { get; set; } = r;
@@ -32,19 +44,12 @@ public class RGBStructure(byte r, byte g, byte b) : INotationConvertableStructur
 
 	public string ToNotation()
 		=> $"{R} {G} {B}";
-
-
-	public static RGBStructure FromString(string source)
-	{
-		RGBStructure rgb = new(0, 0, 0);
-
-		
-
-		return rgb;
-	}
 }
 
 
+/// <summary>
+/// Represents a format tag: "<green red underline>"
+/// </summary>
 public class FormatTagStructure(
 	INotationConvertableStructure? fg,
 	INotationConvertableStructure? bg,
@@ -64,6 +69,9 @@ public class FormatTagStructure(
 	}
 
 
+	/// <summary>
+	/// Converts this tag to a ColorObject.
+	/// </summary>
 	public ColorObject ToColorObject()
 	{
 		if (ResetTag)
@@ -71,8 +79,8 @@ public class FormatTagStructure(
 
 		ColorObject color = ColorObject.None;
 
-		color.Foreground = Foreground.IsDefaultNotation() ? null : Notation.ToColorElement(Foreground.ToNotation(), ColorLayer.Foreground);
-		color.Background = Background.IsDefaultNotation() ? null : Notation.ToColorElement(Background.ToNotation(), ColorLayer.Background);
+		color.Foreground = Foreground.IsDefaultNotation() ? null : Notation.ToColorElement(Foreground, ColorLayer.Foreground);
+		color.Background = Background.IsDefaultNotation() ? null : Notation.ToColorElement(Background, ColorLayer.Background);
 		color.Mode       = Mode.IsDefaultNotation()       ? null : ColorTable.GetMode(Mode.ToNotation());
 
 		return color;

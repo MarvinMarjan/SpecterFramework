@@ -1,3 +1,7 @@
+using System.Linq;
+using System.Collections.Generic;
+
+
 namespace Specter.Color.Chroma;
 
 
@@ -10,6 +14,14 @@ public interface IExpression
 public interface IExpressionConvertable
 {
 	IExpression ToExpression();
+}
+
+
+
+public class ExpressionConverter
+{
+	public static List<IExpression> ConvertAll(List<IExpressionConvertable> items)
+		=> (from item in items select item.ToExpression()).ToList();
 }
 
 

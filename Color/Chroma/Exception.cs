@@ -4,8 +4,8 @@ using System;
 namespace Specter.Color.Chroma;
 
 
-public class ChromaException(string message, Token? token = null)
+public class ChromaException(string message, HighlightTarget? target = null)
 	: Exception(message)
 {
-	public Token? Token { get; set; } = token;
+	public HighlightTarget? Target { get; set; } = target;
 }

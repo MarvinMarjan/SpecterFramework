@@ -62,6 +62,13 @@ public static class ColorTable
 	]);
 
 
+	/// <summary>
+	/// Gets a color in the table.
+	/// </summary>
+	/// <param name="colorName"> The name of the color. </param>
+	/// <param name="layer"> The color layer. </param>
+	/// <returns> The searched color as a color element. </returns>
+	/// <exception cref="ChromaException"> Exception thrown if it was not possible to find the color. </exception>
 	public static ColorCodeElement GetColor(string colorName, ColorLayer layer)
 	{
 		string finalColorName = layer switch
@@ -80,22 +87,35 @@ public static class ColorTable
 		return element ?? Color16.Reset;
 	}
 
-	public static bool TryGetColor(string colorName, ColorLayer layer, out ColorCodeElement? colorCode)
+	/// <summary>
+	/// Same as "ColorTable.GetColor", but ignores exceptions.
+	/// </summary>
+	/// <param name="colorName"> The color name. </param>
+	/// <param name="layer"> The color layer. </param>
+	/// <param name="colorElement"> The out variable to store the value. </param>
+	/// <returns> True if the operation succeeded, false otherwise. </returns>
+	public static bool TryGetColor(string colorName, ColorLayer layer, out ColorCodeElement? colorElement)
 	{
 		try
 		{
-			colorCode = GetColor(colorName, layer);
+			colorElement = GetColor(colorName, layer);
 			return true;
 		}
 		catch (Exception)
 		{
-			colorCode = null;
+			colorElement = null;
 			return false;
 		}
 	}
 
 
 
+	/// <summary>
+	/// Gets a color mode in the table.
+	/// </summary>
+	/// <param name="colorModeName"> The color mode name. </param>
+	/// <returns> The searched color mode. </returns>
+	/// <exception cref="ChromaException"> Exception thrown if it was not possible to find the color mode. </exception>
 	public static ColorMode GetMode(string colorModeName)
 	{
 		bool found = s_colorModeTable.TryGetValue(colorModeName, out ColorMode mode);
@@ -106,6 +126,12 @@ public static class ColorTable
 		return mode;
 	}
 
+	/// <summary>
+	/// Same as "ColorTable.GetMode", but ignores exceptions.
+	/// </summary>
+	/// <param name="colorModeName"> The color mode name. </param>
+	/// <param name="mode"> The out variable to store de color mode. </param>
+	/// <returns> True if the operation succeeded, false otherwise. </returns>
 	public static bool TryGetMode(string colorModeName, out ColorMode? mode)
 	{
 		try

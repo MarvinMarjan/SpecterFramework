@@ -7,8 +7,6 @@ using Specter.Color.Paint;
 using Specter.String;
 using Specter.Terminal.UI.Exceptions;
 
-using ChromaToken = Specter.Color.Chroma.Token;
-using RuleToken = Specter.Color.Paint.Token;
 
 namespace Specter.Core;
 
@@ -96,10 +94,10 @@ public static class ExceptionMessageFormatter
 		string? details = null;
 		string? extra = null;
 
-		if (exception.Token is ChromaToken token)
+		if (exception.Target is HighlightTarget target)
 		{
-			details = "Index: " + $"{exception.Token?.Start};{exception.Token?.End}";
-			extra = ChromaLang.HighlightTokenFromLastSource(token);
+			details = "Index: " + $"{exception.Target?.From.Start};{exception.Target?.To.End}";
+			extra = ChromaLang.HighlightTargetFromLastSource(target, ColorValue.FGRed + ColorValue.Underline);
 		}
 
 		return BuildErrorStringStructure(exception, details, extra);

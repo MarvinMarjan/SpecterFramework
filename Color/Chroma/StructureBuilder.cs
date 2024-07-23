@@ -45,6 +45,7 @@ public class StructureBuilder
 		{
 			Token current = Advance();
 
+			// ignore white space characters
 			if (char.IsWhiteSpace(current.Lexeme[0]))
 				continue;
 
@@ -78,29 +79,34 @@ public class StructureBuilder
 	private RGBStructure BuildRGB()
 	{
 		List<Token> rgbTokens = [];
-		Token rgbStart = Previous();
+		HighlightTarget target = new(Previous(), FindFirstTokenWithLexeme(")"));
 
 		while (Peek().Type != TokenType.RightParen)
 			rgbTokens.Add(Advance());
 
+		// remove commas and white spaces
 		rgbTokens.RemoveAll(token => token.Type == TokenType.Comma);
 		rgbTokens.RemoveAll(token => char.IsWhiteSpace(token.Lexeme[0]));
 
 		if (rgbTokens.Count > 3)
-			throw new ChromaException($"RGB can't have more than 3 channels, got {rgbTokens.Count}", rgbStart);
+			throw new ChromaException($"RGB can't have more than 3 channels, got {rgbTokens.Count}", target);
 
 		if (rgbTokens.Count == 0)
-			throw new ChromaException($"RGB must have at least one channel.", rgbStart);
+			throw new ChromaException($"RGB must have at least one channel.", target);
 
 		string rgbNotation = string.Join(' ', from rgb in rgbTokens select rgb.Lexeme);
 
 		if (!Notation.IsRGBNotation(rgbNotation, out byte[]? values))
-			throw new ChromaException($"Invalid RGB notation.");
+			throw new ChromaException($"Invalid RGB notation.", target);
 
 		Advance();
 
 		return new(values?[0] ?? 0, values?[1] ?? 0, values?[2] ?? 0);
 	}
+
+
+	private Token FindFirstTokenWithLexeme(string lexeme)
+		=> _tokens[_tokens.FindIndex(_index, token => token.Lexeme == lexeme)];
 
 
 	private bool IsAtEnd() => _index >= _tokens.Count;
