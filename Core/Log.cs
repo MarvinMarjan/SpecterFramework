@@ -1,6 +1,7 @@
 using System;
 
 using Specter.Terminal;
+using Specter.Terminal.Output;
 
 
 namespace Specter.Core;
@@ -14,7 +15,7 @@ public static class Log
 	public static void Error<TException>(TException exception)
 		where TException : SpecterException
 	{
-		TerminalManager.ClearAllScreen();
+		TerminalStream.ClearAllScreen();
 		Console.Write(ControlCodes.CursorToHome());
 		Console.WriteLine(exception.ToString());
 	}

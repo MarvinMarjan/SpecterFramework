@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 
 using Specter.OS;
 using Specter.Terminal.UI;
@@ -8,7 +7,7 @@ using Specter.Terminal.UI;
 namespace Specter.Terminal;
 
 
-public static class TerminalManager
+public static class TerminalAttributes
 {
 	private static Size? s_lastTerminalSize = null;
 	private static Size? s_currentTerminalSize = null;
@@ -16,12 +15,30 @@ public static class TerminalManager
 	private static bool s_terminalResized = false;
 	public static bool TerminalResized => s_terminalResized;
 
+
 	private static bool s_cursorVisible = true;
 	public static bool CursorVisible
 	{
 		get => s_cursorVisible;
 		set => s_cursorVisible = Console.CursorVisible = value;
 	}
+
+
+	public static Point CursorPosition
+	{
+		set => Console.Write(ControlCodes.CursorTo(value.row, value.col));
+		get
+		{
+			var (Left, Top) = Console.GetCursorPosition();
+		
+			//* ANSI escape codes positioning are 1-index based, but
+			//* Console.GetCursorPosition() returns 0-index based values, so it's
+			//* necessary to increment the values by one to avoid weird behavior.
+
+			return new((uint)Top + 1, (uint)Left + 1);
+		}
+	}
+
 
 	private static bool s_echoEnabled = true;
 	public static bool EchoEnabled
@@ -32,6 +49,13 @@ public static class TerminalManager
 			s_echoEnabled = value;
 			SetEchoEnabled(value);
 		}
+	}
+
+
+	public static Size TerminalSize
+	{
+		get => GetTerminalSize();
+		set => Console.SetWindowSize((int)value.width, (int)value.height);
 	}
 
 
@@ -46,20 +70,9 @@ public static class TerminalManager
 		Command.Run($"stty {(enabled ? "" : "-")}echo");
 
 
-	public static Size GetTerminalSize()
+	private static Size GetTerminalSize()
 		=> new((uint)Console.WindowWidth, (uint)Console.WindowHeight);
 
-
-	public static void ClearAllScreen()
-	{
-		StringBuilder codes = new();
-
-		codes.Append(ControlCodes.CursorToHome());
-		codes.Append(ControlCodes.EraseScreen(ControlCodes.ScreenErasingMode.CursorUntilEnd));
-		codes.Append(ControlCodes.EraseScreen(ControlCodes.ScreenErasingMode.SavedLines));
-
-		Console.WriteLine(codes);
-	}
 
 
 	/// <summary>

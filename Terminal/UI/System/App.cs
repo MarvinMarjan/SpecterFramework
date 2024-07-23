@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using Specter.Core;
+using Specter.Terminal.Output;
 using Specter.Terminal.UI.Components;
 using Specter.Terminal.UI.Exceptions;
 
@@ -46,8 +47,8 @@ public abstract class App
 
 	public App()
 	{
-		TerminalManager.EchoEnabled = false;
-		TerminalManager.CursorVisible = false;
+		TerminalAttributes.EchoEnabled = false;
+		TerminalAttributes.CursorVisible = false;
 		Console.OutputEncoding = new UTF8Encoding();
 
 		// on CTRL+C pressed
@@ -72,7 +73,7 @@ public abstract class App
 	protected virtual void Start()
 	{
 		// first drawing
-		TerminalManager.ClearAllScreen();
+
 		Update();
 		Draw();
 	}
@@ -82,7 +83,7 @@ public abstract class App
 	/// </summary>
 	protected virtual void Update()
 	{
-		TerminalManager.Update();
+		TerminalAttributes.Update();
 
 		Root?.Update();
 	}
@@ -92,10 +93,10 @@ public abstract class App
 	/// </summary>
 	protected virtual void Draw()
 	{
-		bool drawAll = TerminalManager.TerminalResized;
+		bool drawAll = TerminalAttributes.TerminalResized;
 
 		if (drawAll is true)
-			TerminalManager.ClearAllScreen();
+			TerminalStream.ClearAllScreen();
 
 		if (drawAll || DrawAllRequested)
 			DrawAll(true);
@@ -209,7 +210,7 @@ public abstract class App
 	private static void OnExit()
 	{
 		Console.Write(ControlCodes.CursorToHome(), ControlCodes.EraseScreen());
-		TerminalManager.EchoEnabled = true;
-		TerminalManager.CursorVisible = true;
+		TerminalAttributes.EchoEnabled = true;
+		TerminalAttributes.CursorVisible = true;
 	}
 }

@@ -165,13 +165,13 @@ public class DefaultInputStream : InputStream
 		Cursor.Stream = this;
 
 		// disable the default cursor visibility. We are going to use our own customized cursor
-		bool startCursorVisibility = TerminalManager.CursorVisible;
-		TerminalManager.CursorVisible = false;
+		bool startCursorVisibility = TerminalAttributes.CursorVisible;
+		TerminalAttributes.CursorVisible = false;
 
 		string data = ReadData();
 
 		// reset the default cursor visibility to the original state.
-		TerminalManager.CursorVisible = startCursorVisibility;
+		TerminalAttributes.CursorVisible = startCursorVisibility;
 
 		Console.Write('\n');
 
