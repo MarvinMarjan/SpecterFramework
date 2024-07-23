@@ -133,7 +133,7 @@ public abstract class App
 			End();
 		}
 		
-		catch (Exception e)
+		catch (SpecterException e)
 		{
 			Log.Error(e);
 		}

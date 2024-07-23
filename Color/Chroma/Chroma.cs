@@ -66,7 +66,7 @@ public static class ChromaLang
 			output = Format(source);
 			return true;
 		}
-		catch (Exception)
+		catch (SpecterException)
 		{
 			output = null;
 			return false;

@@ -2,10 +2,8 @@ using System;
 using System.Text;
 
 using Specter.Color;
-using Specter.Color.Chroma;
 using Specter.Color.Paint;
 using Specter.String;
-using Specter.Terminal.UI.Exceptions;
 
 
 namespace Specter.Core;
@@ -24,22 +22,19 @@ public static class ExceptionMessageFormatter
 
 
 
-	public static string GetExceptionTypeAsString(Exception exception) => exception switch 
+	public static string GetExceptionTypeAsString(Exception exception)
 	{
-		// TODO: probably can be automatized.
+		string name = exception.GetType().Name.Replace("Exception", "");
 
-		AppException => "App",
-		ComponentException => "Component",
-		ComponentPropertyException => "ComponentProperty",
+		if (name.Length == 0)
+			return "Specter";
 
-		ChromaException => "Chroma",
-
-		_ => "Specter"
-	};
+		return name;
+	}
 
 
 
-	public static string BuildErrorStringStructure(Exception exception, string? details, string? extra = null)
+	public static string BuildErrorStringStructure(SpecterException exception, string? details, string? extra = null)
 	{
 		StringBuilder builder = new(ErrorSectionFrom(exception, details is null));
 
@@ -48,58 +43,5 @@ public static class ExceptionMessageFormatter
 		builder.Append($"\n\n\n{extra}");
 
 		return builder.ToString();
-	}
-
-
-
-	public static string Format<TException>(TException exception)
-		where TException : Exception => exception switch
-	{
-		AppException newException => Format(newException),
-		ComponentException newException => Format(newException),
-		ComponentPropertyException newException => Format(newException),
-		ChromaException newException => Format(newException),
-		Exception newException => Format(newException)
-	};
-
-
-	public static string Format(Exception exception)
-		=> BuildErrorStringStructure(exception, null);
-
-
-	public static string Format(AppException exception)
-		=> BuildErrorStringStructure(exception, null);
-
-
-	public static string Format(ComponentException exception)
-		=> BuildErrorStringStructure(
-			exception,
-			"Component " + exception.ComponentName.Quote()
-		);
-
-
-	public static string Format(ComponentPropertyException exception)
-	{
-		string typeOfText = exception.PropertyType is not null ? " of type " + exception.PropertyType.Quote(ColorValue.FGYellow) : string.Empty;
-		string ownedByText = exception.Owner is not null ? ", owned by Component " + exception.Owner.Name.Quote() : string.Empty;
-
-		string details = "Property " + exception.PropertyName.Quote() + typeOfText + ownedByText;
-
-		return BuildErrorStringStructure(exception, details);
-	}
-
-
-	public static string Format(ChromaException exception)
-	{
-		string? details = null;
-		string? extra = null;
-
-		if (exception.Target is HighlightTarget target)
-		{
-			details = "Index: " + $"{exception.Target?.From.Start};{exception.Target?.To.End}";
-			extra = ChromaLang.HighlightTargetFromLastSource(target, ColorValue.FGRed + ColorValue.Underline);
-		}
-
-		return BuildErrorStringStructure(exception, details, extra);
 	}
 }

@@ -12,10 +12,10 @@ namespace Specter.Core;
 public static class Log
 {
 	public static void Error<TException>(TException exception)
-		where TException : Exception
+		where TException : SpecterException
 	{
 		TerminalManager.ClearAllScreen();
 		Console.Write(ControlCodes.CursorToHome());
-		Console.WriteLine(ExceptionMessageFormatter.Format(exception));
+		Console.WriteLine(exception.ToString());
 	}
 }
