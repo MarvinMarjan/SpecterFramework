@@ -29,34 +29,53 @@ public class PinnedText(string text, Point position) : IDrawable
 	public bool EraseOnDraw { get; set; }
 
 
-	public static PinnedText FromCurrent(bool newLine = true)
-	{
-		PinnedText text = new("", TerminalAttributes.CursorPosition);
-	
-		if (newLine)
-			TerminalStream.WriteLine();
+	public static PinnedText FromCurrent()
+		=> new("", TerminalAttributes.CursorPosition);
 
-		return text;
+
+	/// <summary>
+	/// Creates a array of pinned texts. Each pinned text is on a line.
+	/// </summary>
+	/// <param name="count"> The amount of pinned texts to create. </param>
+	/// <returns> The array of pinned texts. </returns>
+	public static PinnedText[] CreateCount(int count)
+	{
+		// make sure the lines already exists
+		TerminalStream.AllocateLines(count);
+
+		PinnedText[] texts = new PinnedText[count];
+
+		for (int i = 0; i < count; i++)
+		{
+			texts[i] = FromCurrent();
+			TerminalStream.WriteLine();
+		}
+
+		return texts;
 	}
 
 
 	public void Write(string text)
 	{
 		Text = text;
-		TerminalStream.Write(Draw());
+		WriteToTerminal();
 	}
+
+
+	public void WriteToTerminal()
+		=> TerminalStream.Write(Draw());
 
 
 	public string Draw()
 	{
 		StringBuilder builder = new();
 
-		builder.Append(ControlCodes.CursorTo(Position.row, Position.col));
+		builder.Append(ControlCodes.CursorTo(Position.Row, Position.Col));
 
 		if (EraseOnDraw)
 		{
 			builder.Append(GetEraseString());
-			builder.Append(ControlCodes.CursorTo(Position.row, Position.col));
+			builder.Append(ControlCodes.CursorTo(Position.Row, Position.Col));
 		}
 
 		builder.Append(Text);

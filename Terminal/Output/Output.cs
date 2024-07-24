@@ -1,6 +1,8 @@
 using System;
 using System.Text;
 
+using Specter.Terminal.UI;
+
 
 namespace Specter.Terminal.Output;
 
@@ -34,9 +36,7 @@ public static class TerminalStream
 		if (s_pinned is null)
 			return false;
 
-		s_pinned.Text = value.ToString() ?? "";
-		DrawPinned();
-
+		s_pinned.Write(value.ToString() ?? "");
 		return true;
 	}
 
@@ -62,7 +62,20 @@ public static class TerminalStream
 		=> s_pinned = null;
 
 
+	
+	/// <summary>
+	/// Create an amount of lines.
+	/// </summary>
+	/// <param name="count"> The number of lines. </param>
+	/// <returns> The final cursor position. </returns>
+	public static Point AllocateLines(int count)
+	{
+		Write(new string('\n', count));
+		Point cursorPos = TerminalAttributes.CursorPosition;
+		cursorPos.Row -= (uint)count;
 
-	internal static void DrawPinned()
-		=> Console.Write(s_pinned?.Draw());
+		TerminalAttributes.CursorPosition = cursorPos;
+
+		return cursorPos;
+	}
 }

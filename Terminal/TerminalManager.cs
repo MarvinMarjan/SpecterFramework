@@ -26,7 +26,7 @@ public static class TerminalAttributes
 
 	public static Point CursorPosition
 	{
-		set => Console.Write(ControlCodes.CursorTo(value.row, value.col));
+		set => Console.Write(ControlCodes.CursorTo(value.Row, value.Col));
 		get
 		{
 			var (Left, Top) = Console.GetCursorPosition();
@@ -55,7 +55,7 @@ public static class TerminalAttributes
 	public static Size TerminalSize
 	{
 		get => GetTerminalSize();
-		set => Console.SetWindowSize((int)value.width, (int)value.height);
+		set => Console.SetWindowSize((int)value.Width, (int)value.Height);
 	}
 
 
