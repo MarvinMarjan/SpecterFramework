@@ -98,15 +98,15 @@ public class SectionComponent : Component
 	{
 		StringBuilder builder = new();
 
-		builder.Append(ControlCodes.CursorTo(RelativePosition.row, RelativePosition.col));
+		builder.Append(ControlCodes.CursorTo(RelativePosition.Row, RelativePosition.Col));
 		builder.Append(Color.Value.AsSequence());
 
-		for (int i = 0; i < Size.Value.height; i++)
+		for (int i = 0; i < Size.Value.Height; i++)
 		{
-			for (int o = 0; o < Size.Value.width; o++)
+			for (int o = 0; o < Size.Value.Width; o++)
 				DrawAt(ref builder, (uint)i, (uint)o);
 
-			builder.Append(ControlCodes.CursorDown(1) + ControlCodes.CursorToColumn(RelativePosition.col));
+			builder.Append(ControlCodes.CursorDown(1) + ControlCodes.CursorToColumn(RelativePosition.Col));
 		}
 
 		builder.Append(EscapeCodes.Reset);

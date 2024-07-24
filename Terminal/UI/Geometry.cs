@@ -13,21 +13,21 @@ public struct Point(uint row, uint col)
 {
 	public static Point None { get => new (0, 0); }
 
-	public uint row = row;
-	public uint col = col;
+	public uint Row { get; set; } = row;
+	public uint Col { get; set; } = col;
 
 
 	public static Point operator+(Point left, Point right)
-		=> new(left.row + right.row, left.col + right.col);
+		=> new(left.Row + right.Row, left.Col + right.Col);
 
 	public static Point operator-(Point left, Point right)
-		=> new(left.row - right.row, left.col - right.col);
+		=> new(left.Row - right.Row, left.Col - right.Col);
 
 	public static Point operator*(Point left, Point right)
-		=> new(left.row * right.row, left.col * right.col);
+		=> new(left.Row * right.Row, left.Col * right.Col);
 
 	public static Point operator/(Point left, Point right)
-		=> new(left.row / right.row, left.col / right.col);
+		=> new(left.Row / right.Row, left.Col / right.Col);
 
 	
 	public static bool operator==(Point left, Point right)
@@ -37,12 +37,16 @@ public struct Point(uint row, uint col)
 		=> !left.Equals(right);
 
 
-	public readonly override int GetHashCode() => (row, col).GetHashCode();
+	public readonly override int GetHashCode() => (Row, Col).GetHashCode();
 
-    public readonly override bool Equals(object? obj)
+	public readonly override bool Equals(object? obj)
 		=> obj is Point point && Equals(point);
 
-    public readonly bool Equals(Point obj) => row == obj.row && col == obj.col;
+	public readonly bool Equals(Point obj) => Row == obj.Row && Col == obj.Col;
+
+
+	public override readonly string ToString()
+		=> $"Pos(row: {Row}, col: {Col})";
 }
 
 
@@ -55,36 +59,40 @@ public struct Size(uint width, uint height) : IEquatable<Size>
 {
 	public static Size None { get => new(0, 0); }
 
-	public uint width = width;
-	public uint height = height;
+	public uint Width { get; set; } = width;
+	public uint Height { get; set; } = height;
 
 
 	public static Size operator+(Size left, Size right)
-		=> new(left.width + right.width, left.height + right.height);
+		=> new(left.Width + right.Width, left.Height + right.Height);
 
 	public static Size operator-(Size left, Size right)
-		=> new(left.width - right.width, left.height - right.height);
+		=> new(left.Width - right.Width, left.Height - right.Height);
 
 	public static Size operator*(Size left, Size right)
-		=> new(left.width * right.width, left.height * right.height);
+		=> new(left.Width * right.Width, left.Height * right.Height);
 
 	public static Size operator/(Size left, Size right)
-		=> new(left.width / right.width, left.height / right.height);
+		=> new(left.Width / right.Width, left.Height / right.Height);
 
 
-    public static bool operator==(Size left, Size right)
+	public static bool operator==(Size left, Size right)
 		=> left.Equals(right);
 
 	public static bool operator!=(Size left, Size right)
 		=> !left.Equals(right);
 
 
-	public readonly override int GetHashCode() => (width, height).GetHashCode();
+	public readonly override int GetHashCode() => (Width, Height).GetHashCode();
 
-    public readonly override bool Equals(object? obj)
+	public readonly override bool Equals(object? obj)
 		=> obj is Size size && Equals(size);
 
-    public readonly bool Equals(Size obj) => width == obj.width && height == obj.height;
+	public readonly bool Equals(Size obj) => Width == obj.Width && Height == obj.Height;
+
+
+	public readonly override string ToString()
+		=> $"Size(width: {Width}, height: {Height})";
 }
 
 
@@ -95,8 +103,8 @@ public struct Size(uint width, uint height) : IEquatable<Size>
 /// <param name="size"> The size. </param>
 public struct Rect(Point position, Size size)
 {
-	public Point position = position;
-	public Size size = size;
+	public Point Position { get; set; } = position;
+	public Size Size { get; set; } = size;
 }
 
 
@@ -109,10 +117,10 @@ public struct Rect(Point position, Size size)
 /// <param name="right"> The right. </param>
 public struct Bounds(uint top, uint left, uint bottom, uint right)
 {
-    public uint top = top;
-    public uint left = left;
-    public uint bottom = bottom;
-    public uint right = right;
+	public uint Top { get; set; } = top;
+	public uint Left { get; set; } = left;
+	public uint Bottom { get; set; } = bottom;
+	public uint Right { get; set; } = right;
 
 
 	[Flags]
@@ -133,16 +141,16 @@ public struct Bounds(uint top, uint left, uint bottom, uint right)
 
 
 	public static Bounds FromRectangle(Point position, Size size)
-		=> new(position.row, position.col, position.row + size.height - 1, position.col + size.width - 1);
+		=> new(position.Row, position.Col, position.Row + size.Height - 1, position.Col + size.Width - 1);
 
 
 	public static bool HasEdgeInEdges(Edge edges, Edge edge)
 		=> (edges & edge) == edge;
 
 
-    public readonly bool IsAtBorder(Point point)
-        => (point.row == top || point.row == bottom) && point.col >= left && point.col <= right ||
-			(point.col == left || point.col == right) && point.row >= top && point.row <= bottom;
+	public readonly bool IsAtBorder(Point point)
+		=> (point.Row == Top || point.Row == Bottom) && point.Col >= Left && point.Col <= Right ||
+			(point.Col == Left || point.Col == Right) && point.Row >= Top && point.Row <= Bottom;
 
 
 	public readonly bool IsAtBorder(Point point, out Edge edges)
@@ -155,10 +163,10 @@ public struct Bounds(uint top, uint left, uint bottom, uint right)
 			return false;
 		}
 
-		edges |= point.row == top ? Edge.Top : 0;
-		edges |= point.row == bottom ? Edge.Bottom : 0;
-		edges |= point.col == left ? Edge.Left : 0;
-		edges |= point.col == right ? Edge.Right : 0;
+		edges |= point.Row == Top ? Edge.Top : 0;
+		edges |= point.Row == Bottom ? Edge.Bottom : 0;
+		edges |= point.Col == Left ? Edge.Left : 0;
+		edges |= point.Col == Right ? Edge.Right : 0;
 
 		return true;
 	}

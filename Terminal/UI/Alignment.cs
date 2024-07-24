@@ -61,36 +61,36 @@ public static class AlignmentExtensions
 	/// <returns> The aligned position. </returns>
 	public static Point CalculatePosition(this Alignment alignment, Rect parent, Rect child)
 	{
-		Point finalPosition = child.position;
-		Size finalSize = child.size;
+		Point finalPosition = child.Position;
+		Size finalSize = child.Size;
 
 		bool hasCenterH = alignment.HasFlag(Alignment.CenterHorizontal);
 		bool hasCenterV = alignment.HasFlag(Alignment.CenterVertical);
 
 		if (hasCenterH)
-			finalPosition.col = CalculateCentralizedValue(parent.size.width, child.size.width);
+			finalPosition.Col = CalculateCentralizedValue(parent.Size.Width, child.Size.Width);
 
 		if (hasCenterV)
-			finalPosition.row = CalculateCentralizedValue(parent.size.height, child.size.height);
+			finalPosition.Row = CalculateCentralizedValue(parent.Size.Height, child.Size.Height);
 
 
 		if (!hasCenterV)
 		{
 			if (alignment.HasFlag(Alignment.Top))
-				finalPosition.row = 0;
+				finalPosition.Row = 0;
 
 			else if (alignment.HasFlag(Alignment.Bottom))
-				finalPosition.row = parent.size.height - finalSize.height;
+				finalPosition.Row = parent.Size.Height - finalSize.Height;
 		}
 			
 
 		if (!hasCenterH)
 		{
 			if (alignment.HasFlag(Alignment.Left))
-				finalPosition.col = 0;
+				finalPosition.Col = 0;
 	
 			else if (alignment.HasFlag(Alignment.Right))
-				finalPosition.col = parent.size.width - finalSize.width;
+				finalPosition.Col = parent.Size.Width - finalSize.Width;
 		}
 
 

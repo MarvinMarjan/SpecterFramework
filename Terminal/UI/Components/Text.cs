@@ -54,7 +54,7 @@ public class TextComponent : Component, IChildLess
 	{
 		StringBuilder builder = new();
 
-		builder.Append(ControlCodes.CursorTo(RelativePosition.row, RelativePosition.col));
+		builder.Append(ControlCodes.CursorTo(RelativePosition.Row, RelativePosition.Col));
 		builder.Append(Color.Value.AsSequence());
 
 		builder.Append(Text);

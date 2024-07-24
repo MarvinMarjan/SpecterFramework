@@ -13,15 +13,12 @@ public struct BorderCharacters
 	public static BorderCharacters UTF8Default => new(new UTF8Encoding());
 	public static BorderCharacters ASCIIDefault => new(new ASCIIEncoding());
 
-	public static BorderCharacters Default
+	public static BorderCharacters Default => Console.OutputEncoding switch 
 	{
-		get => Console.OutputEncoding switch 
-		{
-			UTF8Encoding => UTF8Default,
-			ASCIIEncoding => ASCIIDefault,
-			_ => ASCIIDefault
-		};
-	}
+		UTF8Encoding => UTF8Default,
+		ASCIIEncoding => ASCIIDefault,
+		_ => ASCIIDefault
+	};
 
 
 
