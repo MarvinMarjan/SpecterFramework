@@ -1,8 +1,8 @@
-using Specter.Terminal.UI.System;
-using Specter.Terminal.UI.Exceptions;
+using Specter.Terminal.UI.Application;
+using Specter.Terminal.UI.Application.Exceptions;
 
 
-namespace Specter.Terminal.UI.Components;
+namespace Specter.Terminal.UI.Components.Property;
 
 
 public interface IComponentPropertyEvents<T>

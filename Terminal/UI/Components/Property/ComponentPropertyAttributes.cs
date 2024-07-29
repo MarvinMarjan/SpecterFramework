@@ -1,4 +1,4 @@
-namespace Specter.Terminal.UI.Components;
+namespace Specter.Terminal.UI.Components.Property;
 
 
 public class ComponentPropertyAttributes(

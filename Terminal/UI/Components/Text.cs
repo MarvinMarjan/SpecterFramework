@@ -2,6 +2,7 @@
 
 using Specter.ANSI;
 using Specter.Color;
+using Specter.Terminal.UI.Components.Property;
 
 
 namespace Specter.Terminal.UI.Components;

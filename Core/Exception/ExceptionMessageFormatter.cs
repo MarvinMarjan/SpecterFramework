@@ -1,17 +1,18 @@
-using System;
 using System.Text;
 
 using Specter.Color;
 using Specter.Color.Paint;
 using Specter.String;
 
+using SystemException = System.Exception;
 
-namespace Specter.Core;
+
+namespace Specter.Core.Exception;
 
 
 public static class ExceptionMessageFormatter
 {
-	private static string ErrorSectionFrom(Exception exception, bool colon = false)
+	private static string ErrorSectionFrom(SystemException exception, bool colon = false)
 	{
 		string exceptionType = (ColorValue.FGRed + ColorValue.Underline).Paint(GetExceptionTypeAsString(exception));
 		string errorText = " Error".FGBRed();
@@ -22,7 +23,7 @@ public static class ExceptionMessageFormatter
 
 
 
-	public static string GetExceptionTypeAsString(Exception exception)
+	public static string GetExceptionTypeAsString(SystemException exception)
 	{
 		string name = exception.GetType().Name.Replace("Exception", "");
 

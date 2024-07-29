@@ -1,10 +1,10 @@
-using Specter.Core;
 using Specter.Color;
+using Specter.Core.Exception;
 using Specter.String;
 using Specter.Terminal.UI.Components;
 
 
-namespace Specter.Terminal.UI.Exceptions;
+namespace Specter.Terminal.UI.Application.Exceptions;
 
 
 public class ComponentPropertyException(

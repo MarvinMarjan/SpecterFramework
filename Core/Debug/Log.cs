@@ -1,10 +1,11 @@
 using System;
 
+using Specter.Core.Exception;
 using Specter.Terminal;
 using Specter.Terminal.Output;
 
 
-namespace Specter.Core;
+namespace Specter.Core.Debug;
 
 
 /// <summary>

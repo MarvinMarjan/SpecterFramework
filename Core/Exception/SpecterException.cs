@@ -1,7 +1,7 @@
 ﻿using SystemException = System.Exception;
 
 
-namespace Specter.Core;
+namespace Specter.Core.Exception;
 
 
 public class SpecterException(string message)

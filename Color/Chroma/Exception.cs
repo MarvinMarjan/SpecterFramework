@@ -1,4 +1,4 @@
-using Specter.Core;
+using Specter.Core.Exception;
 
 
 namespace Specter.Color.Chroma;

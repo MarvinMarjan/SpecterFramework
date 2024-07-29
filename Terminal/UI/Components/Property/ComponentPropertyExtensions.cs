@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 
 
-namespace Specter.Terminal.UI.Components;
+namespace Specter.Terminal.UI.Components.Property;
 
 
 public static class ComponentPropertyExtensions

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 
-using Specter.Terminal.UI.Exceptions;
+using Specter.Terminal.UI.Application.Exceptions;
 
 
-namespace Specter.Terminal.UI.Components;
+namespace Specter.Terminal.UI.Components.Property;
 
 
 /// <summary>

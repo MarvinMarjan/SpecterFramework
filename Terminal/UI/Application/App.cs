@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-using Specter.Core;
+using Specter.Core.Exception;
+using Specter.Core.Debug;
 using Specter.Terminal.Output;
 using Specter.Terminal.UI.Components;
-using Specter.Terminal.UI.Exceptions;
+using Specter.Terminal.UI.Application.Exceptions;
 
 
-namespace Specter.Terminal.UI.System;
+namespace Specter.Terminal.UI.Application;
 
 
 /// <summary>
