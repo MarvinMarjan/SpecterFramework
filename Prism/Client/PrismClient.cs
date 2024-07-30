@@ -1,3 +1,4 @@
+using System;
 using System.Net.Sockets;
 
 
@@ -36,4 +37,12 @@ public class PrismClient
 
 	public void WriteCommandRequest(string command)
 		=> Tcp.WriteDataTransfer(ToDataTransferStructure() with { Command = command });
+
+
+	
+	public void Disconnect()
+	{
+		WriteCommandRequest($"client disconnect: \"{Name}\"");
+		Tcp.Close();
+	}
 }

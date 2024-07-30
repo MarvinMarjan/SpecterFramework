@@ -2,10 +2,11 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading;
 
 using Specter.Debug.Prism.Client;
-using System.Net.WebSockets;
+using System.Linq;
 
 
 namespace Specter.Debug.Prism.Server;
@@ -14,9 +15,9 @@ namespace Specter.Debug.Prism.Server;
 // TODO: add exception handling
 
 
-public class PrismServer : TcpListener
+public partial class PrismServer : TcpListener
 {
-	public List<PrismClient> Clients { get; init; } = [];
+	public ConcurrentDictionary<string, PrismClient> Clients { get; private set; } = [];
 
 
 	private readonly Thread _listenToNewClientsThread;
@@ -41,26 +42,23 @@ public class PrismServer : TcpListener
 	{
 		List<ClientDataTransferStructure> datas = [];
 
-		for (int i = Clients.Count - 1; i >= 0; i--)
+		foreach (var pair in Clients)
 		{
-			PrismClient client = Clients[i];
+			PrismClient client = pair.Value;
 
+			if (client.Disconnected())
+			{
+				ClientRemove(client.Name);
+				continue;
+			}
+
+			// FIXME: commands not working
 			if (client.Stream.DataAvailable)
 				datas.Add(client.ReadDataTransfer());
 		}
 
 		return datas;
 	}
-
-
-	public void MsgInfo(string message)
-		=> Console.WriteLine($"Info: {message}");
-	
-	public void MsgWarn(string message)
-		=> Console.WriteLine($"Warning: {message}");
-
-	public void MsgError(string message)
-		=> Console.WriteLine($"Error: {message}");
 
 
 
@@ -79,7 +77,7 @@ public class PrismServer : TcpListener
 
 		ClientDataTransferStructure registrationData = client.ReadDataTransfer();
 
-		Clients.Add(new(registrationData.Name, client));
+		Clients.TryAdd(registrationData.Name, new(registrationData.Name, client));
 
 		Console.WriteLine($"Client registrated as {registrationData.Name}.");
 	}

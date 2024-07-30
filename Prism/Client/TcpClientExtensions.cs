@@ -1,11 +1,29 @@
 using System.Text;
 using System.Net.Sockets;
 
+
 namespace Specter.Debug.Prism.Client;
 
 
 public static class TcpClientExtensions
 {
+	public static bool Disconnected(this TcpClient client)
+	{
+		try
+		{
+			client.WriteDataAsString("check");
+			return false;
+		}
+		catch
+		{
+			return true;
+		}
+	}
+
+	public static bool Disconnected(this PrismClient client)
+		=> client.Tcp.Disconnected();
+
+
 	public static ClientDataTransferStructure ReadDataTransfer(this PrismClient client)
 		=> client.Tcp.ReadDataTransfer();
 
