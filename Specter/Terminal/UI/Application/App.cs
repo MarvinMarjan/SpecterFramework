@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-using Specter.Core.Exception;
-using Specter.Core.Debug;
+using Specter.Debug;
 using Specter.Terminal.Output;
 using Specter.Terminal.UI.Components;
 using Specter.Terminal.UI.Application.Exceptions;
@@ -137,7 +136,7 @@ public abstract class App
 		
 		catch (SpecterException e)
 		{
-			Log.Error(e);
+			Log.FullscreenError(e);
 		}
 
 		finally

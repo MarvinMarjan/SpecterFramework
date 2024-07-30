@@ -1,5 +1,4 @@
 using Specter.Color;
-using Specter.Core.Exception;
 using Specter.String;
 using Specter.Terminal.UI.Components;
 

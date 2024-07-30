@@ -7,7 +7,7 @@ using Specter.String;
 using SystemException = System.Exception;
 
 
-namespace Specter.Core.Exception;
+namespace Specter;
 
 
 public static class ExceptionMessageFormatter
@@ -40,8 +40,8 @@ public static class ExceptionMessageFormatter
 		StringBuilder builder = new(ErrorSectionFrom(exception, details is null));
 
 		builder.Append(details is not null ? $" ({details}):" : string.Empty);
-		builder.Append($"\n\n  --->> ".FGBRed() + $"{exception.Message}");
-		builder.Append($"\n\n\n{extra}");
+		builder.Append($"\n  --->> ".FGBRed() + $"{exception.Message}");
+		builder.Append($"\n\n{extra}");
 
 		return builder.ToString();
 	}

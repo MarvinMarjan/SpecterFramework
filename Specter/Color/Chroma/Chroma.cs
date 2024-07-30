@@ -1,6 +1,5 @@
 using Specter.ANSI;
-using Specter.Core.Debug;
-using Specter.Core.Exception;
+using Specter.Debug;
 
 
 namespace Specter.Color.Chroma;
@@ -45,7 +44,7 @@ public static class ChromaLang
 		
 		catch (ChromaException e)
 		{
-			Log.Error(e);
+			Log.FullscreenError(e);
 		}
 
 		return string.Empty;

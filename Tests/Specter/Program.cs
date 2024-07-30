@@ -6,12 +6,12 @@ using Specter.Color;
 using Specter.Color.Paint;
 using Specter.Color.Chroma;
 using Specter.String;
+using Specter.Terminal;
 using Specter.Terminal.Input;
 using Specter.Terminal.Output;
 using Specter.Terminal.UI;
 using Specter.Terminal.UI.Components;
 using Specter.Terminal.UI.Application;
-using Specter.Terminal;
 
 
 namespace Specter.Tests;
@@ -260,8 +260,6 @@ public class SpecterTesting
 
 	private static void Main(string[] args)
 	{
-		Console.WriteLine(Environment.CurrentDirectory);
-
 		T4();
 	}
 }
