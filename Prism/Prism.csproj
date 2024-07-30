@@ -4,12 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>Specter</RootNamespace>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Folder Include="Core/" />
-    <Folder Include="Debug/" />
-    <Folder Include="Exception/" />
-  </ItemGroup>
 
 </Project>
