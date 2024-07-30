@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using System.Collections.Generic;
+using System.Threading;
 
-//using Specter.Debug.Prism.Client;
+using Specter.Debug.Prism.Client;
+using System.Net.WebSockets;
 
 
 namespace Specter.Debug.Prism.Server;
@@ -14,11 +16,10 @@ namespace Specter.Debug.Prism.Server;
 
 public class PrismServer : TcpListener
 {
-	// TODO: add a way to convert TcpClient into PrismClient
-	// TODO: transfer data using JSON
+	public List<PrismClient> Clients { get; init; } = [];
 
-	public TcpClient Client { get; set; }
-	public NetworkStream ClientStream { get; set; }
+
+	private readonly Thread _listenToNewClientsThread;
 
 
 	public PrismServer(int port)
@@ -26,27 +27,29 @@ public class PrismServer : TcpListener
 	{
 		ServerState.Server = this;
 
+		// start server
 		Start();
 
 		Console.WriteLine($"Server listening at port {port}.");
-		Console.WriteLine($"Waiting for a client...");
-		
-		Client = AcceptTcpClient();
-		ClientStream = Client.GetStream();
-	
-		Console.WriteLine($"Client connected.");
+
+		_listenToNewClientsThread = new(ListenToNewClients);
+		_listenToNewClientsThread.Start();
 	}
 
 
-	public string ReadDataFromClient()
+	public List<ClientDataTransferStructure> ReadAllDataTransfers()
 	{
-		if (!ClientStream.DataAvailable)
-			return "";
+		List<ClientDataTransferStructure> datas = [];
 
-		byte[] buffer = new byte[2048];
-		int bytesRead = ClientStream.Read(buffer, 0, buffer.Length);
+		for (int i = Clients.Count - 1; i >= 0; i--)
+		{
+			PrismClient client = Clients[i];
 
-		return Encoding.UTF8.GetString(buffer, 0, bytesRead);
+			if (client.Stream.DataAvailable)
+				datas.Add(client.ReadDataTransfer());
+		}
+
+		return datas;
 	}
 
 
@@ -58,4 +61,26 @@ public class PrismServer : TcpListener
 
 	public void MsgError(string message)
 		=> Console.WriteLine($"Error: {message}");
+
+
+
+	private void ListenToNewClients()
+	{
+		while (true)
+			ListenToNewClient();
+	}
+
+
+	private void ListenToNewClient()
+	{
+		TcpClient client = AcceptTcpClient();
+
+		Console.WriteLine("New client connected. Waiting for registration...");
+
+		ClientDataTransferStructure registrationData = client.ReadDataTransfer();
+
+		Clients.Add(new(registrationData.Name, client));
+
+		Console.WriteLine($"Client registrated as {registrationData.Name}.");
+	}
 }

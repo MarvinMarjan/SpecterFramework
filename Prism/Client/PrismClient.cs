@@ -1,29 +1,39 @@
-using System;
-using System.Text;
 using System.Net.Sockets;
 
 
 namespace Specter.Debug.Prism.Client;
 
 
-public class PrismClient : TcpClient
+public class PrismClient
 {
-	public NetworkStream Stream { get; set; }
+	public string Name { get; init; }
+
+	public NetworkStream Stream { get; init; }
+	public TcpClient Tcp { get; init; }
 
 
-	public PrismClient(int port)
-		: base("localhost", port)
+	public PrismClient(string name, int port)
+		: this(name, new TcpClient("localhost", port))
 	{
-		Console.WriteLine($"Client connected at port {port}.");
-		Console.WriteLine($"Start writing:\n");
-
-		Stream = GetStream();
+		Tcp.WriteDataAsString(ToDataTransferStructure().ToJson());
 	}
 
 
-	public void WriteDataToServer(string data)
+	public PrismClient(string name, TcpClient client)
 	{
-		byte[] bytes = Encoding.UTF8.GetBytes(data ?? "");
-		Stream.Write(bytes, 0, bytes.Length);
+		Name = name;
+		Tcp = client;
+		Stream = Tcp.GetStream();
 	}
+
+
+	public ClientDataTransferStructure ToDataTransferStructure()
+		=> new(Name, "");
+
+
+	public void WriteDataTransfer()
+		=> Tcp.WriteDataTransfer(ToDataTransferStructure());
+
+	public void WriteCommandRequest(string command)
+		=> Tcp.WriteDataTransfer(ToDataTransferStructure() with { Command = command });
 }

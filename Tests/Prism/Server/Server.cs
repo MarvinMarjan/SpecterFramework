@@ -1,4 +1,6 @@
-﻿using Specter.Debug.Prism.Commands;
+﻿using System.Collections.Generic;
+using Specter.Debug.Prism.Client;
+using Specter.Debug.Prism.Commands;
 using Specter.Debug.Prism.Server;
 
 
@@ -13,12 +15,10 @@ public class PrismServerTesting
 
 		while (true)
 		{
-			string data;
+			List<ClientDataTransferStructure> datas = server.ReadAllDataTransfers();
 
-			if ((data = server.ReadDataFromClient()) == "")
-				continue;
-
-			CommandRunner.Run(data);
+			foreach (ClientDataTransferStructure data in datas)
+				CommandRunner.Run(data);
 		}
 	}
 }

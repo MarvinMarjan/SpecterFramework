@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using Specter.Debug.Prism.Client;
 
 namespace Specter.Debug.Prism.Commands;
 
 
 public interface ICommand
 {
-	void Execute(List<object?> args);
+	void Execute(ClientDataTransferStructure clientData, List<object?> args);
 }
 
 
