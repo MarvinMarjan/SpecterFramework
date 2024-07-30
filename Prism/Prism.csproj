@@ -7,10 +7,4 @@
     <RootNamespace>Specter.Debug.Prism</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Client/" />
-    <Folder Include="Commands/" />
-    <Folder Include="Server/" />
-  </ItemGroup>
-
 </Project>
