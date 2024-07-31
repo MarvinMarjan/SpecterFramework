@@ -1,5 +1,4 @@
 using Specter.ANSI;
-using Specter.Debug;
 
 
 namespace Specter.Color.Chroma;
@@ -31,23 +30,13 @@ public static class ChromaLang
 	/// <returns> A string formatted by Chroma. </returns>
 	public static string Format(string source)
 	{
-		try
-		{
-			LastSource = source;
-	
-			var tokens = new Scanner().Scan(source);
-			var structures = new StructureBuilder().BuildExpressionConvertableStructures(tokens);
-			var expressions = ExpressionConverter.ConvertAll(structures);
-	
-			return Formatter.Format(expressions);
-		}
-		
-		catch (ChromaException e)
-		{
-			Log.FullscreenError(e);
-		}
+		LastSource = source;
 
-		return string.Empty;
+		var tokens = new Scanner().Scan(source);
+		var structures = new StructureBuilder().BuildExpressionConvertableStructures(tokens);
+		var expressions = ExpressionConverter.ConvertAll(structures);
+
+		return Formatter.Format(expressions);
 	}
 
 

@@ -133,15 +133,9 @@ public abstract class App
 
 			End();
 		}
-		
-		catch (SpecterException e)
-		{
-			Log.FullscreenError(e);
-		}
 
 		finally
 		{
-			Console.ReadKey(true);
 			End();
 		}
 	}

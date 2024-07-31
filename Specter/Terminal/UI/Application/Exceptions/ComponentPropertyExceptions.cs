@@ -1,5 +1,3 @@
-using Specter.Color;
-using Specter.String;
 using Specter.Terminal.UI.Components;
 
 
@@ -19,15 +17,4 @@ public class ComponentPropertyException(
 	public string? PropertyType { get; } = propertyType;
 
 	public Component? Owner { get; } = owner;
-
-
-	public override string ToString()
-	{
-		string typeOfText = PropertyType is not null ? " of type " + PropertyType.Quote(ColorValue.FGYellow) : string.Empty;
-		string ownedByText = Owner is not null ? ", owned by Component " + Owner.Name.Quote() : string.Empty;
-
-		string details = "Property " + PropertyName.Quote() + typeOfText + ownedByText;
-
-		return ExceptionMessageFormatter.BuildErrorStringStructure(this, details);
-	}
 }
