@@ -6,7 +6,7 @@ namespace Specter.Debug.Prism.Commands;
 
 public interface ICommand
 {
-	void Execute(ClientDataTransferStructure clientData, List<object?> args);
+	void Execute(DataTransferStructure clientData, List<object?> args);
 }
 
 

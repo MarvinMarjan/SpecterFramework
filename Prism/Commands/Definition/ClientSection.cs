@@ -9,6 +9,6 @@ namespace Specter.Debug.Prism.Commands.Definition;
 
 public class ClientRemove : ICommand
 {
-	public void Execute(ClientDataTransferStructure clientData, List<object?> args)
+	public void Execute(DataTransferStructure clientData, List<object?> args)
 		=> ServerState.Server?.ClientRemove(args[0] as string ?? "");
 }

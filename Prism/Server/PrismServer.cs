@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
+using System.IO;
 
 using Specter.Debug.Prism.Client;
-using System.Linq;
+using Specter.Debug.Prism.Commands;
 
 
 namespace Specter.Debug.Prism.Server;
@@ -15,12 +17,22 @@ namespace Specter.Debug.Prism.Server;
 // TODO: add exception handling
 
 
+public struct RequestListener(Task task, CancellationTokenSource cancellationTokenSource)
+{
+	public Task Task { get; set; } = task;
+	public CancellationTokenSource CancellationTokenSource { get; set; } = cancellationTokenSource;
+}
+
+
 public partial class PrismServer : TcpListener
 {
-	public ConcurrentDictionary<string, PrismClient> Clients { get; private set; } = [];
+	public ConcurrentDictionary<int, PrismClient> Clients { get; private set; }
+	public ConcurrentDictionary<int, DataTransferStructure> Requests { get; private set; }
 
+	private readonly Dictionary<string, RequestListener> _clientRequestListeners;
 
 	private readonly Thread _listenToNewClientsThread;
+
 
 
 	public PrismServer(int port)
@@ -28,44 +40,28 @@ public partial class PrismServer : TcpListener
 	{
 		ServerState.Server = this;
 
+		Clients = [];
+		Requests = [];
+
 		// start server
 		Start();
 
 		Console.WriteLine($"Server listening at port {port}.");
 
-		_listenToNewClientsThread = new(ListenToNewClients);
+		_listenToNewClientsThread = new(new ThreadStart(() => { while (true) ListenToNewClient(); }));
 		_listenToNewClientsThread.Start();
+
+		_clientRequestListeners = [];
 	}
 
 
-	public List<ClientDataTransferStructure> ReadAllDataTransfers()
+	public void ProcessRequests()
 	{
-		List<ClientDataTransferStructure> datas = [];
-
-		foreach (var pair in Clients)
+		foreach (var (index, request) in Requests)
 		{
-			PrismClient client = pair.Value;
-
-			if (client.Disconnected())
-			{
-				ClientRemove(client.Name);
-				continue;
-			}
-
-			// FIXME: commands not working
-			if (client.Stream.DataAvailable)
-				datas.Add(client.ReadDataTransfer());
+			CommandRunner.Run(request);
+			Requests.Remove(index, out _);
 		}
-
-		return datas;
-	}
-
-
-
-	private void ListenToNewClients()
-	{
-		while (true)
-			ListenToNewClient();
 	}
 
 
@@ -75,10 +71,45 @@ public partial class PrismServer : TcpListener
 
 		Console.WriteLine("New client connected. Waiting for registration...");
 
-		ClientDataTransferStructure registrationData = client.ReadDataTransfer();
+		DataTransferStructure? registrationData = new StreamReader(client.GetStream()).ReadDataTransfer();
 
-		Clients.TryAdd(registrationData.Name, new(registrationData.Name, client));
+		if (registrationData is not DataTransferStructure valid)
+			return;
 
-		Console.WriteLine($"Client registrated as {registrationData.Name}.");
+		Console.WriteLine($"Client registrated as {valid.Name}.");
+
+		PrismClient prismClient = new(valid.Name, client);
+
+		Clients.TryAdd(Clients.Count, prismClient);
+		AddRequestListenerForClient(prismClient);
+	}
+
+
+	private void AddRequestListenerForClient(PrismClient client)
+	{
+		CancellationTokenSource tokenSource = new();
+
+		_clientRequestListeners.TryAdd(client.Name, new(
+			Task.Run(() => ListenForClientRequest(client, tokenSource.Token), tokenSource.Token),
+			tokenSource
+		));
+	}
+
+
+	private async Task ListenForClientRequest(PrismClient client, CancellationToken cancellationToken)
+	{
+		while (true)
+		{
+			DataTransferStructure? data = await client.Reader.ReadDataTransferAsync(cancellationToken);
+
+			if (cancellationToken.IsCancellationRequested)
+				break;
+
+			if (data is DataTransferStructure valid)
+				Requests.TryAdd(Requests.Count, valid);
+
+			else
+				ClientRemove(client.Name);
+		}
 	}
 }

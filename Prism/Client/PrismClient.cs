@@ -1,4 +1,4 @@
-using System;
+using System.IO;
 using System.Net.Sockets;
 
 
@@ -9,14 +9,16 @@ public class PrismClient
 {
 	public string Name { get; init; }
 
-	public NetworkStream Stream { get; init; }
+	public StreamWriter Writer { get; init; }
+	public StreamReader Reader { get; init; }
 	public TcpClient Tcp { get; init; }
 
 
 	public PrismClient(string name, int port)
 		: this(name, new TcpClient("localhost", port))
 	{
-		Tcp.WriteDataAsString(ToDataTransferStructure().ToJson());
+		// registration data
+		Writer.WriteLine(ToDataTransferStructure().ToJson());	
 	}
 
 
@@ -24,25 +26,22 @@ public class PrismClient
 	{
 		Name = name;
 		Tcp = client;
-		Stream = Tcp.GetStream();
+		Writer = new(Tcp.GetStream());
+		Reader = new(Tcp.GetStream());
+
+		Writer.AutoFlush = true;
 	}
 
 
-	public ClientDataTransferStructure ToDataTransferStructure()
-		=> new(Name, "");
+	public DataTransferStructure ToDataTransferStructure()
+		=> new() {
+			Name = Name,
+		};
 
 
 	public void WriteDataTransfer()
-		=> Tcp.WriteDataTransfer(ToDataTransferStructure());
+		=> Writer.WriteDataTransfer(ToDataTransferStructure());
 
 	public void WriteCommandRequest(string command)
-		=> Tcp.WriteDataTransfer(ToDataTransferStructure() with { Command = command });
-
-
-	
-	public void Disconnect()
-	{
-		WriteCommandRequest($"client disconnect: \"{Name}\"");
-		Tcp.Close();
-	}
+		=> Writer.WriteDataTransfer(ToDataTransferStructure() with { Command = command });
 }

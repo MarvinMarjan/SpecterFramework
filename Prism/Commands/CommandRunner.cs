@@ -9,7 +9,7 @@ namespace Specter.Debug.Prism.Commands;
 
 public static class CommandRunner
 {
-	public static void Run(ClientDataTransferStructure clientData)
+	public static void Run(DataTransferStructure clientData)
 	{
 		List<Token> tokens = new Scanner().Scan(clientData.Command);
 		CommandData? commandData = new Parser().Parse(tokens);
@@ -19,7 +19,7 @@ public static class CommandRunner
 	}
 
 
-	public static void Run(ClientDataTransferStructure clientData, CommandData commandData)
+	public static void Run(DataTransferStructure clientData, CommandData commandData)
 		=> CommandDefinition.Commands[commandData.Location.ToString()]
 			.Execute(clientData, commandData.Arguments);
 }

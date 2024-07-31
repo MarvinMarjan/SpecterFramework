@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Specter.Debug.Prism.Client;
 
 
@@ -10,9 +9,19 @@ public partial class PrismServer
 {
 	public void ClientRemove(string clientName)
 	{
-		Clients.TryRemove(clientName, out _);
+		foreach (var (index, client) in Clients)
+			if (client.Name == clientName)
+				ClientRemove(index);
+	}
 
-		Console.WriteLine($"Client {clientName} disconnected.");
+	public void ClientRemove(int index)
+	{
+		Clients.TryRemove(index, out PrismClient? client);
+		_clientRequestListeners.Remove(client?.Name ?? "", out RequestListener listener);
+
+		listener.CancellationTokenSource.Cancel();
+
+		Console.WriteLine($"Client {client?.Name} ({index}) removed.");
 	}
 
 
