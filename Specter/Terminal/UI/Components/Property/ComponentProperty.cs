@@ -58,10 +58,10 @@ public abstract class ComponentProperty
 			}
 
 			if (value is not InheritableComponentPropertyAttributes inheritableAttribute)
-					throw new ComponentPropertyException(
-						Name, GetType().Name, Owner,
-						@"Trying to set an ""InheritableComponentProperty<T>"" attribute to a non ""InheritableComponentPropertyAttribute""."
-					);
+				throw new ComponentPropertyException(
+					Name, GetType().Name, Owner,
+					@"An ""InheritableComponentProperty<T>"" attribute must be an ""InheritableComponentPropertyAttribute""."
+				);
 
 			_attributes = inheritableAttribute;
 		}

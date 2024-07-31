@@ -127,7 +127,7 @@ public abstract class App
 
 			while (!Exit)
 			{
-				Update();
+				Update(); 
 				Draw();
 			}
 

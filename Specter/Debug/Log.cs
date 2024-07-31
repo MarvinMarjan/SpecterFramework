@@ -1,6 +1,5 @@
 using System;
 
-using Specter;
 using Specter.Terminal;
 using Specter.Terminal.Output;
 
@@ -13,8 +12,7 @@ namespace Specter.Debug;
 /// </summary>
 public static class Log
 {
-	public static void FullscreenError<TException>(TException exception)
-		where TException : SpecterException
+	public static void FullscreenError(Exception exception)
 	{
 		TerminalStream.ClearAllScreen();
 		Console.Write(ControlCodes.CursorToHome());

@@ -1,3 +1,5 @@
+using System;
+
 using Specter.Terminal.UI.Components;
 
 
@@ -11,7 +13,7 @@ public class ComponentPropertyException(
 	
 	string message
 
-) : SpecterException(message)
+) : Exception(message)
 {
 	public string PropertyName { get; } = propertyName;
 	public string? PropertyType { get; } = propertyType;

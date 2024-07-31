@@ -1,6 +1,9 @@
-﻿namespace Specter.Terminal.UI.Application.Exceptions;
+﻿using System;
+
+
+namespace Specter.Terminal.UI.Application.Exceptions;
 
 
 public class AppException(string message)
-	: SpecterException(message)
+	: Exception(message)
 {}
