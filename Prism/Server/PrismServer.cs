@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Net;
 using System.Net.Sockets;
 using System.Collections.Concurrent;
@@ -11,30 +10,26 @@ using System.IO;
 using Specter.Debug.Prism.Client;
 using Specter.Debug.Prism.Commands;
 using Specter.Debug.Prism.Exceptions;
+using System;
 
 
 namespace Specter.Debug.Prism.Server;
 
 
-// TODO: make server more flexibe, it looks like a program, not a framework.
-
-
 // a Task that keeps running in loop waiting for a client request.
-public struct RequestListener(Task task, CancellationTokenSource cancellationTokenSource)
+public struct RequestListener(Thread thread, CancellationTokenSource cancellationTokenSource)
 {
-	public Task Task { get; set; } = task;
+	public Thread Thread { get; set; } = thread;
 	public CancellationTokenSource CancellationTokenSource { get; set; } = cancellationTokenSource;
 }
 
 
-public partial class PrismServer : TcpListener
+public abstract partial class PrismServer : TcpListener, ILogWriter
 {
 	public ConcurrentDictionary<string, PrismClient> Clients { get; private set; }
 	public ConcurrentDictionary<string, DataTransferStructure> Requests { get; private set; }
 
-	private readonly Dictionary<string, RequestListener> _clientRequestListeners;
-
-	private readonly Thread _listenToNewClientsThread;
+	protected readonly Dictionary<string, RequestListener> ClientRequestListeners;
 
 
 
@@ -46,29 +41,39 @@ public partial class PrismServer : TcpListener
 		Clients = [];
 		Requests = [];
 
+		ClientRequestListeners = [];
+
 		// start server
 		Start();
-
-		Console.WriteLine($"Server listening at port {port}.");
-
-		_listenToNewClientsThread = new(new ThreadStart(() => { while (true) ListenToNewClient(); }));
-		_listenToNewClientsThread.Start();
-
-		_clientRequestListeners = [];
 	}
 
 
 
 	public void ProcessRequests()
 	{
-		foreach (var (index, request) in Requests)
-		{
-			CommandRunner.Run(request);
-			Requests.Remove(index, out _);
-		}
+		foreach (var (_, requestData) in Requests)
+			ProcessRequest(requestData);
 	}
 
 
+	public void ProcessRequest(DataTransferStructure requestData)
+	{
+		if (!Requests.ContainsKey(requestData.ClientName))
+			throw new ClientRequestDoesNotExists(requestData.ClientName, "Could not find the request to process.");
+
+		CommandRunner.Run(requestData);
+
+		Requests.Remove(requestData.ClientName, out _);
+		ClientRequestProcessedEvent?.Invoke(requestData);
+	}
+
+
+
+	public void AddClientAndRequestListener(PrismClient client)
+	{
+		AddClient(client);
+		AddClientRequestListener(client);
+	}
 
 	public void AddClient(PrismClient client)
 	{
@@ -76,18 +81,31 @@ public partial class PrismServer : TcpListener
 			throw new ClientAlreadyExistsException(client.Name, "Can't add new client, it already exists.");
 
 		Clients.TryAdd(client.Name, client);
-		AddClientRequestListener(client);
+		ClientAddedEvent?.Invoke(client);
+	}
+
+
+	public void RemoveClientAndRequestListener(PrismClient client)
+	{
+		RemoveClient(client);
+		RemoveClientRequestListener(client);
+	}
+
+	public void RemoveClient(PrismClient client)
+	{
+		if (!Clients.ContainsKey(client.Name))
+			throw new ClientDoesNotExistsException(client.Name, "Could not find client.");
+
+		Clients.TryRemove(client.Name, out _);
+		ClientRemovedEvent?.Invoke(client);
 	}
 
 	public void RemoveClient(string clientName)
 	{
-		if (!Clients.ContainsKey(clientName))
+		if (!Clients.TryGetValue(clientName, out PrismClient? client))
 			throw new ClientDoesNotExistsException(clientName, "Could not find client.");
 
-		Clients.TryRemove(clientName, out PrismClient? client);
-		RemoveClientRequestListener(clientName);
-
-		Console.WriteLine($"Client {client?.Name} removed.");
+		RemoveClient(client);
 	}
 
 
@@ -95,20 +113,25 @@ public partial class PrismServer : TcpListener
 	{
 		CancellationTokenSource tokenSource = new();
 
-		if (_clientRequestListeners.ContainsKey(client.Name))
+		if (ClientRequestListeners.ContainsKey(client.Name))
 			throw new ClientRequestListenerAlreadyExistsException(client.Name, "Can't add new client request listener, it already exists.");
 
-		_clientRequestListeners.TryAdd(client.Name, new(
-			Task.Run(() => ListenForClientRequest(client, tokenSource.Token), tokenSource.Token),
-			tokenSource
+		Thread requestListenerThread = new(new ThreadStart(
+			() => AddAndListenForClientRequestThread(client, tokenSource.Token)
 		));
+
+		requestListenerThread.Start();
+
+		ClientRequestListeners.TryAdd(client.Name, new(requestListenerThread, tokenSource));
+		ClientRequestListenerAddedEvent?.Invoke(client);
 	}
 
-	public void RemoveClientRequestListener(string clientName)
+	public void RemoveClientRequestListener(PrismClient client)
 	{
-		_clientRequestListeners.Remove(clientName, out RequestListener listener);
-
+		ClientRequestListeners.Remove(client.Name, out RequestListener listener);
 		listener.CancellationTokenSource.Cancel();
+
+		ClientRequestListenerRemovedEvent?.Invoke(client);
 	}
 
 
@@ -118,41 +141,40 @@ public partial class PrismServer : TcpListener
 			throw new TooMuchRequestsException(requestData.ClientName, "Client has already sent a request.");
 
 		Requests.TryAdd(requestData.ClientName, requestData);
+		ClientSentRequestEvent?.Invoke(requestData);
 	}
 
 
-
-	public void Info(string message)
-		=> Console.WriteLine($"Info: {message}");
-	
-	public void Warning(string message)
-		=> Console.WriteLine($"Warning: {message}");
-
-	public void Error(string message)
-		=> Console.WriteLine($"Error: {message}");
-
-
-
-
-
-
-
-	private void ListenToNewClient()
+	public void RemoveClientRequest(string clientName)
 	{
-		TcpClient client = AcceptTcpClient();
+		if (!Requests.ContainsKey(clientName))
+			throw new ClientRequestDoesNotExists(clientName, "Could not find the request made by client.");
+	
+		Requests.Remove(clientName, out _);
+	}
 
-		Console.WriteLine("New client connected. Waiting for registration...");
 
+	public PrismClient AddAndWaitForNewClient()
+		=> RegisterClient(AcceptTcpClient());
+
+
+	protected PrismClient RegisterClient(TcpClient client)
+	{
 		try
 		{
+			ClientRegistrationStartEvent?.Invoke();
+
 			DataTransferStructure? registrationData = new StreamReader(client.GetStream()).ReadDataTransfer();
-	
+		
 			if (registrationData is not DataTransferStructure validRegistrationData)
 				throw new InvalidRegistrationDataException("Invalid registration data.");
-	
-			Console.WriteLine($"Client registrated as {validRegistrationData.ClientName}.");
-	
-			AddClient(new(validRegistrationData.ClientName, client));
+
+			PrismClient prismClient = new(validRegistrationData.ClientName, client);
+
+			ClientRegistrationEndEvent?.Invoke(prismClient);
+
+			AddClientAndRequestListener(prismClient);
+			return prismClient;
 		}
 		catch (JsonException e)
 		{
@@ -161,19 +183,45 @@ public partial class PrismServer : TcpListener
 	}
 
 
-	private async Task ListenForClientRequest(PrismClient client, CancellationToken cancellationToken)
+	private void AddAndListenForClientRequestThread(PrismClient client, CancellationToken cancellationToken)
 	{
-		while (true)
+		while (!cancellationToken.IsCancellationRequested)
 		{
-			DataTransferStructure? requestData = await client.Reader.ReadDataTransferAsync(cancellationToken);
-
-			if (cancellationToken.IsCancellationRequested)
-				break;
-
-			if (requestData is DataTransferStructure validRequestData)
-				AddClientRequest(validRequestData);
-			else
-				RemoveClient(client.Name);
+			try
+			{
+				AddAndListenForClientRequestAsync(client, cancellationToken).Wait(CancellationToken.None);
+			}
+			catch (Exception e)
+			{
+				RequestListenerFailedEvent?.Invoke(client, e);
+			}
 		}
 	}
+
+
+	private async Task AddAndListenForClientRequestAsync(PrismClient client, CancellationToken cancellationToken)
+	{
+		DataTransferStructure? requestData = await client.Reader.ReadDataTransferAsync(cancellationToken);
+
+
+		if (cancellationToken.IsCancellationRequested)
+			return;
+
+		if (requestData is DataTransferStructure validRequestData)
+			AddClientRequest(validRequestData);
+		else
+			RemoveClientAndRequestListener(client);
+	}
+
+
+
+
+
+	public abstract void ServerMessage(string message);
+	public abstract void ServerWarning(string message);
+	public abstract void ServerError(string message);
+
+	public abstract void Message(string message, DataTransferStructure requestData);
+	public abstract void Warning(string message, DataTransferStructure requestData);
+	public abstract void Error(string message, DataTransferStructure requestData);
 }

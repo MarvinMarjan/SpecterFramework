@@ -4,6 +4,9 @@ using System;
 namespace Specter.Debug.Prism.Exceptions;
 
 
+// TODO: must override Object.ToString()
+
+
 [Serializable]
 public class ClientException : Exception
 {
@@ -88,6 +91,23 @@ public class TooMuchRequestsException : ClientException
 	{ }
 
 	public TooMuchRequestsException(string clientName, string message, Exception inner)
+		: base(clientName, message, inner)
+	{ }
+}
+
+
+
+[Serializable]
+public class ClientRequestDoesNotExists : ClientException
+{
+	public ClientRequestDoesNotExists()
+	{ }
+
+	public ClientRequestDoesNotExists(string clientName, string message)
+		: base(clientName, message)
+	{ }
+
+	public ClientRequestDoesNotExists(string clientName, string message, Exception inner)
 		: base(clientName, message, inner)
 	{ }
 }
