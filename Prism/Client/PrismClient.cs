@@ -18,7 +18,7 @@ public class PrismClient
 		: this(name, new TcpClient("localhost", port))
 	{
 		// registration data
-		Writer.WriteLine(ToDataTransferStructure().ToJson());	
+		WriteDataTransfer();	
 	}
 
 
@@ -35,7 +35,7 @@ public class PrismClient
 
 	public DataTransferStructure ToDataTransferStructure()
 		=> new() {
-			Name = Name,
+			ClientName = Name,
 		};
 
 

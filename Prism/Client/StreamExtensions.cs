@@ -11,7 +11,6 @@ public static class StreamExtensions
 	public static DataTransferStructure? ReadDataTransfer(this StreamReader stream)
 	{
 		string? data = stream.ReadLine();
-	
 		return data is null ? null : DataTransferStructure.FromJson(data);
 	}
 

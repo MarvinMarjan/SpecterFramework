@@ -6,7 +6,7 @@ namespace Specter.Debug.Prism.Client;
 
 public struct DataTransferStructure()
 {
-	public string Name { get; set; } = "";
+	public string ClientName { get; set; } = "";
 	public string Command { get; set; } = "";
 
 
