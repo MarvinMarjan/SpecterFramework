@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Specter.Debug.Prism.Exceptions;
 
 
 namespace Specter.Debug.Prism.Commands;
@@ -53,6 +54,9 @@ public class Scanner
 			else if (char.IsDigit(ch))
 				NumberValue();
 
+			else
+				throw new InvalidTokenException("Invalid token.");
+
 			break;
 		}
 	}
@@ -60,16 +64,16 @@ public class Scanner
 
 	private void Identifier()
 	{
-		while (char.IsLetterOrDigit(Peek()))
+		while (!AtEnd() && char.IsLetterOrDigit(Peek()))
 			Advance();
 
-		AddToken(TokenType.Value);
+		AddToken(TokenType.Value, _source[_start .. _end]);
 	}
 
 
 	private void StringValue()
 	{
-		while (Peek() != '"')
+		while (!AtEnd() && Peek() != '"')
 			Advance();
 
 		Advance();
@@ -82,7 +86,7 @@ public class Scanner
 
 	private void NumberValue()
 	{
-		while (char.IsDigit(Peek()))
+		while (!AtEnd() && char.IsDigit(Peek()))
 			Advance();
 
 		_ = int.TryParse(_source[_start .. _end], out int result);

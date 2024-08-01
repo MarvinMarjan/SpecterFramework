@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 
@@ -10,16 +11,16 @@ public class Parser
 	private int _index;
 
 
-	public CommandData? Parse(List<Token> tokens)
+	public CommandData Parse(List<Token> tokens)
 	{
 		if (tokens.Count == 0)
-			return null;
+			throw new ArgumentException("Don't pass a empty list for parsing.");
 
 		_tokens = tokens;
 		_index = 0;
 
 		Location location = ParseLocation();
-		Advance();
+		AdvanceNoReturn();
 		List<object?> arguments = ParseArguments();
 
 		return new(location, arguments);
@@ -30,13 +31,14 @@ public class Parser
 	{
 		Location location = new();
 
-		while (!AtEnd())
+		do
 		{
 			location.Names.Add(Advance().Lexeme);
 
-			if (Peek().Type == TokenType.Colon)
+			if (!AtEnd() && Peek().Type == TokenType.Colon)
 				break;
 		}
+		while (!AtEnd());
 
 		return location;
 	}
@@ -56,5 +58,6 @@ public class Parser
 	private bool AtEnd() => _index >= _tokens.Count;
 
 	private Token Advance() => _tokens[_index++];
+	private void AdvanceNoReturn() => _index++;
 	private Token Peek() => _tokens[_index];
 }

@@ -117,7 +117,14 @@ public class PrismServerTesting
 
 		while (true)
 		{
-			server.ProcessRequests();
+			try
+			{
+				server.ProcessRequests();
+			}
+			catch (Exception e)
+			{
+				server.ServerError(e.Message);
+			}
 		}
 	}
 }

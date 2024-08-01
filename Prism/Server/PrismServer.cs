@@ -61,10 +61,15 @@ public abstract partial class PrismServer : TcpListener, ILogWriter
 		if (!Requests.ContainsKey(requestData.ClientName))
 			throw new ClientRequestDoesNotExists(requestData.ClientName, "Could not find the request to process.");
 
-		CommandRunner.Run(requestData);
-
-		Requests.Remove(requestData.ClientName, out _);
-		ClientRequestProcessedEvent?.Invoke(requestData);
+		try
+		{
+			CommandRunner.Run(requestData);
+		}
+		finally
+		{
+			Requests.Remove(requestData.ClientName, out _);
+			ClientRequestProcessedEvent?.Invoke(requestData);
+		}
 	}
 
 
