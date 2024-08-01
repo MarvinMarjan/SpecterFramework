@@ -1,7 +1,5 @@
 using System;
 
-using Specter.Debug.Prism.Commands;
-
 
 namespace Specter.Debug.Prism.Exceptions;
 
@@ -12,6 +10,10 @@ public class CommandException : Exception
 	public CommandException() { }
 	public CommandException(string message) : base(message) { }
 	public CommandException(string message, Exception inner) : base(message, inner) { }
+
+
+	public override string ToString()
+		=> Message;
 }
 
 
@@ -22,6 +24,16 @@ public class InvalidTokenException : CommandException
 	public InvalidTokenException() { }
 	public InvalidTokenException(string message) : base(message) { }
 	public InvalidTokenException(string message, Exception inner) : base(message, inner) { }
+}
+
+
+
+[Serializable]
+public class UnclosedStringException : CommandException
+{
+	public UnclosedStringException() { }
+	public UnclosedStringException(string message) : base(message) { }
+	public UnclosedStringException(string message, Exception inner) : base(message, inner) { }
 }
 
 
@@ -42,4 +54,8 @@ public class CommandNotFoundException : CommandException
 	{
 		Command = command;
 	}
+
+
+	public override string ToString()
+		=> Message + $@" (""{Command}"")";
 }

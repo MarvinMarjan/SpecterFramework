@@ -76,6 +76,9 @@ public class Scanner
 		while (!AtEnd() && Peek() != '"')
 			Advance();
 
+		if (AtEnd())
+			throw new UnclosedStringException("String not closed.");
+
 		Advance();
 
 		string value = _source[(_start + 1) .. (_end - 1)];

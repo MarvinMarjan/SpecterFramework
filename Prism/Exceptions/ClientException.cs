@@ -4,9 +4,6 @@ using System;
 namespace Specter.Debug.Prism.Exceptions;
 
 
-// TODO: must override Object.ToString()
-
-
 [Serializable]
 public class ClientException : Exception
 {
@@ -25,6 +22,10 @@ public class ClientException : Exception
 	{
 		ClientName = clientName;
 	}
+
+
+	public override string ToString()
+		=> Message + $@" (""{ClientName}"")";
 }
 
 

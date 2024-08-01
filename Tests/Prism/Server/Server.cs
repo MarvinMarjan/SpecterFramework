@@ -44,7 +44,7 @@ public class Server : PrismServer
 			}
 			catch (Exception e)
 			{
-				ServerError(e.Message);
+				ServerError(e.ToString());
 			}
 		}
 	}
@@ -123,7 +123,7 @@ public class PrismServerTesting
 			}
 			catch (Exception e)
 			{
-				server.ServerError(e.Message);
+				server.ServerError(e.ToString());
 			}
 		}
 	}
