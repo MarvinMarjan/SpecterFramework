@@ -89,15 +89,15 @@ public class StructureBuilder
 		rgbTokens.RemoveAll(token => char.IsWhiteSpace(token.Lexeme[0]));
 
 		if (rgbTokens.Count > 3)
-			throw new ChromaException($"RGB can't have more than 3 channels, got {rgbTokens.Count}", target);
+			throw new ChromaException(target, $"RGB can't have more than 3 channels, got {rgbTokens.Count}");
 
 		if (rgbTokens.Count == 0)
-			throw new ChromaException($"RGB must have at least one channel.", target);
+			throw new ChromaException(target, $"RGB must have at least one channel.");
 
 		string rgbNotation = string.Join(' ', from rgb in rgbTokens select rgb.Lexeme);
 
 		if (!Notation.IsRGBNotation(rgbNotation, out byte[]? values))
-			throw new ChromaException($"Invalid RGB notation.", target);
+			throw new ChromaException(target, $"Invalid RGB notation.");
 
 		Advance();
 

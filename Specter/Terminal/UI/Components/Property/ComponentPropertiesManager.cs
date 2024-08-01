@@ -42,7 +42,7 @@ public class ComponentPropertiesManager(Component owner, ComponentPropertyManage
 	{
 		if (_properties.Contains(property))
 			throw new ComponentPropertyException(
-				property.Name, property.GetType().Name, null,
+				property.GetData(),
 				"Can't add a new property because it has already been added."
 			);
 
@@ -66,7 +66,7 @@ public class ComponentPropertiesManager(Component owner, ComponentPropertyManage
 				return convertedProperty;
 			
 		throw new ComponentPropertyException(
-			propertyName, null, null,
+			new(propertyName, null, null),
 			"Property couldn't be found."
 		);
 	}

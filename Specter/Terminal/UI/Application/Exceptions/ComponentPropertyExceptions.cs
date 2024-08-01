@@ -1,22 +1,25 @@
 using System;
 
-using Specter.Terminal.UI.Components;
+using Specter.Terminal.UI.Components.Property;
 
 
 namespace Specter.Terminal.UI.Application.Exceptions;
 
 
-public class ComponentPropertyException(
-	string propertyName,
-	string? propertyType,
-	Component? owner,
-	
-	string message
-
-) : Exception(message)
+public class ComponentPropertyException : Exception
 {
-	public string PropertyName { get; } = propertyName;
-	public string? PropertyType { get; } = propertyType;
+	public ComponentPropertyData PropertyData { get; set; }
 
-	public Component? Owner { get; } = owner;
+
+	public ComponentPropertyException() : base() {}
+
+	public ComponentPropertyException(ComponentPropertyData data, string message) : base(message)
+	{
+		PropertyData = data;
+	}
+
+	public ComponentPropertyException(ComponentPropertyData data, string message, Exception inner) : base(message, inner)
+	{
+		PropertyData = data;
+	}
 }

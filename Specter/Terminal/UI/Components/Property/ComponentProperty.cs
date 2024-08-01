@@ -22,6 +22,15 @@ public interface IComponentPropertyEvents
 
 
 
+public readonly struct ComponentPropertyData(string name, string? typeName, Component? owner)
+{
+	public string Name { get; init; } = name;
+	public string? TypeName { get; init; } = typeName;
+	public Component? Owner { get; init; } = owner;
+}
+
+
+
 /// <summary>
 /// The base class of every other ComponentProperty.
 /// </summary>
@@ -59,7 +68,7 @@ public abstract class ComponentProperty
 
 			if (value is not InheritableComponentPropertyAttributes inheritableAttribute)
 				throw new ComponentPropertyException(
-					Name, GetType().Name, Owner,
+					GetData(),
 					@"An ""InheritableComponentProperty<T>"" attribute must be an ""InheritableComponentPropertyAttribute""."
 				);
 
@@ -83,6 +92,11 @@ public abstract class ComponentProperty
 
 		Name = name;
 	}
+
+
+
+	public ComponentPropertyData GetData()
+		=> new(Name, GetType().Name, Owner);
 }
 
 

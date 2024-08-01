@@ -82,7 +82,7 @@ public static class ColorTable
 		bool found = s_colorTable.TryGetValue(finalColorName, out ColorCodeElement? element);
 	
 		if (!found)
-			throw new ChromaException($"Invalid color name: {colorName}");
+			throw new ChromaException(null, $"Invalid color name: {colorName}");
 
 		return element ?? Color16.Reset;
 	}
@@ -121,7 +121,7 @@ public static class ColorTable
 		bool found = s_colorModeTable.TryGetValue(colorModeName, out ColorMode mode);
 	
 		if (!found)
-			throw new ChromaException($"Invalid color mode name: {colorModeName}");
+			throw new ChromaException(null, $"Invalid color mode name: {colorModeName}");
 
 		return mode;
 	}
