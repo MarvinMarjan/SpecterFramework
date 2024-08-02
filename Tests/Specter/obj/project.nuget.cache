@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "NWC8kdNGK017MilPi9OxfTu+gHq5icp6giNDfFLBhX65Z1lVqyvy6yEP7eigEwJXCL97oMujuruINqXhV+s21w==",
+  "success": true,
+  "projectFilePath": "/home/marvin/Documentos/program/csharp/SpecterFramework/Tests/Specter/SpecterTest.csproj",
+  "expectedPackageFiles": [
+    "/home/marvin/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.6/microsoft.aspnetcore.app.ref.8.0.6.nupkg.sha512"
+  ],
+  "logs": []
+}

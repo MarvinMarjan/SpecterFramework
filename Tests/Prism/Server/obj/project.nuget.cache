@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "JxxbZzYvnvng+syHmAS8edC/dTj6Fw3coVl72iFvN/n09QENAN4Vn9r4JiYxRCD6cy8ucLm/zTDzb720wTgQww==",
+  "success": true,
+  "projectFilePath": "/home/marvin/Documentos/program/csharp/SpecterFramework/Tests/Prism/Server/PrismServerTest.csproj",
+  "expectedPackageFiles": [
+    "/home/marvin/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.6/microsoft.aspnetcore.app.ref.8.0.6.nupkg.sha512"
+  ],
+  "logs": []
+}
