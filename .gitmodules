@@ -1,6 +1,9 @@
 [submodule "Specter"]
 	path = Specter
 	url = https://github.com/MarvinMarjan/Specter.git
+[submodule "Chroma"]
+	path = Chroma
+	url = https://github.com/MarvinMarjan/Chroma.git
 [submodule "Prism"]
 	path = Prism
 	url = https://github.com/MarvinMarjan/Prism.git
