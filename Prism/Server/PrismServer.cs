@@ -16,7 +16,9 @@ using Specter.Debug.Prism.Exceptions;
 namespace Specter.Debug.Prism.Server;
 
 
-// a Thread that keeps running in a loop waiting for a client request.
+/// <summary>
+/// A Thread that keeps running in a loop waiting for a client request.
+/// </summary>
 public struct RequestListener(Thread thread, CancellationTokenSource cancellationTokenSource)
 {
 	public Thread Thread { get; set; } = thread;

@@ -19,11 +19,12 @@ public class Server : PrismServer
 	public Server(int port)
 		: base(port)
 	{
+		// stay listening for new clients in a separated thread
 		_waitForNewClientsThread = new(new ThreadStart(WaitForNewClientsThread));
 		_waitForNewClientsThread.Start();
 
+		// events
 		RequestListenerFailedEvent += OnRequestListenerFail;
-
 		ClientAddedEvent += OnClientAdded;
 		ClientRemovedEvent += OnClientRemoved;
 		ClientRegistrationStartEvent += OnClientRegistrationStart;
