@@ -44,4 +44,15 @@ public class PrismClient
 
 	public void WriteCommandRequest(string command)
 		=> Writer.WriteDataTransfer(ToDataTransferStructure() with { Command = command });
+
+
+
+	public void Info(string message)
+		=> WriteCommandRequest($@"msg info: ""{message}""");
+
+	public void Warning(string message)
+		=> WriteCommandRequest($@"msg warn: ""{message}""");
+
+	public void Error(string message)
+		=> WriteCommandRequest($@"msg error: ""{message}""");
 }

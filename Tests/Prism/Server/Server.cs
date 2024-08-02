@@ -11,7 +11,6 @@ using Specter.String;
 namespace Specter.Tests;
 
 
-
 public class Server : PrismServer
 {
 	private readonly Thread _waitForNewClientsThread;

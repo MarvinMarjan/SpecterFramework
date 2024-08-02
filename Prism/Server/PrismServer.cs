@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using System.Net;
 using System.Net.Sockets;
 using System.Collections.Concurrent;
@@ -10,13 +11,12 @@ using System.IO;
 using Specter.Debug.Prism.Client;
 using Specter.Debug.Prism.Commands;
 using Specter.Debug.Prism.Exceptions;
-using System;
 
 
 namespace Specter.Debug.Prism.Server;
 
 
-// a Task that keeps running in loop waiting for a client request.
+// a Thread that keeps running in a loop waiting for a client request.
 public struct RequestListener(Thread thread, CancellationTokenSource cancellationTokenSource)
 {
 	public Thread Thread { get; set; } = thread;
@@ -49,6 +49,7 @@ public abstract partial class PrismServer : TcpListener, ILogWriter
 
 
 
+
 	public void ProcessRequests()
 	{
 		foreach (var (_, requestData) in Requests)
@@ -67,10 +68,10 @@ public abstract partial class PrismServer : TcpListener, ILogWriter
 		}
 		finally
 		{
-			Requests.Remove(requestData.ClientName, out _);
-			ClientRequestProcessedEvent?.Invoke(requestData);
+			RemoveClientRequest(requestData.ClientName);
 		}
 	}
+
 
 
 
@@ -88,6 +89,8 @@ public abstract partial class PrismServer : TcpListener, ILogWriter
 		Clients.TryAdd(client.Name, client);
 		ClientAddedEvent?.Invoke(client);
 	}
+
+
 
 
 	public void RemoveClientAndRequestListener(PrismClient client)
@@ -112,6 +115,8 @@ public abstract partial class PrismServer : TcpListener, ILogWriter
 
 		RemoveClient(client);
 	}
+
+
 
 
 	public void AddClientRequestListener(PrismClient client)
@@ -140,6 +145,8 @@ public abstract partial class PrismServer : TcpListener, ILogWriter
 	}
 
 
+
+
 	public void AddClientRequest(DataTransferStructure requestData)
 	{
 		if (Requests.ContainsKey(requestData.ClientName))
@@ -155,12 +162,23 @@ public abstract partial class PrismServer : TcpListener, ILogWriter
 		if (!Requests.ContainsKey(clientName))
 			throw new ClientRequestDoesNotExists(clientName, "Could not find the request made by client.");
 	
-		Requests.Remove(clientName, out _);
+		Requests.Remove(clientName, out DataTransferStructure requestData);
+		ClientRequestProcessedEvent?.Invoke(requestData);
 	}
+
+
 
 
 	public PrismClient AddAndWaitForNewClient()
 		=> RegisterClient(AcceptTcpClient());
+
+
+
+
+	public List<string> GetAllClientNames()
+		=> [.. Clients.Keys];
+
+
 
 
 	protected PrismClient RegisterClient(TcpClient client)
